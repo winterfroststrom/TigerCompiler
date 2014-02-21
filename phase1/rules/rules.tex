@@ -12,6 +12,7 @@
 \usepackage[margin=0.5in]{geometry}
 \usepackage{dot2texi}
 \usepackage{tikz}
+\usepackage{longtable}
 \usetikzlibrary{shapes,arrows}
 \usepackage{sectsty}
 
@@ -46,6 +47,8 @@
 
 Pre-parse the input to remove comments with the following DFA. The resulting NOT-COMMENT tokens are concatenated together.
 
+Everything under the token column represents either generated tokens or custom table actions on the character buffer used to produce the text associated with tokens.
+
 \begin{tabular}{l|l|l|l}
 start state		&	symbol							&	next	 state		&	token		 	\\
 \hline
@@ -67,13 +70,11 @@ COMMENT-END		&	/								&	START			&	COMMENT			\\
 
 The DFA for uncommented code.
 
-Note, any time backtracking is mentioned, it essentially is the same as not having read the last character and transitioning to the start state and then reading the last character. Also, the token produced does not include the last character. This is included to prevent duplication of the start state transitions.
+Note, any time backtracking is mentioned, it essentially is the same as treating the current state as the start state and doing the corresponding transitions or token generations. This is included to simplify the table by removing duplication of the start state transitions.
 
 Note, all ids are later matched character by character with keywords to determine if they are keywords.
 
 Note, drop character for the error state means that the last read character is ignored, and the state remains unchanged.
-
-Note, the accept state is also the start state. Failure to end in the accept state results in the current character buffer being abandoned, and an error message stating a incomplete state of the current state name.
 
 \begin{tabular}{l|l|l|l}
 start state		&	symbol						&	next	 state		&	token		 		\\
@@ -121,7 +122,7 @@ STRING-LIT-SLASH		&	t						&	STRING-LIT			&								\\
 STRING-LIT-SLASH		&	''						&	STRING-LIT			&								\\
 STRING-LIT-SLASH		&	\textbackslash			&	STRING-LIT			&								\\
 STRING-LIT-SLASH		&	\textasciicircum			&	STRING-LIT-CTL		&								\\
-STRING-LIT-SLASH		&	0-9						&	STRING-LIT-CODE-1			&					\\
+STRING-LIT-SLASH		&	0-9						&	STRING-LIT-CODE-1	&					\\
 STRING-LIT-SLASH		&	whitespace				&	STRING-LIT-SPACE		& ignore 2 characters			\\
 STRING-LIT-SLASH		&	others					&	ERROR				& drop character				\\
 
@@ -141,19 +142,22 @@ STRING-LIT-SPACE		&	others					&	ERROR				& drop character				\\
 
 Raw Grammar:
 
-\begin{tabular}{l|l}
+\begin{longtable}{l|l}
 symbol							&	rule								\\
 \hline
 \atag{tiger-program}				&	let \atag{declaration-segment} in \atag{stat-seq} end				\\
 \atag{declaration-segment}		&	\atag{type-declaration-list}	\atag{var-declaration-list} \atag{funct-declaration-list}	\\
-\atag{type-declaration-list}		&	NULL		\\
 \atag{type-declaration-list}		&	\atag{type-declaration} \atag{type-declaration-list}	\\
-\atag{var-declaration-list}		&	NULL		\\
+\atag{type-declaration-list}		&	NULL		\\
 \atag{var-declaration-list}		&	\atag{var-declaration} \atag{var-declaration-list}	\\
+\atag{var-declaration-list}		&	NULL		\\
 \atag{funct-declaration-list}	&	\atag{funct-declaration} \atag{funct-declaration-list}	\\
 \atag{type-declaration}			&	type id = \atag{type} ;		\\
 \atag{type}						&	\atag{type-id}		\\
-\atag{type}						&	array [ INTLIT ] of \atag{type-id}		\\
+%\atag{type}						&	array [ INTLIT ] of \atag{type-id}		\\
+\atag{type}						&	array [ INTLIT ] of \atag{type-dim} of \atag{type-id}	\\
+\atag{type-dim}					&	[ INTLIT ] \atag{type-dim}	\\
+\atag{type-dim}					&	NULL		\\
 \atag{type-id}					&	int		\\
 \atag{type-id}					&	string		\\
 \atag{type-id}					&	id		\\
@@ -170,32 +174,128 @@ symbol							&	rule								\\
 \atag{ret-type}					&	NULL		\\
 \atag{ret-type}					&	: \atag{type-id}		\\
 \atag{param}						&	id : \atag{type-id}		\\
-\atag{stat-seq}					&	\atag{stat}		\\
 \atag{stat-seq}					&	\atag{stat} \atag{stat-seq}		\\
+\atag{stat-seq}					&	\atag{stat}		\\
 \atag{stat}						&	\atag{lvalue} := \atag{expr}	;	\\
 \atag{stat}						&	if \atag{expr} then \atag{stat-seq} endif ;		\\
 \atag{stat}						&	if \atag{expr} then \atag{stat-seq} else \atag{stat-seq} endif ;		\\
 \atag{stat}						&	while \atag{expr} do \atag{stat-seq} enddo ;		\\
 \atag{stat}						&	for id := \atag{expr} to \atag{expr} do \atag{stat-seq} enddo ;		\\
-\atag{stat}						&	id ( \atag{expr-list} ) ;		\\
+%\atag{stat}						&	id ( \atag{expr-list} ) ;		\\
+\atag{stat}						&	\atag{opt-prefix} id ( \atag{expr-list} ) \\
 \atag{stat}						&	break ;		\\
 \atag{stat}						&	return \atag{expr} ;		\\
+\atag{expr}						&	\atag{expr} \atag{binary-operator} \atag{expr}		\\
 \atag{expr}						&	\atag{const}		\\
 \atag{expr}						&	\atag{lvalue}		\\
 \atag{expr}						&	- \atag{expr}		\\
-\atag{expr}						&	\atag{expr} \atag{binary-operator} \atag{expr}		\\
 \atag{expr}						&	( \atag{expr} )		\\
+\atag{binary-operator}			&	*	\\
+\atag{binary-operator}			&	/	\\
+\atag{binary-operator}			&	+	\\
+\atag{binary-operator}			&	-	\\
+\atag{binary-operator}			&	=	\\
+\atag{binary-operator}			&	$<$	\\
+\atag{binary-operator}			&	$>$	\\
+\atag{binary-operator}			&	$<=$	\\
+\atag{binary-operator}			&	$>=$	\\
+\atag{binary-operator}			&	$<>$	\\
+\atag{binary-operator}			&	\&	\\
+\atag{binary-operator}			&	|	\\
+\atag{binary-operator}			&	:=	\\
+\atag{opt-prefix}				&	\atag{lvalue} :=		\\
+\atag{opt-prefix}				&	NULL		\\
 \atag{const}						&	INTLIT		\\
 \atag{const}						&	STRLIT		\\
 \atag{const}						&	nil		\\
-\atag{expr-list}					&	NULL		\\
 \atag{expr-list}					&	\atag{expr} \atag{expr-list-tail}		\\
+\atag{expr-list}					&	NULL		\\
 \atag{expr-list-tail}			&	, \atag{expr} \atag{expr-list-tail}		\\
 \atag{expr-list-tail}			&	NULL		\\
 \atag{lvalue}					&	id \atag{lvalue-tail}		\\
 \atag{lvalue-tail}				&	[ \atag{expr} ] \atag{lvalue-tail}		\\
 \atag{lvalue-tail}				&	NULL		\\
-\end{tabular}
+\end{longtable}
+
+Modified Grammar:
+
+\begin{longtable}{l|l}
+symbol							&	rule								\\
+\hline
+\atag{tiger-program}				&	let \atag{declaration-segment} in \atag{stat-seq} end				\\
+\atag{declaration-segment}		&	\atag{type-declaration-list}	\atag{var-declaration-list} \atag{funct-declaration-list}	\\
+\atag{type-declaration-list}		&	\atag{type-declaration} \atag{type-declaration-list}	\\
+\atag{type-declaration-list}		&	NULL		\\
+\atag{var-declaration-list}		&	\atag{var-declaration} \atag{var-declaration-list}	\\
+\atag{var-declaration-list}		&	NULL		\\
+\atag{funct-declaration-list}	&	\atag{funct-declaration} \atag{funct-declaration-list}	\\
+\atag{type-declaration}			&	type id = \atag{type} ;		\\
+\atag{type}						&	\atag{type-id}		\\
+\atag{type}						&	array [ INTLIT ] of \atag{type-dim} of \atag{type-id}	\\
+\atag{type-dim}					&	[ INTLIT ] \atag{type-dim}	\\
+\atag{type-dim}					&	NULL		\\
+\atag{type-id}					&	int		\\
+\atag{type-id}					&	string		\\
+\atag{type-id}					&	id		\\
+\atag{var-declaration}			&	var \atag{id-list} : \atag{type-id} \atag{optional-init} ;		\\
+\atag{id-list}					&	id		\\
+\atag{id-list}					&	id , \atag{id-list}		\\
+\atag{optional-init}				&	NULL		\\
+\atag{optional-init}				&	:= \atag{const}		\\
+\atag{funct-declaration}			&	function id ( \atag{param-list} ) \atag{ret-type} begin \atag{stat-seq} end ;	\\
+\atag{param-list}				&	NULL		\\
+\atag{param-list}				&	\atag{param}	 \atag{param-list-tail}	\\
+\atag{param-list-tail}			&	NULL		\\
+\atag{param-list-tail}			&	, \atag{param} \atag{param-list-tail}		\\
+\atag{ret-type}					&	NULL		\\
+\atag{ret-type}					&	: \atag{type-id}		\\
+\atag{param}						&	id : \atag{type-id}		\\
+\atag{stat-seq}					&	\atag{stat} \atag{stat-seq-tail}		\\
+\atag{stat-seq-tail}				&	\atag{stat} \atag{stat-seq-tail}		\\
+\atag{stat-seq-tail}				&	NULL		\\
+\atag{stat}						&	\atag{lvalue} := \atag{expr}	;	\\
+\atag{stat}						&	if \atag{expr} then \atag{stat-seq} endif ;		\\
+\atag{stat}						&	if \atag{expr} then \atag{stat-seq} else \atag{stat-seq} endif ;		\\
+\atag{stat}						&	while \atag{expr} do \atag{stat-seq} enddo ;		\\
+\atag{stat}						&	for id := \atag{expr} to \atag{expr} do \atag{stat-seq} enddo ;		\\
+\atag{stat}						&	\atag{opt-prefix} id ( \atag{expr-list} ) \\
+\atag{stat}						&	break ;		\\
+\atag{stat}						&	return \atag{expr} ;		\\
+\atag{expr}						&	\atag{term} \atag{binary-operator} \atag{expr}		\\
+\atag{expr}						&	\atag{const}		\\
+\atag{expr}						&	\atag{lvalue}		\\
+\atag{expr}						&	- \atag{expr}		\\
+\atag{expr}						&	( \atag{expr} )		\\
+\atag{term}						&	\atag{const}		\\
+\atag{term}						&	\atag{lvalue}		\\
+\atag{term}						&	- \atag{expr}		\\
+\atag{term}						&	( \atag{expr} )		\\
+\atag{binary-operator}			&	*	\\
+\atag{binary-operator}			&	/	\\
+\atag{binary-operator}			&	+	\\
+\atag{binary-operator}			&	-	\\
+\atag{binary-operator}			&	=	\\
+\atag{binary-operator}			&	$<$	\\
+\atag{binary-operator}			&	$>$	\\
+\atag{binary-operator}			&	$<=$	\\
+\atag{binary-operator}			&	$>=$	\\
+\atag{binary-operator}			&	$<>$	\\
+\atag{binary-operator}			&	\&	\\
+\atag{binary-operator}			&	|	\\
+\atag{binary-operator}			&	:=	\\
+\atag{opt-prefix}				&	\atag{lvalue} :=		\\
+\atag{opt-prefix}				&	NULL		\\
+\atag{const}						&	INTLIT		\\
+\atag{const}						&	STRLIT		\\
+\atag{const}						&	nil		\\
+\atag{expr-list}					&	\atag{expr} \atag{expr-list-tail}		\\
+\atag{expr-list}					&	NULL		\\
+\atag{expr-list-tail}			&	, \atag{expr} \atag{expr-list-tail}		\\
+\atag{expr-list-tail}			&	NULL		\\
+\atag{lvalue}					&	id \atag{lvalue-tail}		\\
+\atag{lvalue-tail}				&	[ \atag{expr} ] \atag{lvalue-tail}		\\
+\atag{lvalue-tail}				&	NULL		\\
+\end{longtable}
 
 
 
