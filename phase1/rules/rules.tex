@@ -1,0 +1,202 @@
+\documentclass[11pt, fleqn]{article}
+
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{amsthm}
+\usepackage{float}
+\usepackage{graphicx}
+\usepackage{hyperref}
+\usepackage{multirow}
+\usepackage{parskip}
+\usepackage{subfigure}
+\usepackage[margin=0.5in]{geometry}
+\usepackage{dot2texi}
+\usepackage{tikz}
+\usetikzlibrary{shapes,arrows}
+\usepackage{sectsty}
+
+% always have Definitions.sty handy
+\usepackage{Definitions}
+
+\def \union {\cup}
+\def \intersect {\cap}
+\def \Union {\bigcup}
+\def \Intersect {\bigcap}
+\def \And {\wedge}
+\def \Or {\vee}
+\def \st {\text{ s.t. }}
+\def \blank {\sqcup}
+
+\newcommand{\atag}[1]{$\langle$#1$\rangle$}
+
+%\allsectionsfont{\normalfont}
+\setlength{\parindent}{0cm}
+
+\begin{document}
+
+\title{CS 4240 Phase 1}
+\author{David Zhang}
+\date{\today}
+
+\newtheorem{Lemma}{Lemma}
+\newtheorem{Theorem}{Theorem}
+\maketitle
+
+\section{Lexical Rules}
+
+Pre-parse the input to remove comments with the following DFA. The resulting NOT-COMMENT tokens are concatenated together.
+
+\begin{tabular}{l|l|l|l}
+start state		&	symbol							&	next	 state		&	token		 	\\
+\hline
+START			&	$\Sigma - \{/, "\}$				& 	START			&	NOT-COMMENT		\\
+START			&	``								& 	STRING			&					\\
+START			&	/								&	SLASH			&					\\
+STRING			&	$\Sigma - \{\backslash, "\}$		& 	STRING			&					\\
+STRING			&	\textbackslash					& 	STRING-SLASH		&					\\
+STRING			&	''								& 	START			&	NOT-COMMENT		\\
+STRING-SLASH		&	$\Sigma$							&	STRING			&					\\
+SLASH			&	$\Sigma - \{*\}$					&	START			&	NOT-COMMENT		\\
+SLASH			&	*								&	COMMENT			&					\\
+COMMENT			&	$\Sigma - \{*\}$					&	COMMENT			&					\\
+COMMENT			&	*								&	COMMENT-END		&					\\
+COMMENT-END		&	$\Sigma - \{*, /\}$				&	COMMENT			&					\\
+COMMENT-END		&	*								&	COMMENT-END		&					\\
+COMMENT-END		&	/								&	START			&	COMMENT			\\
+\end{tabular}
+
+The DFA for uncommented code.
+
+Note, any time backtracking is mentioned, it essentially is the same as not having read the last character and transitioning to the start state and then reading the last character. Also, the token produced does not include the last character. This is included to prevent duplication of the start state transitions.
+
+Note, all ids are later matched character by character with keywords to determine if they are keywords.
+
+Note, drop character for the error state means that the last read character is ignored, and the state remains unchanged.
+
+Note, the accept state is also the start state. Failure to end in the accept state results in the current character buffer being abandoned, and an error message stating a incomplete state of the current state name.
+
+\begin{tabular}{l|l|l|l}
+start state		&	symbol						&	next	 state		&	token		 		\\
+\hline
+START			&	+								&	START			&	PLUS					\\
+START			&	-								&	START			&	MIN					\\
+START			&	*								&	START			&	MULT					\\
+START			&	/								&	START			&	DIV					\\
+START			&	=								&	START			&	EQ					\\
+START			&	(								&	START			&	LPAREN				\\
+START			&	)								&	START			&	RPAREN				\\
+START			&	,								&	START			&	COMMA				\\
+START			&	\&								&	START			&	AND					\\
+START			&	|								&	START			&	OR					\\
+START			&	[								&	START			&	LSQUARE				\\
+START			&	]								&	START			&	RSQUARE				\\
+%START			&	\{								&	START			&	LCURLY				\\
+%START			&	\}								&	START			&	RCURLY				\\
+START			&	;								&	START			&	SEMI					\\
+START			&	$\langle$						&	LANGLE			&						\\
+START			&	$\rangle$						&	RANGLE			&						\\
+START			&	:								&	COLON			&						\\
+START			&	0-9								&	INT-LIT			&						\\
+START			&	``								&	STRING-LIT		&						\\
+START			&	a-zA-Z							&	ID				&						\\
+START			&	whitespace						&	START			&	ignore				\\
+START			&	others							&	ERROR			&	drop character		\\
+LANGLE			&	$\Sigma - \{=, \rangle\}$		&	START			&	LESS	, backtrack		\\
+LANGLE			&	$\rangle$						&	START			&	NOTEQ				\\
+LANGLE			&	=								&	START			&	LESSEQ				\\
+RANGLE			&	$\Sigma - \{=\}$					&	START			&	GREATER, backtrack	\\
+RANGLE			&	=								&	START			&	GREATEREQ			\\
+COLON			&	=								&	START			&	ASSIGN				\\
+COLON			&	$\Sigma - \{=\}$					&	START			&	COLON, backtrack		\\
+INT-LIT			&	0-9								&	INT-LIT			&						\\
+INT-LIT			&	$\Sigma - 0-9	$				&	START			&	INT-LIT, backtrack	\\
+ID				&	a-zA-Z0-9\_						&	ID				&						\\
+ID				&	$\Sigma - a-zA-Z0-9\_$			&	START			&	ID, backtrack		\\
+
+STRING-LIT			&	$\Sigma - {\backslash}$	&	STRING-LIT			&						\\
+STRING-LIT			&	''						&	START				&	STRING-LIT			\\
+STRING-LIT			&	\textbackslash			&	STRING-LIT-SLASH		&						\\
+STRING-LIT-SLASH		&	n						&	STRING-LIT			&						\\
+STRING-LIT-SLASH		&	t						&	STRING-LIT			&								\\
+STRING-LIT-SLASH		&	''						&	STRING-LIT			&								\\
+STRING-LIT-SLASH		&	\textbackslash			&	STRING-LIT			&								\\
+STRING-LIT-SLASH		&	\textasciicircum			&	STRING-LIT-CTL		&								\\
+STRING-LIT-SLASH		&	0-9						&	STRING-LIT-CODE-1			&					\\
+STRING-LIT-SLASH		&	whitespace				&	STRING-LIT-SPACE		& ignore 2 characters			\\
+STRING-LIT-SLASH		&	others					&	ERROR				& drop character				\\
+
+STRING-LIT-CTL		&	@A-Z[\textbackslash]\textasciicircum\_ .		&	STRING-LIT			&			\\
+STRING-LIT-CTL		&	others					&	ERROR				& drop character					\\
+STRING-LIT-CODE-1	&	0-9						&	STRING-LIT-CODE-2			&					\\
+STRING-LIT-CODE-1	&	others					&	ERROR			&	drop character				\\
+STRING-LIT-CODE-2	&	0-9						&	STRING-LIT		&								\\
+STRING-LIT-CODE-2	&	others					&	ERROR			&	drop character				\\
+
+STRING-LIT-SPACE		&	whitespace				&	STRING-LIT-SPACE		& ignore							\\
+STRING-LIT-SPACE		&	\textbackslash			&	STRING-LIT			& ignore							\\
+STRING-LIT-SPACE		&	others					&	ERROR				& drop character				\\
+\end{tabular}
+
+\section{Grammar Rules}
+
+Raw Grammar:
+
+\begin{tabular}{l|l}
+symbol							&	rule								\\
+\hline
+\atag{tiger-program}				&	let \atag{declaration-segment} in \atag{stat-seq} end				\\
+\atag{declaration-segment}		&	\atag{type-declaration-list}	\atag{var-declaration-list} \atag{funct-declaration-list}	\\
+\atag{type-declaration-list}		&	NULL		\\
+\atag{type-declaration-list}		&	\atag{type-declaration} \atag{type-declaration-list}	\\
+\atag{var-declaration-list}		&	NULL		\\
+\atag{var-declaration-list}		&	\atag{var-declaration} \atag{var-declaration-list}	\\
+\atag{funct-declaration-list}	&	\atag{funct-declaration} \atag{funct-declaration-list}	\\
+\atag{type-declaration}			&	type id = \atag{type} ;		\\
+\atag{type}						&	\atag{type-id}		\\
+\atag{type}						&	array [ INTLIT ] of \atag{type-id}		\\
+\atag{type-id}					&	int		\\
+\atag{type-id}					&	string		\\
+\atag{type-id}					&	id		\\
+\atag{var-declaration}			&	var \atag{id-list} : \atag{type-id} \atag{optional-init} ;		\\
+\atag{id-list}					&	id		\\
+\atag{id-list}					&	id , \atag{id-list}		\\
+\atag{optional-init}				&	NULL		\\
+\atag{optional-init}				&	:= \atag{const}		\\
+\atag{funct-declaration}			&	function id ( \atag{param-list} ) \atag{ret-type} begin \atag{stat-seq} end ;	\\
+\atag{param-list}				&	NULL		\\
+\atag{param-list}				&	\atag{param}	 \atag{param-list-tail}	\\
+\atag{param-list-tail}			&	NULL		\\
+\atag{param-list-tail}			&	, \atag{param} \atag{param-list-tail}		\\
+\atag{ret-type}					&	NULL		\\
+\atag{ret-type}					&	: \atag{type-id}		\\
+\atag{param}						&	id : \atag{type-id}		\\
+\atag{stat-seq}					&	\atag{stat}		\\
+\atag{stat-seq}					&	\atag{stat} \atag{stat-seq}		\\
+\atag{stat}						&	\atag{lvalue} := \atag{expr}	;	\\
+\atag{stat}						&	if \atag{expr} then \atag{stat-seq} endif ;		\\
+\atag{stat}						&	if \atag{expr} then \atag{stat-seq} else \atag{stat-seq} endif ;		\\
+\atag{stat}						&	while \atag{expr} do \atag{stat-seq} enddo ;		\\
+\atag{stat}						&	for id := \atag{expr} to \atag{expr} do \atag{stat-seq} enddo ;		\\
+\atag{stat}						&	id ( \atag{expr-list} ) ;		\\
+\atag{stat}						&	break ;		\\
+\atag{stat}						&	return \atag{expr} ;		\\
+\atag{expr}						&	\atag{const}		\\
+\atag{expr}						&	\atag{lvalue}		\\
+\atag{expr}						&	- \atag{expr}		\\
+\atag{expr}						&	\atag{expr} \atag{binary-operator} \atag{expr}		\\
+\atag{expr}						&	( \atag{expr} )		\\
+\atag{const}						&	INTLIT		\\
+\atag{const}						&	STRLIT		\\
+\atag{const}						&	nil		\\
+\atag{expr-list}					&	NULL		\\
+\atag{expr-list}					&	\atag{expr} \atag{expr-list-tail}		\\
+\atag{expr-list-tail}			&	, \atag{expr} \atag{expr-list-tail}		\\
+\atag{expr-list-tail}			&	NULL		\\
+\atag{lvalue}					&	id \atag{lvalue-tail}		\\
+\atag{lvalue-tail}				&	[ \atag{expr} ] \atag{lvalue-tail}		\\
+\atag{lvalue-tail}				&	NULL		\\
+\end{tabular}
+
+
+
+\end{document}
