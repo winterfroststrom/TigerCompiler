@@ -238,8 +238,9 @@ symbol							&	rule								\\
 \atag{type-id}					&	string		\\
 \atag{type-id}					&	id		\\
 \atag{var-declaration}			&	var \atag{id-list} : \atag{type-id} \atag{optional-init} ;		\\
-\atag{id-list}					&	id		\\
-\atag{id-list}					&	id , \atag{id-list}		\\
+\atag{id-list}					&	id \atag{id-list-tail}		\\
+\atag{id-list-tail}				&	, id \atag{id-list-tail}		\\
+\atag{id-list-tail}				&	NULL		\\
 \atag{optional-init}				&	NULL		\\
 \atag{optional-init}				&	:= \atag{const}		\\
 \atag{funct-declaration}			&	function id ( \atag{param-list} ) \atag{ret-type} begin \atag{stat-seq} end ;	\\
