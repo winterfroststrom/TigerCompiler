@@ -264,43 +264,39 @@ symbol							&	rule								\\
 \atag{stat-if-tail}				&	endif ;		\\
 \atag{stat-assign}				&	\atag{expr}	;	\\
 \atag{stat-assign}				&	id ( \atag{expr-list} ) ;	\\
-\atag{opt-prefix}				&	\atag{lvalue} :=		\\
-\atag{opt-prefix}				&	NULL		\\
 \atag{expr}						&	\atag{orexpr} \atag{orop} \atag{expr}		\\
 \atag{expr}						&	\atag{orexpr}		\\
-\atag{orop} 						&	\textbar		\\
 \atag{orexpr} 					&	\atag{andexpr} \atag{andop} \atag{orexpr}		\\
 \atag{orexpr} 					&	\atag{andexpr}		\\
-\atag{andop}						&	\&		\\
 \atag{andexpr} 					&	\atag{compare} \atag{compop} \atag{and}		\\
 \atag{andexpr} 					&	\atag{compare}		\\
 \atag{const}						&	INTLIT		\\
 \atag{const}						&	STRLIT		\\
 \atag{const}						&	nil		\\
+\atag{compare}					&	\atag{term} \atag{addop} \atag{compare}		\\
+\atag{compare}					&	\atag{term}		\\
+\atag{term}						&	\atag{factor} \atag{mulop} \atag{term}		\\
+\atag{term}						&	\atag{factor}		\\
+\atag{factor}					&	\atag{unaryminus}		\\
+\atag{factor}					&	- \atag{unaryminus}		\\
+\atag{unaryminus}				&	( \atag{expr} )		\\
+\atag{unaryminus}				&	\atag{const}		\\
+\atag{unaryminus}				&	\atag{lvalue}		\\
+\atag{const}						&	INTLIT		\\
+\atag{const}						&	STRLIT		\\
+\atag{const}						&	nil		\\
+\atag{orop} 						&	\textbar		\\
+\atag{andop}						&	\&		\\
 \atag{compop}					&	=		\\
 \atag{compop}					&	$<>$		\\
 \atag{compop}					&	$>$		\\
 \atag{compop}					&	$<$		\\
 \atag{compop}					&	$>=$		\\
 \atag{compop}					&	$<=$		\\
-\atag{compare}					&	\atag{term} \atag{addop} \atag{compare}		\\
-\atag{compare}					&	\atag{term}		\\
 \atag{addop}						&	+		\\
 \atag{addop}						&	-		\\
-\atag{term}						&	\atag{factor} \atag{mulop} \atag{term}		\\
-\atag{term}						&	\atag{factor}		\\
 \atag{mulop}						&	*		\\
 \atag{mulop}						&	/		\\
-\atag{factor}					&	\atag{unaryminus}		\\
-\atag{factor}					&	- \atag{unaryminus}		\\
-\atag{unaryminus}				&	( \atag{expr} )		\\
-\atag{unaryminus}				&	\atag{const}		\\
-\atag{unaryminus}				&	\atag{lvalue}		\\
-\atag{opt-prefix}				&	\atag{lvalue} :=		\\
-\atag{opt-prefix}				&	NULL		\\
-\atag{const}						&	INTLIT		\\
-\atag{const}						&	STRLIT		\\
-\atag{const}						&	nil		\\
 \atag{expr-list}					&	\atag{expr} \atag{expr-list-tail}		\\
 \atag{expr-list}					&	NULL		\\
 \atag{expr-list-tail}			&	, \atag{expr} \atag{expr-list-tail}		\\
