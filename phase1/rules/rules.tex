@@ -230,18 +230,18 @@ symbol							&	rule								\\
 \atag{var-declaration-list}		&	NULL		\\
 \atag{funct-declaration-list}	&	\atag{funct-declaration} \atag{funct-declaration-list}	\\
 \atag{type-declaration}			&	type id = \atag{type} ;		\\
+\atag{var-declaration}			&	var \atag{id-list} : \atag{type-id} \atag{optional-init} ;		\\
+\atag{funct-declaration}			&	function id ( \atag{param-list} ) \atag{ret-type} begin \atag{stat-seq} end ;	\\
 \atag{type}						&	\atag{type-id}		\\
 \atag{type}						&	array [ INTLIT ] of \atag{type-dim} of \atag{type-id}	\\
 \atag{type-dim}					&	[ INTLIT ] \atag{type-dim}	\\
 \atag{type-dim}					&	NULL		\\
 \atag{type-id}					&	id		\\
-\atag{var-declaration}			&	var \atag{id-list} : \atag{type-id} \atag{optional-init} ;		\\
 \atag{id-list}					&	id \atag{id-list-tail}		\\
 \atag{id-list-tail}				&	, id \atag{id-list-tail}		\\
 \atag{id-list-tail}				&	NULL		\\
 \atag{optional-init}				&	:= \atag{const}		\\
 \atag{optional-init}				&	NULL		\\
-\atag{funct-declaration}			&	function id ( \atag{param-list} ) \atag{ret-type} begin \atag{stat-seq} end ;	\\
 \atag{param-list}				&	\atag{param}	 \atag{param-list-tail}	\\
 \atag{param-list}				&	NULL		\\
 \atag{param-list-tail}			&	, \atag{param} \atag{param-list-tail}		\\
@@ -264,19 +264,21 @@ symbol							&	rule								\\
 \atag{stat-if-tail}				&	endif ;		\\
 \atag{stat-assign}				&	\atag{expr}	;	\\
 \atag{stat-assign}				&	id ( \atag{expr-list} ) ;	\\
-\atag{expr}						&	\atag{orexpr} \atag{orop} \atag{expr}		\\
-\atag{expr}						&	\atag{orexpr}		\\
-\atag{orexpr} 					&	\atag{andexpr} \atag{andop} \atag{orexpr}		\\
-\atag{orexpr} 					&	\atag{andexpr}		\\
-\atag{andexpr} 					&	\atag{compare} \atag{compop} \atag{andexpr}		\\
-\atag{andexpr} 					&	\atag{compare}		\\
-\atag{const}						&	INTLIT		\\
-\atag{const}						&	STRLIT		\\
-\atag{const}						&	nil		\\
-\atag{compare}					&	\atag{term} \atag{addop} \atag{compare}		\\
-\atag{compare}					&	\atag{term}		\\
-\atag{term}						&	\atag{factor} \atag{mulop} \atag{term}		\\
-\atag{term}						&	\atag{factor}		\\
+\atag{expr}						&	\atag{orexpr} \atag{expr-tail}		\\
+\atag{expr-tail}					&	\atag{orop} \atag{orexpr} \atag{expr-tail}	\\
+\atag{expr-tail}					&	NULL		\\
+\atag{orexpr} 					&	\atag{andexpr} \atag{orexpr-tail}		\\
+\atag{orexpr-tail}				&	\atag{andop} \atag{andexpr} \atag{orexpr-tail}	\\
+\atag{orexpr-tail}				&	NULL	\\
+\atag{andexpr} 					&	\atag{compare} \atag{andexpr-tail}		\\
+\atag{andexpr-tail}				&	\atag{compop} \atag{compare} \atag{andexpr-tail}	\\
+\atag{andexpr-tail}				&	NULL	\\
+\atag{compare} 					&	\atag{term} \atag{compare-tail}		\\
+\atag{compare-tail}				&	\atag{addop} \atag{term} \atag{compare-tail}	\\
+\atag{compare-tail}				&	NULL	\\
+\atag{term} 						&	\atag{factor} \atag{term-tail}		\\
+\atag{term-tail}					&	\atag{factor} \atag{mulop} \atag{term-tail}	\\
+\atag{term-tail}					&	NULL	\\
 \atag{factor}					&	\atag{unaryminus}		\\
 \atag{factor}					&	- \atag{unaryminus}		\\
 \atag{unaryminus}				&	( \atag{expr} )		\\
