@@ -255,17 +255,17 @@ symbol							&	rule								\\
 \atag{stat}						&	if \atag{expr} then \atag{stat-seq} \atag{stat-if-tail}		\\
 \atag{stat}						&	while \atag{expr} do \atag{stat-seq} enddo ;		\\
 \atag{stat}						&	for id := \atag{expr} to \atag{expr} do \atag{stat-seq} enddo ;		\\
-\atag{stat}						&	\atag{lvalue} := \atag{stat-assign}	\\
-\atag{stat}						&	id ( \atag{expr-list} ) ;	\\
 \atag{stat}						&	break ;		\\
 \atag{stat}						&	return \atag{expr} ;		\\
+\atag{stat}						&	id \atag{stat-func-or-assign}	\\
+\atag{stat-func-or-assign}		&	( \atag{expr-list} ) ;	\\
+\atag{stat-func-or-assign}		&	\atag{lvalue-tail} := \atag{stat-assign}	\\
 \atag{stat-if-tail}				&	else \atag{stat-seq} endif ;		\\
 \atag{stat-if-tail}				&	endif ;		\\
 \atag{stat-assign}				&	\atag{expr}	;	\\
 \atag{stat-assign}				&	id ( \atag{expr-list} ) ;	\\
 \atag{opt-prefix}				&	\atag{lvalue} :=		\\
 \atag{opt-prefix}				&	NULL		\\
-
 \atag{expr}						&	\atag{orexpr} \atag{orop} \atag{expr}		\\
 \atag{expr}						&	\atag{orexpr}		\\
 \atag{orop} 						&	\textbar		\\
