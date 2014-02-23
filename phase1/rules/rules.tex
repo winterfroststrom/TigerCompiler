@@ -262,13 +262,13 @@ symbol							&	rule								\\
 \atag{stat}						&	\atag{opt-prefix} id ( \atag{expr-list} ) \\
 \atag{stat}						&	break ;		\\
 \atag{stat}						&	return \atag{expr} ;		\\
-\atag{expr}					&	\atag{expr} \atag{orop} \atag{orexpr}		\\
+\atag{expr}					&	\atag{orexpr} \atag{orop} \atag{expr}		\\
 \atag{expr}					&	\atag{orexpr}		\\
 \atag{orop} 					&	|		\\
-\atag{orexpr} 					&	\atag{orexpr} \atag{andop} \atag{andexpr}		\\
+\atag{orexpr} 					&	\atag{andexpr} \atag{andop} \atag{orexpr}		\\
 \atag{orexpr} 					&	\atag{andexpr}		\\
 \atag{andop}					&	\&		\\
-\atag{andexpr} 					&	\atag{andexpr} \atag{compop} \atag{compare}		\\
+\atag{andexpr} 					&	\atag{compare} \atag{compop} \atag{and}		\\
 \atag{andexpr} 					&	\atag{compare}		\\
 \atag{compop}					&	=		\\
 \atag{compop}					&	$<>$		\\
@@ -276,11 +276,11 @@ symbol							&	rule								\\
 \atag{compop}					&	$<$		\\
 \atag{compop}					&	$>=$		\\
 \atag{compop}					&	$<=$		\\
-\atag{compare}					&	\atag{compare} \atag{addop} \atag{term}		\\
-\atag{compare}					&	\atag{addexpr}		\\
+\atag{compare}					&	\atag{term} \atag{addop} \atag{compare}		\\
+\atag{compare}					&	\atag{term}		\\
 \atag{addop}					&	+		\\
 \atag{addop}					&	-		\\
-\atag{term}					&	\atag{term} \atag{mulop} \atag{factor}		\\
+\atag{term}					&	\atag{factor} \atag{mulop} \atag{term}		\\
 \atag{term}					&	\atag{factor}		\\
 \atag{mulop}					&	*		\\
 \atag{mulop}					&	/		\\
@@ -289,28 +289,6 @@ symbol							&	rule								\\
 \atag{unaryminus}				&	( \atag{expr} )		\\
 \atag{unaryminus}				&	\atag{const}		\\
 \atag{unaryminus}				&	\atag{lvalue}		\\
-\atag{expr}					&	\atag{term} \atag{binary-operator} \atag{expr}		\\
-\atag{expr}					&	\atag{const}		\\
-\atag{expr}					&	\atag{lvalue}		\\
-\atag{expr}					&	- \atag{expr}		\\
-\atag{expr}					&	( \atag{expr} )		\\
-\atag{term}					&	\atag{const}		\\
-\atag{term}					&	\atag{lvalue}		\\
-\atag{term}					&	- \atag{expr}		\\
-\atag{term}					&	( \atag{expr} )		\\
-\atag{binary-operator}			&	*	\\
-\atag{binary-operator}			&	/	\\
-\atag{binary-operator}			&	+	\\
-\atag{binary-operator}			&	-	\\
-\atag{binary-operator}			&	=	\\
-\atag{binary-operator}			&	$<$	\\
-\atag{binary-operator}			&	$>$	\\
-\atag{binary-operator}			&	$<=$	\\
-\atag{binary-operator}			&	$>=$	\\
-\atag{binary-operator}			&	$<>$	\\
-\atag{binary-operator}			&	\&	\\
-\atag{binary-operator}			&	|	\\
-\atag{binary-operator}			&	:=	\\
 \atag{opt-prefix}				&	\atag{lvalue} :=		\\
 \atag{opt-prefix}				&	NULL		\\
 \atag{const}						&	INTLIT		\\
