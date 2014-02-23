@@ -13,7 +13,7 @@ import General.Token;
 
 class LL1Parser {
 	private static Production[][] GRAMMAR_TABLE = new Production[EVARIABLE.length][ETERMINAL.length];
-	private static final boolean debugging = true;
+	private static final boolean debugging = false;
 	private static boolean initialized;
 	private Stack<Symbol> symbols;
 	private List<ETERMINAL> input;
@@ -50,10 +50,12 @@ class LL1Parser {
 			multiRule(EXPR, nexts(LPAREN, NIL, STRLIT, INTLIT, ID, MINUS),
 					p(s(OREXPR), s(EXPR_TAIL)));
 			rule(EXPR_TAIL, OR, p(s(OROP), s(OREXPR), s(EXPR_TAIL)));
-			multiEpsilon(EXPR_TAIL, nexts(IF, WHILE, FOR, BREAK, RETURN, ID, ENDIF, END, ENDDO, RPAREN, COMMA,
+			multiEpsilon(EXPR_TAIL, nexts(IF, WHILE, FOR, BREAK, RETURN, 
+					ID, ENDIF, END, ENDDO, RPAREN, COMMA,
 					RBRACK, THEN, DO, TO, SEMI));
-			multiRule(FACTOR, nexts(LPAREN, NIL, STRLIT, INTLIT, ID, MINUS),
+			multiRule(FACTOR, nexts(LPAREN, NIL, STRLIT, INTLIT, ID),
 					p(s(UNARYMINUS)));
+			rule(FACTOR, MINUS, p(s(MINUS), s(UNARYMINUS)));
 			rule(FUNCT_DECLARATION, FUNC, 
 					p(s(FUNC), s(ID), s(LPAREN), s(PARAM_LIST), s(RPAREN), s(RET_TYPE), 
 							s(BEGIN), s(STAT_SEQ), s(END), s(SEMI)));
@@ -129,7 +131,7 @@ class LL1Parser {
 			multiRule(TERM_TAIL, nexts(MULT, DIV),
 					p(s(MULOP), s(FACTOR), s(TERM_TAIL)));
 			multiEpsilon(TERM_TAIL, nexts(RPAREN, OR, AND, ENDIF, END, ENDDO, ID, RETURN, BREAK,
-					FOR, WHILE, IF, MINUS, PLUS, NEQ, LESSEREQ, GREATEREQ, LESS, EQ,
+					FOR, WHILE, IF, MINUS, PLUS, NEQ, LESSEREQ, GREATEREQ, GREATER, LESS, EQ,
 					SEMI, TO, DO, THEN, RBRACK, COMMA));
 			rule(TIGER_PROGRAM, LET, 
 					p(s(LET), s(DECLARATION_SEGMENT), s(IN), s(STAT_SEQ), s(END)));
