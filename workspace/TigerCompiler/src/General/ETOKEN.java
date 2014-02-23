@@ -1,4 +1,4 @@
-package Lexer;
+package General;
 
 public enum ETOKEN {
 	PLUS, MINUS, MULT, DIV, EQ, LPAREN, RPAREN, COMMA, AND, OR, LBRACK, RBRACK, 

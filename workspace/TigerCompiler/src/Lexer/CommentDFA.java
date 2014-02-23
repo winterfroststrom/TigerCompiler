@@ -5,7 +5,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 
-public class CommentDFA {
+class CommentDFA {
 	private static final int[][] STATE_TABLE = new int[6][Character.MAX_VALUE]; 
 	private static final int[][] ACTION_TABLE = new int[6][Character.MAX_VALUE]; 
 	private static final int START = 0;

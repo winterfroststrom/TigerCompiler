@@ -1,4 +1,4 @@
-package Lexer;
+package General;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintStream;
@@ -8,40 +8,50 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 
 
-public class TigerFileHandler {
+public class TigerFileHandler implements AutoCloseable{
 	public static final String TIGER_FILE_TYPE = ".tiger";
 	public static final String TIGER_LEXER_OUTPUT_TYPE = ".tokens";
 	public static final String TIGER_LEXER_ERROR_TYPE = ".err";
-
+	private boolean redirectedConsole;
+	private PrintStream out;
+	private PrintStream err;
 	private String[] args;
 	
 	public TigerFileHandler(String[] args){
 		this.args = args;
 	}
-	
-	public boolean isTigerFile(String name) {
-		if(name.length() <= TIGER_FILE_TYPE.length()) {
-			return false;
-		}
-		String fileType = name.substring(name.length() - TIGER_FILE_TYPE.length());
-		return fileType.equalsIgnoreCase(TIGER_FILE_TYPE);
-	}
 
 	public void redirectConsole() throws IOException{
-		String filename = checkFilename();
-		String outputName = createOutputFilename(filename);
-		String errorName = createErrorFilename(filename);
-		PrintStream out = new PrintStream(outputName);
-		PrintStream err = new PrintStream(errorName);
-		System.setOut(out);
-		System.setErr(err);
+		if(!redirectedConsole){
+			String filename = checkFilename();
+			String outputName = createOutputFilename(filename);
+			String errorName = createErrorFilename(filename);
+			out = new PrintStream(outputName);
+			err = new PrintStream(errorName);
+			System.setOut(out);
+			System.setErr(err);
+		}
+	}
+	
+	@Override
+	public void close(){
+		out.close();
+		err.close();
 	}
 	
 	public String getInput() throws IOException{
 		String filename = checkFilename();
 		return readFile(filename, Charset.defaultCharset());
 	}
-
+	
+	private boolean isTigerFile(String name) {
+		if(name.length() <= TIGER_FILE_TYPE.length()) {
+			return false;
+		}
+		String fileType = name.substring(name.length() - TIGER_FILE_TYPE.length());
+		return fileType.equalsIgnoreCase(TIGER_FILE_TYPE);
+	}
+	
 	private String checkFilename() throws IOException {
 		if(args.length < 1){
 			throw new IOException("No arguments");

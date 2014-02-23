@@ -1,6 +1,6 @@
-package Lexer;
+package General;
 
-import static Lexer.ETOKEN.*;
+import static General.ETOKEN.*;
 
 public class Token {
 	public final ETOKEN token;

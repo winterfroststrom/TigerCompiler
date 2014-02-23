@@ -4,57 +4,62 @@ import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
+import General.ETOKEN;
+import General.Token;
 import static Lexer.GeneralDFA.EACTION_TYPE.*;
 import static Lexer.GeneralDFA.ESTATE.*;
 
-public class GeneralDFA {
+class GeneralDFA {
 	private static final ESTATE[][] STATE_TABLE = new ESTATE[ESTATE.values().length][Character.MAX_VALUE]; 
-	private static final Action[][] ACTION_TABLE = new Action[ESTATE.values().length][Character.MAX_VALUE]; 
-
+	private static final Action[][] ACTION_TABLE = new Action[ESTATE.values().length][Character.MAX_VALUE];
+	private List<LexerError> errors = new LinkedList<>();
 	private List<Token> tokens = new LinkedList<>();
 	private List<Character> charBuffer = new ArrayList<>();
 	private int position = 0;
 	private ESTATE state = START;
-	public boolean errored;
+	private boolean initialized;
 	
 	private void initializeTable(){
-		defaultTransitionAction(START, START, new Action(DROP));
-		action(START, ' ', new Action(IGNO));
-		action(START, '\n', new Action(IGNO));
-		action(START, '\t', new Action(IGNO));
-		action(START, '\f', new Action(IGNO));
-		action(START, '\r', new Action(IGNO));
-		action(START, '+', new Action(TOKE, ETOKEN.PLUS));
-		action(START, '-', new Action(TOKE, ETOKEN.MINUS));
-		action(START, '*', new Action(TOKE, ETOKEN.MULT));
-		action(START, '/', new Action(TOKE, ETOKEN.DIV));
-		action(START, '=', new Action(TOKE, ETOKEN.EQ));
-		action(START, '(', new Action(TOKE, ETOKEN.LPAREN));
-		action(START, ')', new Action(TOKE, ETOKEN.RPAREN));
-		action(START, ',', new Action(TOKE, ETOKEN.COMMA));
-		action(START, '&', new Action(TOKE, ETOKEN.AND));
-		action(START, '|', new Action(TOKE, ETOKEN.OR));
-		action(START, '[', new Action(TOKE, ETOKEN.LBRACK));
-		action(START, ']', new Action(TOKE, ETOKEN.RBRACK));
-		action(START, ';', new Action(TOKE, ETOKEN.SEMI));
-		
-		transitionAction(START, ':', COLON, new Action(NOOP));
-		defaultTransitionAction(COLON, START, new Action(BACK, ETOKEN.COLON));
-		transitionAction(COLON, '=', START, new Action(TOKE, ETOKEN.ASSIGN));
-
-		transitionAction(START, '<', LANGLE, new Action(NOOP));
-		defaultTransitionAction(LANGLE, START, new Action(BACK, ETOKEN.LESS));
-		transitionAction(LANGLE, '>', START, new Action(TOKE, ETOKEN.NEQ));
-		transitionAction(LANGLE, '=', START, new Action(TOKE, ETOKEN.LESSEREQ));
-		
-		transitionAction(START, '>', RANGLE, new Action(NOOP));
-		defaultTransitionAction(RANGLE, START, new Action(BACK, ETOKEN.GREATER));
-		transitionAction(RANGLE, '=', START, new Action(TOKE, ETOKEN.GREATEREQ));
-		
-		initializeTableForSTRLIT();		
-		initializeTableForINTLIT();
-		initializeTableForID();
-		
+		if(!initialized){
+			defaultTransitionAction(START, START, new Action(DROP));
+			action(START, ' ', new Action(IGNO));
+			action(START, '\n', new Action(IGNO));
+			action(START, '\t', new Action(IGNO));
+			action(START, '\f', new Action(IGNO));
+			action(START, '\r', new Action(IGNO));
+			action(START, '+', new Action(TOKE, ETOKEN.PLUS));
+			action(START, '-', new Action(TOKE, ETOKEN.MINUS));
+			action(START, '*', new Action(TOKE, ETOKEN.MULT));
+			action(START, '/', new Action(TOKE, ETOKEN.DIV));
+			action(START, '=', new Action(TOKE, ETOKEN.EQ));
+			action(START, '(', new Action(TOKE, ETOKEN.LPAREN));
+			action(START, ')', new Action(TOKE, ETOKEN.RPAREN));
+			action(START, ',', new Action(TOKE, ETOKEN.COMMA));
+			action(START, '&', new Action(TOKE, ETOKEN.AND));
+			action(START, '|', new Action(TOKE, ETOKEN.OR));
+			action(START, '[', new Action(TOKE, ETOKEN.LBRACK));
+			action(START, ']', new Action(TOKE, ETOKEN.RBRACK));
+			action(START, ';', new Action(TOKE, ETOKEN.SEMI));
+			
+			transitionAction(START, ':', COLON, new Action(NOOP));
+			defaultTransitionAction(COLON, START, new Action(BACK, ETOKEN.COLON));
+			transitionAction(COLON, '=', START, new Action(TOKE, ETOKEN.ASSIGN));
+	
+			transitionAction(START, '<', LANGLE, new Action(NOOP));
+			defaultTransitionAction(LANGLE, START, new Action(BACK, ETOKEN.LESS));
+			transitionAction(LANGLE, '>', START, new Action(TOKE, ETOKEN.NEQ));
+			transitionAction(LANGLE, '=', START, new Action(TOKE, ETOKEN.LESSEREQ));
+			
+			transitionAction(START, '>', RANGLE, new Action(NOOP));
+			defaultTransitionAction(RANGLE, START, new Action(BACK, ETOKEN.GREATER));
+			transitionAction(RANGLE, '=', START, new Action(TOKE, ETOKEN.GREATEREQ));
+			
+			initializeTableForSTRLIT();		
+			initializeTableForINTLIT();
+			initializeTableForID();
+		} else {
+			initialized = true;
+		}
 	}
 
 	private void initializeTableForSTRLIT() {
@@ -137,8 +142,6 @@ public class GeneralDFA {
 		transitionAction(ID, '_', ID, new Action(NOOP));
 	}
 	
-	
-	
 	private void defaultTransitionAction(ESTATE current, ESTATE next, Action action){
 		defaultTransition(current, next);
 		defaultAction(current, action);
@@ -171,7 +174,9 @@ public class GeneralDFA {
 		Arrays.fill(ACTION_TABLE[current.ordinal()], action);
 	}
 	
-	
+	public List<LexerError> errors(){
+		return errors;
+	}
 	
 	public List<Token> lex(String input){
 		initializeTable();
@@ -213,10 +218,7 @@ public class GeneralDFA {
 			charBuffer.remove(charBuffer.size() - 1);
 			break;
 		case DROP:
-			errored = true;
-			System.err.println("Unexcepted character : " 
-					+ charBuffer.get(charBuffer.size() - 1)
-					+ " at state " + state);
+			errors.add(generateErrorMessage());
 		case IGNO:
 			charBuffer.remove(charBuffer.size() - 1);
 			break;
@@ -225,6 +227,10 @@ public class GeneralDFA {
 		}
 	}
 
+	private LexerError generateErrorMessage(){
+		return new LexerError(charBuffer.get(charBuffer.size() - 1), position, state);
+	}
+	
 	private class Action{
 		final EACTION_TYPE action;
 		final ETOKEN token;

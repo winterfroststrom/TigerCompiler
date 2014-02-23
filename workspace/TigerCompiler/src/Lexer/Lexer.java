@@ -1,31 +1,23 @@
 package Lexer;
-import java.io.IOException;
+import java.util.LinkedList;
 import java.util.List;
 
-public class Lexer {
+import General.Token;
 
-	public void lex(String input) {
-		CommentDFA cdfa = new CommentDFA();
-		GeneralDFA gdfa = new GeneralDFA();
-		List<Token> tokens = gdfa.lex(cdfa.lex(input));
-		for(Token token : tokens){
-			System.out.print(token.token + " ");	
-		}
-		if(!gdfa.errored){
-			System.out.println();
-			System.out.println("successful parse");
-		}
+public class Lexer {
+	private CommentDFA cdfa;
+	private GeneralDFA gdfa;
+	public List<Token> lex(String input) {
+		cdfa = new CommentDFA();
+		gdfa = new GeneralDFA();
+		return gdfa.lex(cdfa.lex(input));
 	}
 	
-	public static void main(String[] args) {
-		args[0] = "resources/ex5.tiger";
-		TigerFileHandler tfh = new TigerFileHandler(args);
-		Lexer lexer = new Lexer();
-		try{
-			tfh.redirectConsole();
-			lexer.lex(tfh.getInput());
-		} catch(IOException e){
-			System.out.println(e.getMessage());
+	public List<LexerError> errors(){
+		if(gdfa != null){
+			return gdfa.errors();
+		} else{
+			return new LinkedList<>();
 		}
 	}
 }
