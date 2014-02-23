@@ -18,8 +18,6 @@ class CommentDFA {
 	private static final int TOKEN = 1;
 	private static final int CLEAR = 2;
 	
-	
-	
 	private List<String> tokens = new LinkedList<>();
 	private List<Character> charBuffer = new ArrayList<>();
 	

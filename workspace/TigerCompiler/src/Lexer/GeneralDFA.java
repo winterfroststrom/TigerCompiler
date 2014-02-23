@@ -4,20 +4,20 @@ import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
-import General.ETOKEN;
+import General.ETERMINAL;
 import General.Token;
 import static Lexer.GeneralDFA.EACTION_TYPE.*;
 import static Lexer.GeneralDFA.ESTATE.*;
 
 class GeneralDFA {
-	private static final ESTATE[][] STATE_TABLE = new ESTATE[ESTATE.values().length][Character.MAX_VALUE]; 
-	private static final Action[][] ACTION_TABLE = new Action[ESTATE.values().length][Character.MAX_VALUE];
+	private static final ESTATE[][] STATE_TABLE = new ESTATE[ESTATE.length][Character.MAX_VALUE]; 
+	private static final Action[][] ACTION_TABLE = new Action[ESTATE.length][Character.MAX_VALUE];
+	private static boolean initialized;
 	private List<LexerError> errors = new LinkedList<>();
 	private List<Token> tokens = new LinkedList<>();
 	private List<Character> charBuffer = new ArrayList<>();
 	private int position = 0;
 	private ESTATE state = START;
-	private boolean initialized;
 	
 	private void initializeTable(){
 		if(!initialized){
@@ -27,37 +27,36 @@ class GeneralDFA {
 			action(START, '\t', new Action(IGNO));
 			action(START, '\f', new Action(IGNO));
 			action(START, '\r', new Action(IGNO));
-			action(START, '+', new Action(TOKE, ETOKEN.PLUS));
-			action(START, '-', new Action(TOKE, ETOKEN.MINUS));
-			action(START, '*', new Action(TOKE, ETOKEN.MULT));
-			action(START, '/', new Action(TOKE, ETOKEN.DIV));
-			action(START, '=', new Action(TOKE, ETOKEN.EQ));
-			action(START, '(', new Action(TOKE, ETOKEN.LPAREN));
-			action(START, ')', new Action(TOKE, ETOKEN.RPAREN));
-			action(START, ',', new Action(TOKE, ETOKEN.COMMA));
-			action(START, '&', new Action(TOKE, ETOKEN.AND));
-			action(START, '|', new Action(TOKE, ETOKEN.OR));
-			action(START, '[', new Action(TOKE, ETOKEN.LBRACK));
-			action(START, ']', new Action(TOKE, ETOKEN.RBRACK));
-			action(START, ';', new Action(TOKE, ETOKEN.SEMI));
+			action(START, '+', new Action(TOKE, ETERMINAL.PLUS));
+			action(START, '-', new Action(TOKE, ETERMINAL.MINUS));
+			action(START, '*', new Action(TOKE, ETERMINAL.MULT));
+			action(START, '/', new Action(TOKE, ETERMINAL.DIV));
+			action(START, '=', new Action(TOKE, ETERMINAL.EQ));
+			action(START, '(', new Action(TOKE, ETERMINAL.LPAREN));
+			action(START, ')', new Action(TOKE, ETERMINAL.RPAREN));
+			action(START, ',', new Action(TOKE, ETERMINAL.COMMA));
+			action(START, '&', new Action(TOKE, ETERMINAL.AND));
+			action(START, '|', new Action(TOKE, ETERMINAL.OR));
+			action(START, '[', new Action(TOKE, ETERMINAL.LBRACK));
+			action(START, ']', new Action(TOKE, ETERMINAL.RBRACK));
+			action(START, ';', new Action(TOKE, ETERMINAL.SEMI));
 			
 			transitionAction(START, ':', COLON, new Action(NOOP));
-			defaultTransitionAction(COLON, START, new Action(BACK, ETOKEN.COLON));
-			transitionAction(COLON, '=', START, new Action(TOKE, ETOKEN.ASSIGN));
+			defaultTransitionAction(COLON, START, new Action(BACK, ETERMINAL.COLON));
+			transitionAction(COLON, '=', START, new Action(TOKE, ETERMINAL.ASSIGN));
 	
 			transitionAction(START, '<', LANGLE, new Action(NOOP));
-			defaultTransitionAction(LANGLE, START, new Action(BACK, ETOKEN.LESS));
-			transitionAction(LANGLE, '>', START, new Action(TOKE, ETOKEN.NEQ));
-			transitionAction(LANGLE, '=', START, new Action(TOKE, ETOKEN.LESSEREQ));
+			defaultTransitionAction(LANGLE, START, new Action(BACK, ETERMINAL.LESS));
+			transitionAction(LANGLE, '>', START, new Action(TOKE, ETERMINAL.NEQ));
+			transitionAction(LANGLE, '=', START, new Action(TOKE, ETERMINAL.LESSEREQ));
 			
 			transitionAction(START, '>', RANGLE, new Action(NOOP));
-			defaultTransitionAction(RANGLE, START, new Action(BACK, ETOKEN.GREATER));
-			transitionAction(RANGLE, '=', START, new Action(TOKE, ETOKEN.GREATEREQ));
+			defaultTransitionAction(RANGLE, START, new Action(BACK, ETERMINAL.GREATER));
+			transitionAction(RANGLE, '=', START, new Action(TOKE, ETERMINAL.GREATEREQ));
 			
 			initializeTableForSTRLIT();		
 			initializeTableForINTLIT();
 			initializeTableForID();
-		} else {
 			initialized = true;
 		}
 	}
@@ -65,7 +64,7 @@ class GeneralDFA {
 	private void initializeTableForSTRLIT() {
 		transitionAction(START, '"', STRLIT, new Action(NOOP));
 		defaultTransitionAction(STRLIT, STRLIT, new Action(NOOP));
-		transitionAction(STRLIT, '"', START, new Action(TOKE, ETOKEN.STRLIT));
+		transitionAction(STRLIT, '"', START, new Action(TOKE, ETERMINAL.STRLIT));
 		
 		transition(STRLIT, '\\', STRLIT_SLASH);
 		defaultTransitionAction(STRLIT_SLASH, STRLIT_SLASH, new Action(DROP));
@@ -114,7 +113,7 @@ class GeneralDFA {
 	private void initializeTableForINTLIT() {
 		multiTransitionAction(START, new char[]{'0', '1', '2', '3', 
 				'4', '5', '6', '7', '8', '9'}, INTLIT, new Action(NOOP));
-		defaultTransitionAction(INTLIT, START, new Action(BACK, ETOKEN.INTLIT));
+		defaultTransitionAction(INTLIT, START, new Action(BACK, ETERMINAL.INTLIT));
 		multiTransitionAction(INTLIT, new char[]{'0', '1', '2', '3', 
 				'4', '5', '6', '7', '8', '9'}, INTLIT, new Action(NOOP));
 	}
@@ -126,7 +125,7 @@ class GeneralDFA {
 		for(char i = 'A'; i < 'Z' + 1; i++){
 			transitionAction(START, i, ID, new Action(NOOP));
 		}
-		defaultTransitionAction(ID, START, new Action(BACK, ETOKEN.ID));
+		defaultTransitionAction(ID, START, new Action(BACK, ETERMINAL.ID));
 		for(char i = 'a'; i < 'z' + 1; i++){
 			transitionAction(ID, i, ID, new Action(NOOP));
 		}
@@ -233,9 +232,9 @@ class GeneralDFA {
 	
 	private class Action{
 		final EACTION_TYPE action;
-		final ETOKEN token;
+		final ETERMINAL token;
 		
-		Action(EACTION_TYPE action, ETOKEN token){
+		Action(EACTION_TYPE action, ETERMINAL token){
 			this.action = action;
 			this.token = token;
 		}
@@ -252,5 +251,6 @@ class GeneralDFA {
 	protected enum ESTATE{
 		START, LANGLE, RANGLE, COLON, INTLIT, ID, STRLIT, STRLIT_SLASH, 
 		STRLIT_CTL, STRLIT_CODE1, STRLIT_CODE2, STRLIT_SPACE;
+		public static final int length = ESTATE.values().length;
 	}
 }

@@ -1,12 +1,12 @@
 package General;
 
-import static General.ETOKEN.*;
+import static General.ETERMINAL.*;
 
 public class Token {
-	public final ETOKEN token;
+	public final ETERMINAL token;
 	public final String text;
 	
-	public Token(ETOKEN token, String text){
+	public Token(ETERMINAL token, String text){
 		if(token.equals(ID)){
 			this.token = idToken(text);
 		} else {
@@ -15,7 +15,7 @@ public class Token {
 		this.text = text;
 	}
 	
-	private static final ETOKEN idToken(String text){
+	private static final ETERMINAL idToken(String text){
 		switch(text){
 		case "return":
 			return RETURN;
@@ -64,7 +64,7 @@ public class Token {
 		case "enddo":
 			return ENDDO;
 		default:
-			return ETOKEN.ID;
+			return ETERMINAL.ID;
 		}
 	}
 	

@@ -24,7 +24,7 @@ public class Runner {
 			if(parser.parse(tokens)){
 				System.out.println("successful parse");
 			}  else {
-				System.out.println("successful parse");				
+				System.out.println("unsuccessful parse");				
 			}
 			printLexerErrors(lexer.errors());
 			printParserErrors(parser.errors());
