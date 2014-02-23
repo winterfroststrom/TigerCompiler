@@ -49,7 +49,7 @@ Pre-parse the input to remove comments with the following DFA. The resulting NOT
 
 Everything under the token column represents either generated tokens or custom table actions on the character buffer used to produce the text associated with tokens.
 
-\begin{tabular}{l|l|l|l}
+\begin{longtable}{l|l|l|l}
 start state		&	symbol							&	next	 state		&	token		 	\\
 \hline
 START			&	$\Sigma - \{/, "\}$				& 	START			&	NOT-COMMENT		\\
@@ -66,7 +66,7 @@ COMMENT			&	*								&	COMMENT-END		&					\\
 COMMENT-END		&	$\Sigma - \{*, /\}$				&	COMMENT			&					\\
 COMMENT-END		&	*								&	COMMENT-END		&					\\
 COMMENT-END		&	/								&	START			&	COMMENT			\\
-\end{tabular}
+\end{longtable}
 
 The DFA for uncommented code.
 
@@ -76,7 +76,7 @@ Note, all ids are later matched character by character with keywords to determin
 
 Note, drop character for the error state means that the last read character is ignored, and the state remains unchanged.
 
-\begin{tabular}{l|l|l|l}
+\begin{longtable}{l|l|l|l}
 start state		&	symbol						&	next	 state		&	token		 		\\
 \hline
 START			&	+								&	START			&	PLUS					\\
@@ -113,7 +113,6 @@ INT-LIT			&	0-9								&	INT-LIT			&						\\
 INT-LIT			&	$\Sigma - 0-9	$				&	START			&	INT-LIT, backtrack	\\
 ID				&	a-zA-Z0-9\_						&	ID				&						\\
 ID				&	$\Sigma - a-zA-Z0-9\_$			&	START			&	ID, backtrack		\\
-
 STRING-LIT			&	$\Sigma - {\backslash}$	&	STRING-LIT			&						\\
 STRING-LIT			&	''						&	START				&	STRING-LIT			\\
 STRING-LIT			&	\textbackslash			&	STRING-LIT-SLASH		&						\\
@@ -125,18 +124,16 @@ STRING-LIT-SLASH		&	\textasciicircum			&	STRING-LIT-CTL		&								\\
 STRING-LIT-SLASH		&	0-9						&	STRING-LIT-CODE-1	&					\\
 STRING-LIT-SLASH		&	whitespace				&	STRING-LIT-SPACE		& ignore 2 characters			\\
 STRING-LIT-SLASH		&	others					&	ERROR				& drop character				\\
-
 STRING-LIT-CTL		&	@A-Z[\textbackslash]\textasciicircum\_ .		&	STRING-LIT			&			\\
 STRING-LIT-CTL		&	others					&	ERROR				& drop character					\\
 STRING-LIT-CODE-1	&	0-9						&	STRING-LIT-CODE-2			&					\\
 STRING-LIT-CODE-1	&	others					&	ERROR			&	drop character				\\
 STRING-LIT-CODE-2	&	0-9						&	STRING-LIT		&								\\
 STRING-LIT-CODE-2	&	others					&	ERROR			&	drop character				\\
-
 STRING-LIT-SPACE		&	whitespace				&	STRING-LIT-SPACE		& ignore							\\
 STRING-LIT-SPACE		&	\textbackslash			&	STRING-LIT			& ignore							\\
 STRING-LIT-SPACE		&	others					&	ERROR				& drop character				\\
-\end{tabular}
+\end{longtable}
 
 \section{Grammar Rules}
 
@@ -152,6 +149,7 @@ symbol							&	rule								\\
 \atag{var-declaration-list}		&	\atag{var-declaration} \atag{var-declaration-list}	\\
 \atag{var-declaration-list}		&	NULL		\\
 \atag{funct-declaration-list}	&	\atag{funct-declaration} \atag{funct-declaration-list}	\\
+\atag{funct-declaration-list}	&	NULL		\\
 \atag{type-declaration}			&	type id = \atag{type} ;		\\
 \atag{type}						&	\atag{type-id}		\\
 %\atag{type}						&	array [ INTLIT ] of \atag{type-id}		\\
@@ -229,6 +227,7 @@ symbol							&	rule								\\
 \atag{var-declaration-list}		&	\atag{var-declaration} \atag{var-declaration-list}	\\
 \atag{var-declaration-list}		&	NULL		\\
 \atag{funct-declaration-list}	&	\atag{funct-declaration} \atag{funct-declaration-list}	\\
+\atag{funct-declaration-list}	&	NULL		\\
 \atag{type-declaration}			&	type id = \atag{type} ;		\\
 \atag{var-declaration}			&	var \atag{id-list} : \atag{type-id} \atag{optional-init} ;		\\
 \atag{funct-declaration}			&	function id ( \atag{param-list} ) \atag{ret-type} begin \atag{stat-seq} end ;	\\
@@ -262,8 +261,17 @@ symbol							&	rule								\\
 \atag{stat-func-or-assign}		&	\atag{lvalue-tail} := \atag{stat-assign}	\\
 \atag{stat-if-tail}				&	else \atag{stat-seq} endif ;		\\
 \atag{stat-if-tail}				&	endif ;		\\
-\atag{stat-assign}				&	\atag{expr}	;	\\
-\atag{stat-assign}				&	id ( \atag{expr-list} ) ;	\\
+\atag{stat-assign}				&	- \atag{unaryminus} \atag{stat-assign-tail}	\\
+\atag{stat-assign}				&	( \atag{expr} ) \atag{stat-assign-tail}	\\
+\atag{stat-assign}				&	\atag{const}	 \atag{stat-assign-tail}		\\
+\atag{stat-assign}				&	id \atag{stat-assign-id}	\\
+\atag{stat-assign-id}			&	( \atag{expr-list} ) ;	\\
+\atag{stat-assign-id}			&	\atag{lvalue-tail} \atag{stat-assign-tail}	\\
+\atag{stat-assign-tail}			&	\atag{expr-tail}		\\
+\atag{stat-assign-tail}			&	\atag{orexpr-tail}		\\
+\atag{stat-assign-tail}			&	\atag{andexpr-tail}		\\
+\atag{stat-assign-tail}			&	\atag{compare-tail}		\\
+\atag{stat-assign-tail}			&	\atag{term-tail}		\\
 \atag{expr}						&	\atag{orexpr} \atag{expr-tail}		\\
 \atag{expr-tail}					&	\atag{orop} \atag{orexpr} \atag{expr-tail}	\\
 \atag{expr-tail}					&	NULL		\\
@@ -277,7 +285,7 @@ symbol							&	rule								\\
 \atag{compare-tail}				&	\atag{addop} \atag{term} \atag{compare-tail}	\\
 \atag{compare-tail}				&	NULL	\\
 \atag{term} 						&	\atag{factor} \atag{term-tail}		\\
-\atag{term-tail}					&	\atag{factor} \atag{mulop} \atag{term-tail}	\\
+\atag{term-tail}					&	\atag{mulop} \atag{factor} \atag{term-tail}	\\
 \atag{term-tail}					&	NULL	\\
 \atag{factor}					&	\atag{unaryminus}		\\
 \atag{factor}					&	- \atag{unaryminus}		\\
@@ -309,10 +317,100 @@ symbol							&	rule								\\
 \end{longtable}
 
 
-Tokens for the parser table:
+\begin{longtable}{l|l}
+non-terminal						&	first set												\\
+\hline
+\atag{lvalue-tail}				&	[, $\epsilon$												\\
+\atag{lvalue}					&	id														\\
+\atag{expr-list-tail}			&	,, $\epsilon$												\\
+\atag{expr-list}					&	(, nil, STRLIT, INTLIT, id, -, $\epsilon$				\\
+\atag{mulop}						&	*, /														\\
+\atag{addop}						&	+, -														\\
+\atag{compop}					&	$=, <, >, <=, >=, <>$									\\
+\atag{andop}						&	\&														\\
+\atag{orop} 						&	\textbar		\\
+\atag{const}						&	nil, STRLIT, INTLIT		\\
+\atag{unaryminus}				&	(, nil, STRLIT, INTLIT, id		\\
+\atag{factor}					&	(, nil, STRLIT, INTLIT, id, -		\\
+\atag{term-tail}					&	*, /	, $\epsilon$	\\
+\atag{term} 						&	(, nil, STRLIT, INTLIT, id, -		\\
+\atag{compare-tail}				&	+, -, $\epsilon$	\\
+\atag{compare} 					&	(, nil, STRLIT, INTLIT, id, -		\\
+\atag{andexpr-tail}				&	$=, <, >, <=, >=, <>$, $\epsilon$	\\
+\atag{andexpr} 					&	(, nil, STRLIT, INTLIT, id, -		\\
+\atag{orexpr} 					&	(, nil, STRLIT, INTLIT, id, -		\\
+\atag{orexpr-tail}				&	\& , $\epsilon$	\\
+\atag{expr}						&	(, nil, STRLIT, INTLIT, id, -		\\
+\atag{expr-tail}					&	\textbar	, $\epsilon$	\\
+\atag{stat-assign}				&	id, -, (, nil, STRLIT, INTLIT	\\
+\atag{stat-assign-id}			&	[, (, *, /, +, -, $=, <, >, <=, >=, <>$, \& , \textbar , $\epsilon	$\\
+\atag{stat-assign-tail}			&	*, /	, +, -, $=, <, >, <=, >=, <>$, \& , \textbar , $\epsilon$	\\
+\atag{stat-if-tail}				&	else, endif		\\
+\atag{stat-func-or-assign}		&	(, :=, [		\\
+\atag{stat}						&	if, while, for, break, return, id		\\
+\atag{stat-seq}					&	if, while, for, break, return, id		\\
+\atag{stat-seq-tail}				&	if, while, for, break, return, id, $\epsilon$		\\
+\atag{param}						&	id		\\
+\atag{ret-type}					&	:, $\epsilon	$	\\
+\atag{param-list-tail}			&	,, $\epsilon$		\\
+\atag{param-list}				&	id, $\epsilon$		\\
+\atag{optional-init}				&	:=, $\epsilon$		\\
+\atag{id-list-tail}				&	,, $\epsilon$		\\
+\atag{id-list}					&	id		\\
+\atag{type-id}					&	id		\\
+\atag{type-dim}					&	[, $\epsilon$	\\
+\atag{type}						&	array, id		\\
+\atag{funct-declaration}			&	function		\\
+\atag{var-declaration}			&	var \\
+\atag{type-declaration}			&	type 		\\
+\atag{funct-declaration-list}	&	function, $\epsilon$	\\
+\atag{var-declaration-list}		&	var, $\epsilon$	\\
+\atag{type-declaration-list}		&	type, $\epsilon$		\\
+\atag{declaration-segment}		&	function, var, type, $\epsilon$	\\
+\atag{tiger-program}				&	let				\\
+\end{longtable}
 
-PLUS, MINUS, MULT, DIV, EQ, LPAREN, RPAREN, COMMA, AND, OR, LBRACK, RBRACK, SEMI, NEQ, LESSEREQ, LESS, GREATEREQ, GREATER, ASSIGN, COLON, INTLIT, ID, STRLIT, RETURN, ARRAY, BREAK, DO, ELSE, END, FOR, FUNC, IF, IN, LET, NIL, OF, THEN, TO, TYPE, VAR, WHILE, ENDIF, BEGIN, ENDDO
+Note, the dollar sign is the end of tokens symbol.
 
+\begin{longtable}{l|l}
+non-terminal						&	follow set												\\
+\hline
+\atag{lvalue-tail}				&	:=, *, /	, +, -, $=, <, >, <=, >=, <>$, \& \\
+\atag{lvalue-tail}				&	\textbar , if, while, for, break, return, id, endif, end,  \& ,\textbar , ), ,, , ], then, do, to, ; 					\\
+\atag{expr-list-tail}			&	)												\\
+\atag{expr-list}					&	)								\\
+\atag{expr-tail}					&	if, while, for, break, return, id, endif, end, ), ,, , ], then, do, to, ;	\\
+\atag{orexpr-tail}				&	if, while, for, break, return, id, endif, end, \textbar , ), ,, , ], then, do, to, ;	\\
+\atag{andexpr-tail}				&	if, while, for, break, return, id, endif, end, \& ,\textbar , ), ,, , ], then, do, to, ; 	\\
+\atag{compare-tail}				&	if, while, for, break, return, id, endif, end	\\
+\atag{compare-tail}				&	\& ,\textbar , ), ,, , ], then, do, to, ;, $=, <, >, <=, >=, <>$	\\
+\atag{term-tail}					&	if, while, for, break, return, id, endif, end, \& ,\textbar , )	\\
+\atag{term-tail}					&	, , ], then, do, to, ;, $=, <, >, <=, >=, <>$, +, -	\\
+\atag{stat-assign-tail}			&	if, while, for, break, return, id, endif, end	\\
+\atag{stat-assign-id}			&	if, while, for, break, return, id, endif, end	\\
+\atag{stat-seq-tail}				&	endif, end		\\
+\atag{ret-type}					&	begin		\\
+\atag{param-list-tail}			&	)	\\
+\atag{param-list}				&	)		\\
+\atag{optional-init}				&	function, in		\\
+\atag{id-list-tail}				&	:		\\
+\atag{type-dim}					&	of	\\
+\atag{funct-declaration-list}	&	in	\\
+\atag{var-declaration-list}		&	function, in	\\
+\atag{type-declaration-list}		&	var, function, in		\\
+\atag{declaration-segment}		&	in	\\
+\end{longtable}
+
+
+Note, if there is no corresponding rule, then that means a parser error is generated.
+
+Note, errors are handled by dropping tokens until a valid token is found.
+
+\begin{longtable}{l|l|l}
+symbol		&	next token	&	rule												\\
+\hline
+
+\end{longtable}
 
 
 \end{document}
