@@ -258,14 +258,14 @@ symbol							&	rule								\\
 \atag{stat}						&	return \atag{expr} ;		\\
 \atag{stat}						&	id \atag{stat-func-or-assign}	\\
 \atag{stat-func-or-assign}		&	( \atag{expr-list} ) ;	\\
-\atag{stat-func-or-assign}		&	\atag{lvalue-tail} := \atag{stat-assign}	\\
+\atag{stat-func-or-assign}		&	\atag{lvalue-tail} := \atag{stat-assign}	;	\\
 \atag{stat-if-tail}				&	else \atag{stat-seq} endif ;		\\
 \atag{stat-if-tail}				&	endif ;		\\
 \atag{stat-assign}				&	- \atag{unaryminus} \atag{stat-assign-tail}	\\
 \atag{stat-assign}				&	( \atag{expr} ) \atag{stat-assign-tail}	\\
 \atag{stat-assign}				&	\atag{const}	 \atag{stat-assign-tail}		\\
 \atag{stat-assign}				&	id \atag{stat-assign-id}	\\
-\atag{stat-assign-id}			&	( \atag{expr-list} ) ;	\\
+\atag{stat-assign-id}			&	( \atag{expr-list} )		\\
 \atag{stat-assign-id}			&	\atag{lvalue-tail} \atag{stat-assign-tail}	\\
 \atag{stat-assign-tail}			&	\atag{expr-tail}		\\
 \atag{stat-assign-tail}			&	\atag{orexpr-tail}		\\
@@ -377,20 +377,20 @@ non-terminal						&	follow set												\\
 \atag{lvalue-tail}				&	\textbar , if, while, for, break, return, id, endif, end, ), ,, , ], then, do, to, ; 					\\
 \atag{expr-list-tail}			&	)												\\
 \atag{expr-list}					&	)								\\
-\atag{expr-tail}					&	if, while, for, break, return, id, endif, end, ), ,, , ], then, do, to, ;	\\
-\atag{orexpr-tail}				&	if, while, for, break, return, id, endif, end, \textbar , ), ,, , ], then, do, to, ;	\\
-\atag{andexpr-tail}				&	if, while, for, break, return, id, endif, end, \& ,\textbar , ), ,, , ], then, do, to, ; 	\\
-\atag{compare-tail}				&	if, while, for, break, return, id, endif, end	\\
+\atag{expr-tail}					&	if, while, for, break, return, id, endif, end, enddo, ), ,, , ], then, do, to, ;	\\
+\atag{orexpr-tail}				&	if, while, for, break, return, id, endif, end, enddo, \textbar , ), ,, , ], then, do, to, ;	\\
+\atag{andexpr-tail}				&	if, while, for, break, return, id, endif, end, enddo, \& ,\textbar , ), ,, , ], then, do, to, ; 	\\
+\atag{compare-tail}				&	if, while, for, break, return, id, endif, end, enddo	\\
 \atag{compare-tail}				&	\& ,\textbar , ), ,, , ], then, do, to, ;, $=, <, >, <=, >=, <>$	\\
-\atag{term-tail}					&	if, while, for, break, return, id, endif, end, \& ,\textbar , )	\\
+\atag{term-tail}					&	if, while, for, break, return, id, endif, end, enddo, \& ,\textbar , ) \\
 \atag{term-tail}					&	, , ], then, do, to, ;, $=, <, >, <=, >=, <>$, +, -	\\
-\atag{stat-assign-tail}			&	if, while, for, break, return, id, endif, end	\\
-\atag{stat-assign-id}			&	if, while, for, break, return, id, endif, end	\\
-\atag{stat-seq-tail}				&	endif, end		\\
+\atag{stat-assign-tail}			&	;	\\
+\atag{stat-assign-id}			&	;	\\
+\atag{stat-seq-tail}				&	endif, end, enddo, else		\\
 \atag{ret-type}					&	begin		\\
 \atag{param-list-tail}			&	)	\\
 \atag{param-list}				&	)		\\
-\atag{optional-init}				&	function, in		\\
+\atag{optional-init}				&	;		\\
 \atag{id-list-tail}				&	:		\\
 \atag{type-dim}					&	of	\\
 \atag{funct-declaration-list}	&	in	\\
@@ -429,6 +429,7 @@ symbol							&	next token	&	rule									\\
 \atag{andexpr-tail}				&	id			&	$\epsilon$	\\
 \atag{andexpr-tail}				&	endif		&	$\epsilon$	\\
 \atag{andexpr-tail}				&	end			&	$\epsilon$	\\
+\atag{andexpr-tail}				&	enddo		&	$\epsilon$	\\
 \atag{andexpr-tail}				&	\&			&	$\epsilon$	\\
 \atag{andexpr-tail}				&	\textbar		&	$\epsilon$	\\
 \atag{andexpr-tail}				&	)			&	$\epsilon$	\\
@@ -455,6 +456,7 @@ symbol							&	next token	&	rule									\\
 \atag{compare-tail}				&	id			&	$\epsilon$					\\
 \atag{compare-tail}				&	endif			&	$\epsilon$					\\
 \atag{compare-tail}				&	end			&	$\epsilon$					\\
+\atag{compare-tail}				&	enddo		&	$\epsilon$					\\
 \atag{compare-tail}				&	\&			&	$\epsilon$					\\
 \atag{compare-tail}				&	\textbar			&	$\epsilon$					\\
 \atag{compare-tail}				&	)			&	$\epsilon$					\\
@@ -507,6 +509,7 @@ symbol							&	next token	&	rule									\\
 \atag{expr-tail}					&	id		&		$\epsilon$	\\
 \atag{expr-tail}					&	endif		&	$\epsilon$		\\
 \atag{expr-tail}					&	end		&	$\epsilon$		\\
+\atag{expr-tail}					&	enddo	&	$\epsilon$		\\
 \atag{expr-tail}					&	)		&	$\epsilon$		\\
 \atag{expr-tail}					&	,		&	$\epsilon$		\\
 \atag{expr-tail}					&	]		&	$\epsilon$		\\
@@ -549,6 +552,7 @@ symbol							&	next token	&	rule									\\
 \atag{lvalue-tail}				&	id		&		$\epsilon$										\\
 \atag{lvalue-tail}				&	endif		&	$\epsilon$											\\
 \atag{lvalue-tail}				&	end		&		$\epsilon$										\\
+\atag{lvalue-tail}				&	enddo	&		$\epsilon$										\\
 \atag{lvalue-tail}				&	)		&	$\epsilon$											\\
 \atag{lvalue-tail}				&	,		&	$\epsilon$											\\
 \atag{lvalue-tail}				&	]		&	$\epsilon$											\\
@@ -559,8 +563,7 @@ symbol							&	next token	&	rule									\\
 \atag{mulop}						&	*		&	*													\\
 \atag{mulop}						&	/		&	/													\\
 \atag{optional-init}				&	:=		&	:= \atag{const}	\\
-\atag{optional-init}				&	function		& $\epsilon$		\\
-\atag{optional-init}				&	in		& $\epsilon$		\\
+\atag{optional-init}				&	;		& $\epsilon$		\\
 \atag{orexpr} 					&	(			&	\atag{andexpr} \atag{orexpr-tail}	\\
 \atag{orexpr} 					&	nil			&	\atag{andexpr} \atag{orexpr-tail}	\\
 \atag{orexpr} 					&	STRLIT			&	\atag{andexpr} \atag{orexpr-tail}	\\
@@ -576,6 +579,7 @@ symbol							&	next token	&	rule									\\
 \atag{orexpr-tail}				&	 id		&	$\epsilon$	\\
 \atag{orexpr-tail}				&	 endif		&	$\epsilon$	\\
 \atag{orexpr-tail}				&	 end		&$\epsilon$		\\
+\atag{orexpr-tail}				&	 enddo	&$\epsilon$		\\
 \atag{orexpr-tail}				&	 \textbar		&	$\epsilon$	\\
 \atag{orexpr-tail}				&	 )		&	$\epsilon$	\\
 \atag{orexpr-tail}				&	 ,		&	$\epsilon$	\\
@@ -598,14 +602,7 @@ symbol							&	next token	&	rule									\\
 \atag{stat-assign}				&	nil		&	\atag{const}	 \atag{stat-assign-tail}		\\
 \atag{stat-assign}				&	STRLIT		&	\atag{const}	 \atag{stat-assign-tail}		\\
 \atag{stat-assign}				&	INTLIT		&	\atag{const}	 \atag{stat-assign-tail}		\\
-\atag{stat-assign-id}			&	end			&	$\epsilon$			\\
-\atag{stat-assign-id}			&	endif		&	$\epsilon$			\\
-\atag{stat-assign-id}			&	id			&	$\epsilon$			\\
-\atag{stat-assign-id}			&	return		&	$\epsilon$			\\
-\atag{stat-assign-id}			&	break		&	$\epsilon$			\\
-\atag{stat-assign-id}			&	for			&	$\epsilon$			\\
-\atag{stat-assign-id}			&	while		&	$\epsilon$			\\
-\atag{stat-assign-id}			&	if			&	$\epsilon$			\\
+\atag{stat-assign-id}			&	;			&	$\epsilon$			\\
 \atag{stat-assign-id}			&	\textbar		&	\atag{lvalue-tail} \atag{stat-assign-tail}			\\
 \atag{stat-assign-id}			&	\&			&	\atag{lvalue-tail} \atag{stat-assign-tail}			\\
 \atag{stat-assign-id}			&	$<>$			&	\atag{lvalue-tail} \atag{stat-assign-tail}			\\
@@ -619,15 +616,8 @@ symbol							&	next token	&	rule									\\
 \atag{stat-assign-id}			&	/			&	\atag{lvalue-tail} \atag{stat-assign-tail}			\\
 \atag{stat-assign-id}			&	*			&	\atag{lvalue-tail} \atag{stat-assign-tail}			\\
 \atag{stat-assign-id}			&	[			&	\atag{lvalue-tail} \atag{stat-assign-tail}			\\
-\atag{stat-assign-id}			&	(			&	( \atag{expr-list} ) ;			\\
-\atag{stat-assign-tail}			&	end			&	$\epsilon$	\\
-\atag{stat-assign-tail}			&	endif			&	$\epsilon$	\\
-\atag{stat-assign-tail}			&	id			&	$\epsilon$	\\
-\atag{stat-assign-tail}			&	return			&	$\epsilon$	\\
-\atag{stat-assign-tail}			&	break			&	$\epsilon$	\\
-\atag{stat-assign-tail}			&	for			&	$\epsilon$	\\
-\atag{stat-assign-tail}			&	while			&	$\epsilon$	\\
-\atag{stat-assign-tail}			&	if			&	$\epsilon$	\\
+\atag{stat-assign-id}			&	(			&	( \atag{expr-list} )			\\
+\atag{stat-assign-tail}			&	;			&	$\epsilon$	\\
 \atag{stat-assign-tail}			&	\textbar		&	\atag{expr-tail}	\\
 \atag{stat-assign-tail}			&	\&			&	\atag{orexpr-tail}	\\
 \atag{stat-assign-tail}			&	$<>$			&	\atag{andexpr-tail}	\\
@@ -641,8 +631,8 @@ symbol							&	next token	&	rule									\\
 \atag{stat-assign-tail}			&	/			&	\atag{term-tail}	\\
 \atag{stat-assign-tail}			&	*			&	\atag{term-tail}	\\
 \atag{stat-func-or-assign}		&	(		&	( \atag{expr-list} ) ;	\\
-\atag{stat-func-or-assign}		&	:=		&	\atag{lvalue-tail} := \atag{stat-assign}\\
-\atag{stat-func-or-assign}		&	[		&	\atag{lvalue-tail} := \atag{stat-assign}	\\
+\atag{stat-func-or-assign}		&	:=		&	\atag{lvalue-tail} := \atag{stat-assign}	;	\\
+\atag{stat-func-or-assign}		&	[		&	\atag{lvalue-tail} := \atag{stat-assign}	;	\\
 \atag{stat-if-tail}				&	else		&	else \atag{stat-seq} endif ;	\\
 \atag{stat-if-tail}				&	endif	&	endif ;	\\
 \atag{stat}						&	if		&	if \atag{expr} then \atag{stat-seq} \atag{stat-if-tail}		\\
@@ -657,8 +647,10 @@ symbol							&	next token	&	rule									\\
 \atag{stat-seq}					&	break	&	\atag{stat} \atag{stat-seq-tail}		\\
 \atag{stat-seq}					&	return	&	\atag{stat} \atag{stat-seq-tail}		\\
 \atag{stat-seq}					&	id		&	\atag{stat} \atag{stat-seq-tail}		\\
-\atag{stat-seq-tail}				&	endif			&	$\epsilon$	\\
+\atag{stat-seq-tail}				&	endif		&	$\epsilon$	\\
 \atag{stat-seq-tail}				&	end			&	$\epsilon$	\\
+\atag{stat-seq-tail}				&	enddo		&	$\epsilon$	\\
+\atag{stat-seq-tail}				&	else			&	$\epsilon$	\\
 \atag{stat-seq-tail}				&	if			&	\atag{stat} \atag{stat-seq-tail}	\\
 \atag{stat-seq-tail}				&	while			&	\atag{stat} \atag{stat-seq-tail}	\\
 \atag{stat-seq-tail}				&	for			&	\atag{stat} \atag{stat-seq-tail}	\\
@@ -678,6 +670,7 @@ symbol							&	next token	&	rule									\\
 \atag{term-tail}					&	\&		&	$\epsilon$		\\
 \atag{term-tail}					&	end		&	$\epsilon$		\\
 \atag{term-tail}					&	endif	&	$\epsilon$		\\
+\atag{term-tail}					&	enddo	&	$\epsilon$		\\
 \atag{term-tail}					&	id		&	$\epsilon$		\\
 \atag{term-tail}					&	return	&	$\epsilon$		\\
 \atag{term-tail}					&	break	&	$\epsilon$		\\

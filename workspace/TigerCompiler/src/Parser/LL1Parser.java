@@ -12,7 +12,8 @@ import General.ETERMINAL;
 import General.Token;
 
 class LL1Parser {
-	private static Production[][] GRAMMAR_TABLE = new Production[EVARIABLE.length][ETERMINAL.length]; 
+	private static Production[][] GRAMMAR_TABLE = new Production[EVARIABLE.length][ETERMINAL.length];
+	private static final boolean debugging = true;
 	private static boolean initialized;
 	private Stack<Symbol> symbols;
 	private List<ETERMINAL> input;
@@ -26,14 +27,14 @@ class LL1Parser {
 					p(s(COMPARE), s(ANDEXPR_TAIL)));
 			multiRule(ANDEXPR_TAIL, nexts(EQ, LESS, GREATER, LESSEREQ, GREATEREQ, NEQ),
 					p(s(COMPOP), s(COMPARE), s(COMPARE_TAIL)));
-			multiEpsilon(ANDEXPR_TAIL, nexts(IF, WHILE, FOR, BREAK, RETURN, ID, ENDIF, END, AND,
+			multiEpsilon(ANDEXPR_TAIL, nexts(IF, WHILE, FOR, BREAK, RETURN, ID, ENDIF, END, ENDDO, AND,
 					OR, RPAREN, COMMA, RBRACK, THEN, DO, TO, SEMI));			
 			literal(ANDOP, AND);
 			multiRule(COMPARE, nexts(LPAREN, NIL, STRLIT, INTLIT, ID, MINUS),
 					p(s(TERM), s(COMPARE_TAIL)));
 			multiRule(COMPARE_TAIL, nexts(PLUS, MINUS), 
 					p(s(ADDOP), s(TERM), s(COMPARE_TAIL)));
-			multiEpsilon(COMPARE_TAIL, nexts(IF, WHILE, FOR, BREAK, RETURN, ID, ENDIF, END,
+			multiEpsilon(COMPARE_TAIL, nexts(IF, WHILE, FOR, BREAK, RETURN, ID, ENDIF, END, ENDDO, 
 					AND, OR, RPAREN, COMMA, RBRACK, THEN, DO, TO, SEMI, EQ, LESS, GREATER, LESSEREQ,
 					GREATEREQ, NEQ));
 			multiLiteral(COMPOP, nexts(EQ, LESS, GREATER, LESSEREQ, GREATEREQ, NEQ));
@@ -49,7 +50,7 @@ class LL1Parser {
 			multiRule(EXPR, nexts(LPAREN, NIL, STRLIT, INTLIT, ID, MINUS),
 					p(s(OREXPR), s(EXPR_TAIL)));
 			rule(EXPR_TAIL, OR, p(s(OROP), s(OREXPR), s(EXPR_TAIL)));
-			multiEpsilon(EXPR_TAIL, nexts(IF, WHILE, FOR, BREAK, RETURN, ID, ENDIF, END, RPAREN, COMMA,
+			multiEpsilon(EXPR_TAIL, nexts(IF, WHILE, FOR, BREAK, RETURN, ID, ENDIF, END, ENDDO, RPAREN, COMMA,
 					RBRACK, THEN, DO, TO, SEMI));
 			multiRule(FACTOR, nexts(LPAREN, NIL, STRLIT, INTLIT, ID, MINUS),
 					p(s(UNARYMINUS)));
@@ -68,16 +69,16 @@ class LL1Parser {
 					p(s(LBRACK), s(EXPR), s(RBRACK), s(LVALUE_TAIL)));
 			multiEpsilon(LVALUE_TAIL, nexts(ASSIGN, MULT, DIV, PLUS, MINUS,
 					EQ, LESS, GREATER, LESSEREQ, GREATEREQ, NEQ, AND, OR,
-					IF, WHILE, FOR, BREAK, RETURN, ID, ENDIF, END, RPAREN, COMMA,
+					IF, WHILE, FOR, BREAK, RETURN, ID, ENDIF, END, ENDDO, RPAREN, COMMA,
 					RBRACK, THEN, DO, TO, SEMI));
 			multiLiteral(MULOP, nexts(MULT, DIV));
 			rule(OPTIONAL_INIT, ASSIGN, p(s(ASSIGN), s(CONST)));
-			multiEpsilon(OPTIONAL_INIT, nexts(FUNC, IN));
+			epsilon(OPTIONAL_INIT, SEMI);
 			multiRule(OREXPR, nexts(LPAREN, NIL, STRLIT, INTLIT, ID, MINUS),
 					p(s(ANDEXPR), s(OREXPR_TAIL)));
 			rule(OREXPR_TAIL, AND, 
 					p(s(ANDOP), s(ANDEXPR), s(OREXPR_TAIL)));
-			multiEpsilon(OREXPR_TAIL, nexts(IF, WHILE, FOR, BREAK, RETURN, ID, ENDIF, END,
+			multiEpsilon(OREXPR_TAIL, nexts(IF, WHILE, FOR, BREAK, RETURN, ID, ENDIF, END, ENDDO,
 					OR, RPAREN, COMMA, RBRACK, THEN, DO, TO, SEMI));
 			literal(OROP, OR);
 			rule(PARAM, ID, p(s(ID), s(COLON), s(TYPE_ID)));
@@ -92,13 +93,13 @@ class LL1Parser {
 					p(s(CONST), s(STAT_ASSIGN_TAIL)));
 			rule(STAT_ASSIGN, ID, p(s(ID), s(STAT_ASSIGN_ID)));
 			rule(STAT_ASSIGN, MINUS, p(s(MINUS), s(UNARYMINUS), s(STAT_ASSIGN_TAIL)));
-			multiEpsilon(STAT_ASSIGN_ID, nexts(END, ENDIF, ID, RETURN, BREAK, FOR, WHILE, IF));
+			epsilon(STAT_ASSIGN_ID, SEMI);
 			multiRule(STAT_ASSIGN_ID, nexts(OR, AND, NEQ, LESSEREQ, GREATEREQ, LESS, GREATER, EQ,
 					PLUS, MINUS, DIV, MULT, LBRACK),
 					p(s(LVALUE_TAIL), s(STAT_ASSIGN_TAIL)));
 			rule(STAT_ASSIGN_ID, LPAREN, 
-					p(s(LPAREN), s(EXPR_LIST), s(RPAREN), s(SEMI)));
-			multiEpsilon(STAT_ASSIGN_TAIL, nexts(END, ENDIF, ID, RETURN, BREAK, FOR, WHILE, IF));
+					p(s(LPAREN), s(EXPR_LIST), s(RPAREN)));
+			epsilon(STAT_ASSIGN_TAIL, SEMI);
 			rule(STAT_ASSIGN_TAIL, OR, p(s(EXPR_TAIL)));
 			rule(STAT_ASSIGN_TAIL, AND, p(s(OREXPR_TAIL)));
 			multiRule(STAT_ASSIGN_TAIL, nexts(EQ, LESS, GREATER, LESSEREQ, GREATEREQ, NEQ), 
@@ -108,7 +109,7 @@ class LL1Parser {
 			rule(STAT_FUNC_OR_ASSIGN, LPAREN, 
 					p(s(LPAREN), s(EXPR_LIST), s(RPAREN), s(SEMI)));
 			multiRule(STAT_FUNC_OR_ASSIGN, nexts(ASSIGN, LBRACK), 
-					p(s(LVALUE_TAIL), s(ASSIGN), s(STAT_ASSIGN)));
+					p(s(LVALUE_TAIL), s(ASSIGN), s(STAT_ASSIGN), s(SEMI)));
 			rule(STAT_IF_TAIL, ELSE, 
 					p(s(ELSE), s(STAT_SEQ), s(ENDIF), s(SEMI)));
 			rule(STAT_IF_TAIL, ENDIF, p(s(ENDIF), s(SEMI)));
@@ -120,14 +121,14 @@ class LL1Parser {
 			rule(STAT, ID, p(s(ID), s(STAT_FUNC_OR_ASSIGN)));
 			multiRule(STAT_SEQ, nexts(IF, WHILE, FOR, BREAK, RETURN, ID), 
 					p(s(STAT), s(STAT_SEQ_TAIL)));
-			multiEpsilon(STAT_SEQ_TAIL, nexts(ENDIF, END));
+			multiEpsilon(STAT_SEQ_TAIL, nexts(ELSE, ENDIF, END, ENDDO));
 			multiRule(STAT_SEQ_TAIL, nexts(IF, WHILE, FOR, BREAK, RETURN, ID), 
 					p(s(STAT), s(STAT_SEQ_TAIL)));
 			multiRule(TERM, nexts(MINUS, ID, INTLIT, STRLIT, NIL, LPAREN),
 					p(s(FACTOR), s(TERM_TAIL)));
 			multiRule(TERM_TAIL, nexts(MULT, DIV),
 					p(s(MULOP), s(FACTOR), s(TERM_TAIL)));
-			multiEpsilon(TERM_TAIL, nexts(RPAREN, OR, AND, ENDIF, END, ID, RETURN, BREAK,
+			multiEpsilon(TERM_TAIL, nexts(RPAREN, OR, AND, ENDIF, END, ENDDO, ID, RETURN, BREAK,
 					FOR, WHILE, IF, MINUS, PLUS, NEQ, LESSEREQ, GREATEREQ, LESS, EQ,
 					SEMI, TO, DO, THEN, RBRACK, COMMA));
 			rule(TIGER_PROGRAM, LET, 
@@ -219,18 +220,22 @@ class LL1Parser {
 		initializeTable();
 		while(!symbols.isEmpty()){
 			Symbol current = symbols.pop();
+			if(debugging){
+				System.err.println(current);
+			}
 			if(current.isTerminal()){
 				if(current.getTerminal().equals(input.get(position))){
 					position++;
 				} else {
-					position++;
 					errors.add(new ParserError(input.get(position), position, current.getTerminal()));
-					for(int i = 0; i < position;i++){
-						System.err.print(input.get(i) + " ");
+					if(debugging){
+						for(int i = 0; i < position;i++){
+							System.err.print(input.get(i) + " ");
+						}
+						System.err.println();
+						System.err.println(symbols);
+						System.err.println(errors.get(errors.size() - 1));
 					}
-					System.err.println();
-					System.err.println(symbols);
-					System.err.println(errors.get(errors.size() - 1));
 				}
 			} else {
 				Production rule = GRAMMAR_TABLE[current.getVariable().ordinal()]
@@ -239,12 +244,14 @@ class LL1Parser {
 				if(rule == null){
 					errors.add(new ParserError(input.get(position), position, 
 							validTerminals(current.getVariable())));
-					for(int i = 0; i < position;i++){
-						System.err.print(input.get(i) + " ");
+					if(debugging){
+						for(int i = 0; i < position;i++){
+							System.err.print(input.get(i) + " ");
+						}
+						System.err.println();
+						System.err.println(symbols);
+						System.err.println(errors.get(errors.size() - 1));
 					}
-					System.err.println();
-					System.err.println(symbols);
-					System.err.println(errors.get(errors.size() - 1));
 				} else {
 					rule.addToStack(symbols);
 				}
