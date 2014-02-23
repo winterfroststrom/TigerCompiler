@@ -4,7 +4,6 @@ import java.util.List;
 
 public class Lexer {
 
-	
 	public void lex(String input) {
 		CommentDFA cdfa = new CommentDFA();
 		GeneralDFA gdfa = new GeneralDFA();

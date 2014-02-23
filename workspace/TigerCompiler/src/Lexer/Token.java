@@ -1,12 +1,12 @@
 package Lexer;
 
-import static Lexer.TOKEN.*;
+import static Lexer.ETOKEN.*;
 
 public class Token {
-	public final TOKEN token;
+	public final ETOKEN token;
 	public final String text;
 	
-	public Token(TOKEN token, String text){
+	public Token(ETOKEN token, String text){
 		if(token.equals(ID)){
 			this.token = idToken(text);
 		} else {
@@ -15,7 +15,7 @@ public class Token {
 		this.text = text;
 	}
 	
-	private static final TOKEN idToken(String text){
+	private static final ETOKEN idToken(String text){
 		switch(text){
 		case "return":
 			return RETURN;
@@ -64,7 +64,7 @@ public class Token {
 		case "enddo":
 			return ENDDO;
 		default:
-			return TOKEN.ID;
+			return ETOKEN.ID;
 		}
 	}
 	
