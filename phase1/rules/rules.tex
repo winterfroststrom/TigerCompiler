@@ -182,7 +182,7 @@ symbol							&	rule								\\
 \atag{stat}						&	while \atag{expr} do \atag{stat-seq} enddo ;		\\
 \atag{stat}						&	for id := \atag{expr} to \atag{expr} do \atag{stat-seq} enddo ;		\\
 %\atag{stat}						&	id ( \atag{expr-list} ) ;		\\
-\atag{stat}						&	\atag{opt-prefix} id ( \atag{expr-list} ) \\
+\atag{stat}						&	\atag{opt-prefix} id ( \atag{expr-list} ) ; \\
 \atag{stat}						&	break ;		\\
 \atag{stat}						&	return \atag{expr} ;		\\
 \atag{expr}						&	\atag{expr} \atag{binary-operator} \atag{expr}		\\
@@ -201,7 +201,7 @@ symbol							&	rule								\\
 \atag{binary-operator}			&	$>=$	\\
 \atag{binary-operator}			&	$<>$	\\
 \atag{binary-operator}			&	\&	\\
-\atag{binary-operator}			&	|	\\
+\atag{binary-operator}			&	\textbar		\\
 \atag{binary-operator}			&	:=	\\
 \atag{opt-prefix}				&	\atag{lvalue} :=		\\
 \atag{opt-prefix}				&	NULL		\\
@@ -234,42 +234,49 @@ symbol							&	rule								\\
 \atag{type}						&	array [ INTLIT ] of \atag{type-dim} of \atag{type-id}	\\
 \atag{type-dim}					&	[ INTLIT ] \atag{type-dim}	\\
 \atag{type-dim}					&	NULL		\\
-\atag{type-id}					&	int		\\
-\atag{type-id}					&	string		\\
 \atag{type-id}					&	id		\\
 \atag{var-declaration}			&	var \atag{id-list} : \atag{type-id} \atag{optional-init} ;		\\
 \atag{id-list}					&	id \atag{id-list-tail}		\\
 \atag{id-list-tail}				&	, id \atag{id-list-tail}		\\
 \atag{id-list-tail}				&	NULL		\\
-\atag{optional-init}				&	NULL		\\
 \atag{optional-init}				&	:= \atag{const}		\\
+\atag{optional-init}				&	NULL		\\
 \atag{funct-declaration}			&	function id ( \atag{param-list} ) \atag{ret-type} begin \atag{stat-seq} end ;	\\
-\atag{param-list}				&	NULL		\\
 \atag{param-list}				&	\atag{param}	 \atag{param-list-tail}	\\
-\atag{param-list-tail}			&	NULL		\\
+\atag{param-list}				&	NULL		\\
 \atag{param-list-tail}			&	, \atag{param} \atag{param-list-tail}		\\
-\atag{ret-type}					&	NULL		\\
+\atag{param-list-tail}			&	NULL		\\
 \atag{ret-type}					&	: \atag{type-id}		\\
+\atag{ret-type}					&	NULL		\\
 \atag{param}						&	id : \atag{type-id}		\\
 \atag{stat-seq}					&	\atag{stat} \atag{stat-seq-tail}		\\
 \atag{stat-seq-tail}				&	\atag{stat} \atag{stat-seq-tail}		\\
 \atag{stat-seq-tail}				&	NULL		\\
-\atag{stat}						&	\atag{lvalue} := \atag{expr}	;	\\
-\atag{stat}						&	if \atag{expr} then \atag{stat-seq} endif ;		\\
-\atag{stat}						&	if \atag{expr} then \atag{stat-seq} else \atag{stat-seq} endif ;		\\
+\atag{stat}						&	if \atag{expr} then \atag{stat-seq} \atag{stat-if-tail}		\\
 \atag{stat}						&	while \atag{expr} do \atag{stat-seq} enddo ;		\\
 \atag{stat}						&	for id := \atag{expr} to \atag{expr} do \atag{stat-seq} enddo ;		\\
-\atag{stat}						&	\atag{opt-prefix} id ( \atag{expr-list} ) \\
+\atag{stat}						&	\atag{lvalue} := \atag{stat-assign}	\\
+\atag{stat}						&	id ( \atag{expr-list} ) ;	\\
 \atag{stat}						&	break ;		\\
 \atag{stat}						&	return \atag{expr} ;		\\
-\atag{expr}					&	\atag{orexpr} \atag{orop} \atag{expr}		\\
-\atag{expr}					&	\atag{orexpr}		\\
-\atag{orop} 					&	|		\\
+\atag{stat-if-tail}				&	else \atag{stat-seq} endif ;		\\
+\atag{stat-if-tail}				&	endif ;		\\
+\atag{stat-assign}				&	\atag{expr}	;	\\
+\atag{stat-assign}				&	id ( \atag{expr-list} ) ;	\\
+\atag{opt-prefix}				&	\atag{lvalue} :=		\\
+\atag{opt-prefix}				&	NULL		\\
+
+\atag{expr}						&	\atag{orexpr} \atag{orop} \atag{expr}		\\
+\atag{expr}						&	\atag{orexpr}		\\
+\atag{orop} 						&	\textbar		\\
 \atag{orexpr} 					&	\atag{andexpr} \atag{andop} \atag{orexpr}		\\
 \atag{orexpr} 					&	\atag{andexpr}		\\
-\atag{andop}					&	\&		\\
+\atag{andop}						&	\&		\\
 \atag{andexpr} 					&	\atag{compare} \atag{compop} \atag{and}		\\
 \atag{andexpr} 					&	\atag{compare}		\\
+\atag{const}						&	INTLIT		\\
+\atag{const}						&	STRLIT		\\
+\atag{const}						&	nil		\\
 \atag{compop}					&	=		\\
 \atag{compop}					&	$<>$		\\
 \atag{compop}					&	$>$		\\
@@ -278,12 +285,12 @@ symbol							&	rule								\\
 \atag{compop}					&	$<=$		\\
 \atag{compare}					&	\atag{term} \atag{addop} \atag{compare}		\\
 \atag{compare}					&	\atag{term}		\\
-\atag{addop}					&	+		\\
-\atag{addop}					&	-		\\
-\atag{term}					&	\atag{factor} \atag{mulop} \atag{term}		\\
-\atag{term}					&	\atag{factor}		\\
-\atag{mulop}					&	*		\\
-\atag{mulop}					&	/		\\
+\atag{addop}						&	+		\\
+\atag{addop}						&	-		\\
+\atag{term}						&	\atag{factor} \atag{mulop} \atag{term}		\\
+\atag{term}						&	\atag{factor}		\\
+\atag{mulop}						&	*		\\
+\atag{mulop}						&	/		\\
 \atag{factor}					&	\atag{unaryminus}		\\
 \atag{factor}					&	- \atag{unaryminus}		\\
 \atag{unaryminus}				&	( \atag{expr} )		\\
@@ -302,6 +309,11 @@ symbol							&	rule								\\
 \atag{lvalue-tail}				&	[ \atag{expr} ] \atag{lvalue-tail}		\\
 \atag{lvalue-tail}				&	NULL		\\
 \end{longtable}
+
+
+Tokens for the parser table:
+
+PLUS, MINUS, MULT, DIV, EQ, LPAREN, RPAREN, COMMA, AND, OR, LBRACK, RBRACK, SEMI, NEQ, LESSEREQ, LESS, GREATEREQ, GREATER, ASSIGN, COLON, INTLIT, ID, STRLIT, RETURN, ARRAY, BREAK, DO, ELSE, END, FOR, FUNC, IF, IN, LET, NIL, OF, THEN, TO, TYPE, VAR, WHILE, ENDIF, BEGIN, ENDDO
 
 
 
