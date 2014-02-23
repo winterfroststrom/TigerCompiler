@@ -16,25 +16,157 @@ class LL1Parser {
 	private static boolean initialized;
 	private Stack<Symbol> symbols;
 	private List<ETERMINAL> input;
+	private List<ParserError> errors;
 	private int position;
 	
 	private void initializeTable(){
 		if(!initialized){
 			multiLiteral(ADDOP, nexts(PLUS, MINUS));
 			multiRule(ANDEXPR, nexts(LPAREN, NIL, STRLIT, INTLIT, ID, MINUS), 
-					new Production(new Symbol(COMPARE), new Symbol(ANDEXPR_TAIL)));
+					p(s(COMPARE), s(ANDEXPR_TAIL)));
 			multiRule(ANDEXPR_TAIL, nexts(EQ, LESS, GREATER, LESSEREQ, GREATEREQ, NEQ),
-					new Production(new Symbol(COMPOP), new Symbol(COMPARE), new Symbol(COMPARE_TAIL)));
+					p(s(COMPOP), s(COMPARE), s(COMPARE_TAIL)));
 			multiEpsilon(ANDEXPR_TAIL, nexts(IF, WHILE, FOR, BREAK, RETURN, ID, ENDIF, END, AND,
 					OR, RPAREN, COMMA, RBRACK, THEN, DO, TO, SEMI));			
 			literal(ANDOP, AND);
 			multiRule(COMPARE, nexts(LPAREN, NIL, STRLIT, INTLIT, ID, MINUS),
-					new Production(new Symbol(TERM), new Symbol(COMPARE_TAIL)));
-
+					p(s(TERM), s(COMPARE_TAIL)));
+			multiRule(COMPARE_TAIL, nexts(PLUS, MINUS), 
+					p(s(ADDOP), s(TERM), s(COMPARE_TAIL)));
+			multiEpsilon(COMPARE_TAIL, nexts(IF, WHILE, FOR, BREAK, RETURN, ID, ENDIF, END,
+					AND, OR, RPAREN, COMMA, RBRACK, THEN, DO, TO, SEMI, EQ, LESS, GREATER, LESSEREQ,
+					GREATEREQ, NEQ));
+			multiLiteral(COMPOP, nexts(EQ, LESS, GREATER, LESSEREQ, GREATEREQ, NEQ));
+			multiLiteral(CONST, nexts(NIL, STRLIT, INTLIT));
+			multiRule(DECLARATION_SEGMENT, nexts(FUNC, VAR, TYPE), 
+					p(s(TYPE_DECLARATION_LIST), s(VAR_DECLARATION_LIST), s(FUNCT_DECLARATION_LIST)));
+			epsilon(DECLARATION_SEGMENT, IN);
+			epsilon(EXPR_LIST, RPAREN);
+			multiRule(EXPR_LIST, nexts(LPAREN, NIL, STRLIT, INTLIT, ID, MINUS),
+					p(s(EXPR), s(EXPR_LIST_TAIL)));
+			epsilon(EXPR_LIST_TAIL, RPAREN);
+			rule(EXPR_LIST_TAIL, COMMA, p(s(COMMA), s(EXPR), s(EXPR_LIST_TAIL)));
+			multiRule(EXPR, nexts(LPAREN, NIL, STRLIT, INTLIT, ID, MINUS),
+					p(s(OREXPR), s(EXPR_TAIL)));
+			rule(EXPR_TAIL, OR, p(s(OROP), s(OREXPR), s(EXPR_TAIL)));
+			multiEpsilon(EXPR_TAIL, nexts(IF, WHILE, FOR, BREAK, RETURN, ID, ENDIF, END, RPAREN, COMMA,
+					RBRACK, THEN, DO, TO, SEMI));
+			multiRule(FACTOR, nexts(LPAREN, NIL, STRLIT, INTLIT, ID, MINUS),
+					p(s(UNARYMINUS)));
+			rule(FUNCT_DECLARATION, FUNC, 
+					p(s(FUNC), s(ID), s(LPAREN), s(PARAM_LIST), s(RPAREN), s(RET_TYPE), 
+							s(BEGIN), s(STAT_SEQ), s(END), s(SEMI)));
+			rule(FUNCT_DECLARATION_LIST, FUNC, 
+					p(s(FUNCT_DECLARATION), s(FUNCT_DECLARATION_LIST)));
+			epsilon(FUNCT_DECLARATION_LIST, IN);
+			rule(ID_LIST, ID, p(s(ID), s(ID_LIST_TAIL)));
+			epsilon(ID_LIST_TAIL, COLON);
+			rule(ID_LIST_TAIL, COMMA, 
+					p(s(COMMA), s(ID), s(ID_LIST_TAIL)));
+			rule(LVALUE, ID, p(s(ID), s(LVALUE_TAIL)));
+			rule(LVALUE_TAIL, LBRACK, 
+					p(s(LBRACK), s(EXPR), s(RBRACK), s(LVALUE_TAIL)));
+			multiEpsilon(LVALUE_TAIL, nexts(ASSIGN, MULT, DIV, PLUS, MINUS,
+					EQ, LESS, GREATER, LESSEREQ, GREATEREQ, NEQ, AND, OR,
+					IF, WHILE, FOR, BREAK, RETURN, ID, ENDIF, END, RPAREN, COMMA,
+					RBRACK, THEN, DO, TO, SEMI));
+			multiLiteral(MULOP, nexts(MULT, DIV));
+			rule(OPTIONAL_INIT, ASSIGN, p(s(ASSIGN), s(CONST)));
+			multiEpsilon(OPTIONAL_INIT, nexts(FUNC, IN));
+			multiRule(OREXPR, nexts(LPAREN, NIL, STRLIT, INTLIT, ID, MINUS),
+					p(s(ANDEXPR), s(OREXPR_TAIL)));
+			rule(OREXPR_TAIL, AND, 
+					p(s(ANDOP), s(ANDEXPR), s(OREXPR_TAIL)));
+			multiEpsilon(OREXPR_TAIL, nexts(IF, WHILE, FOR, BREAK, RETURN, ID, ENDIF, END,
+					OR, RPAREN, COMMA, RBRACK, THEN, DO, TO, SEMI));
+			literal(OROP, OR);
+			rule(PARAM, ID, p(s(ID), s(COLON), s(TYPE_ID)));
+			rule(PARAM_LIST, ID, p(s(PARAM), s(PARAM_LIST_TAIL)));
+			epsilon(PARAM_LIST, RPAREN);
+			epsilon(PARAM_LIST_TAIL, RPAREN);
+			rule(PARAM_LIST_TAIL, COMMA, 
+					p(s(COMMA), s(PARAM), s(PARAM_LIST_TAIL)));
+			epsilon(RET_TYPE, BEGIN);
+			rule(RET_TYPE, COLON, p(s(COLON), s(TYPE_ID)));
+			multiRule(STAT_ASSIGN, nexts(NIL, STRLIT, INTLIT),
+					p(s(CONST), s(STAT_ASSIGN_TAIL)));
+			rule(STAT_ASSIGN, ID, p(s(ID), s(STAT_ASSIGN_ID)));
+			rule(STAT_ASSIGN, MINUS, p(s(MINUS), s(UNARYMINUS), s(STAT_ASSIGN_TAIL)));
+			multiEpsilon(STAT_ASSIGN_ID, nexts(END, ENDIF, ID, RETURN, BREAK, FOR, WHILE, IF));
+			multiRule(STAT_ASSIGN_ID, nexts(OR, AND, NEQ, LESSEREQ, GREATEREQ, LESS, GREATER, EQ,
+					PLUS, MINUS, DIV, MULT, LBRACK),
+					p(s(LVALUE_TAIL), s(STAT_ASSIGN_TAIL)));
+			rule(STAT_ASSIGN_ID, LPAREN, 
+					p(s(LPAREN), s(EXPR_LIST), s(RPAREN), s(SEMI)));
+			multiEpsilon(STAT_ASSIGN_TAIL, nexts(END, ENDIF, ID, RETURN, BREAK, FOR, WHILE, IF));
+			rule(STAT_ASSIGN_TAIL, OR, p(s(EXPR_TAIL)));
+			rule(STAT_ASSIGN_TAIL, AND, p(s(OREXPR_TAIL)));
+			multiRule(STAT_ASSIGN_TAIL, nexts(EQ, LESS, GREATER, LESSEREQ, GREATEREQ, NEQ), 
+					p(s(ANDEXPR_TAIL)));
+			multiRule(STAT_ASSIGN_TAIL, nexts(PLUS, MINUS), p(s(COMPARE_TAIL)));
+			multiRule(STAT_ASSIGN_TAIL, nexts(MULT, DIV), p(s(TERM_TAIL)));
+			rule(STAT_FUNC_OR_ASSIGN, LPAREN, 
+					p(s(LPAREN), s(EXPR_LIST), s(RPAREN), s(SEMI)));
+			multiRule(STAT_FUNC_OR_ASSIGN, nexts(ASSIGN, LBRACK), 
+					p(s(LVALUE_TAIL), s(ASSIGN), s(STAT_ASSIGN)));
+			rule(STAT_IF_TAIL, ELSE, 
+					p(s(ELSE), s(STAT_SEQ), s(ENDIF), s(SEMI)));
+			rule(STAT_IF_TAIL, ENDIF, p(s(ENDIF), s(SEMI)));
+			rule(STAT, IF, p(s(IF), s(EXPR), s(THEN), s(STAT_SEQ), s(STAT_IF_TAIL)));
+			rule(STAT, WHILE, p(s(WHILE), s(EXPR), s(DO), s(STAT_SEQ), s(ENDDO), s(SEMI)));
+			rule(STAT, FOR, p(s(FOR), s(ID), s(ASSIGN), s(EXPR), s(TO), s(EXPR), s(DO), s(STAT_SEQ), s(ENDDO), s(SEMI)));
+			rule(STAT, BREAK, p(s(BREAK), s(SEMI)));
+			rule(STAT, RETURN, p(s(RETURN), s(EXPR), s(SEMI)));
+			rule(STAT, ID, p(s(ID), s(STAT_FUNC_OR_ASSIGN)));
+			multiRule(STAT_SEQ, nexts(IF, WHILE, FOR, BREAK, RETURN, ID), 
+					p(s(STAT), s(STAT_SEQ_TAIL)));
+			multiEpsilon(STAT_SEQ_TAIL, nexts(ENDIF, END));
+			multiRule(STAT_SEQ_TAIL, nexts(IF, WHILE, FOR, BREAK, RETURN, ID), 
+					p(s(STAT), s(STAT_SEQ_TAIL)));
+			multiRule(TERM, nexts(MINUS, ID, INTLIT, STRLIT, NIL, LPAREN),
+					p(s(FACTOR), s(TERM_TAIL)));
+			multiRule(TERM_TAIL, nexts(MULT, DIV),
+					p(s(MULOP), s(FACTOR), s(TERM_TAIL)));
+			multiEpsilon(TERM_TAIL, nexts(RPAREN, OR, AND, ENDIF, END, ID, RETURN, BREAK,
+					FOR, WHILE, IF, MINUS, PLUS, NEQ, LESSEREQ, GREATEREQ, LESS, EQ,
+					SEMI, TO, DO, THEN, RBRACK, COMMA));
+			rule(TIGER_PROGRAM, LET, 
+					p(s(LET), s(DECLARATION_SEGMENT), s(IN), s(STAT_SEQ), s(END)));
+			rule(TYPE_LIT, ARRAY, 
+					p(s(ARRAY), s(LBRACK), s(INTLIT), s(RBRACK), s(TYPE_DIM), s(OF), s(TYPE_ID)));
+			rule(TYPE_LIT, ID, p(s(TYPE_ID)));
+			rule(TYPE_DECLARATION_LIST, TYPE, 
+					p(s(TYPE_DECLARATION), s(TYPE_DECLARATION_LIST)));
+			multiEpsilon(TYPE_DECLARATION_LIST, nexts(VAR, FUNC, IN));
+			rule(TYPE_DECLARATION, TYPE, 
+					p(s(TYPE), s(ID), s(EQ), s(TYPE_LIT), s(SEMI)));
+			rule(TYPE_DIM, LBRACK, p(s(LBRACK), s(INTLIT), s(RBRACK), s(TYPE_DIM)));
+			epsilon(TYPE_DIM, OF);
+			literal(TYPE_ID, ID);
+			rule(UNARYMINUS, LPAREN, p(s(LPAREN), s(EXPR), s(RPAREN)));
+			multiRule(UNARYMINUS, nexts(NIL, STRLIT, INTLIT), p(s(CONST)));
+			rule(UNARYMINUS, ID, p(s(LVALUE)));
+			multiEpsilon(VAR_DECLARATION_LIST, nexts(FUNC, IN));
+			rule(VAR_DECLARATION_LIST, VAR, 
+					p(s(VAR_DECLARATION), s(VAR_DECLARATION_LIST)));
+			rule(VAR_DECLARATION, VAR, p(s(VAR), s(ID_LIST), s(COLON), 
+					s(TYPE_ID), s(OPTIONAL_INIT), s(SEMI)));
 			initialized = true;	
 		}
 	}
 
+	private Symbol s(EVARIABLE v){
+		return new Symbol(v);
+	}
+	
+	private Symbol s(ETERMINAL t){
+		return new Symbol(t);
+	}
+	
+	private Production p(Symbol...symbols){
+		return new Production(symbols);
+	}
+	
 	private ETERMINAL[] nexts(ETERMINAL... nexts){
 		return nexts;
 	}
@@ -79,6 +211,7 @@ class LL1Parser {
 			input.add(token.token);
 		}
 		position = 0;
+		errors = new LinkedList<>();
 	}
 	
 	public boolean parse(List<Token> tokens){
@@ -90,29 +223,42 @@ class LL1Parser {
 				if(current.getTerminal().equals(input.get(position))){
 					position++;
 				} else {
-					System.err.println("Unexpected terminal " + input.get(position) 
-							+ " at position " + position + " expecting " + current);
-					return false;
+					position++;
+					errors.add(new ParserError(input.get(position), position, current.getTerminal()));
+					for(int i = 0; i < position;i++){
+						System.err.print(input.get(i) + " ");
+					}
+					System.err.println();
+					System.err.println(symbols);
+					System.err.println(errors.get(errors.size() - 1));
 				}
 			} else {
 				Production rule = GRAMMAR_TABLE[current.getVariable().ordinal()]
 						[input.get(position).ordinal()];
 
 				if(rule == null){
-					System.err.println("Unexpected terminal " + input.get(position) 
-							+ " at position " + position + 
-							" expecting one of" + validTerminals(current.getVariable()));
-						return false;
+					errors.add(new ParserError(input.get(position), position, 
+							validTerminals(current.getVariable())));
+					for(int i = 0; i < position;i++){
+						System.err.print(input.get(i) + " ");
+					}
+					System.err.println();
+					System.err.println(symbols);
+					System.err.println(errors.get(errors.size() - 1));
 				} else {
 					rule.addToStack(symbols);
 				}
 			}
 		}
-		return true;
+		return errors.isEmpty();
 	}
 	
 	public List<ParserError> errors(){
-		return new LinkedList<>();
+		if(errors != null){
+			return errors;
+		} else {
+			return new LinkedList<>();
+		}
 	}
 	
 	private List<ETERMINAL> validTerminals(EVARIABLE current){

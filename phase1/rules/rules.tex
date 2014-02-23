@@ -153,7 +153,7 @@ symbol							&	rule								\\
 \atag{type-declaration}			&	type id = \atag{type} ;		\\
 \atag{type}						&	\atag{type-id}		\\
 %\atag{type}						&	array [ INTLIT ] of \atag{type-id}		\\
-\atag{type}						&	array [ INTLIT ] of \atag{type-dim} of \atag{type-id}	\\
+\atag{type}						&	array [ INTLIT ] \atag{type-dim} of \atag{type-id}	\\
 \atag{type-dim}					&	[ INTLIT ] \atag{type-dim}	\\
 \atag{type-dim}					&	NULL		\\
 \atag{type-id}					&	int		\\
@@ -232,7 +232,7 @@ symbol							&	rule								\\
 \atag{var-declaration}			&	var \atag{id-list} : \atag{type-id} \atag{optional-init} ;		\\
 \atag{funct-declaration}			&	function id ( \atag{param-list} ) \atag{ret-type} begin \atag{stat-seq} end ;	\\
 \atag{type}						&	\atag{type-id}		\\
-\atag{type}						&	array [ INTLIT ] of \atag{type-dim} of \atag{type-id}	\\
+\atag{type}						&	array [ INTLIT ] \atag{type-dim} of \atag{type-id}	\\
 \atag{type-dim}					&	[ INTLIT ] \atag{type-dim}	\\
 \atag{type-dim}					&	NULL		\\
 \atag{type-id}					&	id		\\
@@ -618,8 +618,8 @@ symbol							&	next token	&	rule									\\
 \atag{stat-assign-id}			&	+			&	\atag{lvalue-tail} \atag{stat-assign-tail}			\\
 \atag{stat-assign-id}			&	/			&	\atag{lvalue-tail} \atag{stat-assign-tail}			\\
 \atag{stat-assign-id}			&	*			&	\atag{lvalue-tail} \atag{stat-assign-tail}			\\
-\atag{stat-assign-id}			&	(			&	( \atag{expr-list} ) ;			\\
 \atag{stat-assign-id}			&	[			&	\atag{lvalue-tail} \atag{stat-assign-tail}			\\
+\atag{stat-assign-id}			&	(			&	( \atag{expr-list} ) ;			\\
 \atag{stat-assign-tail}			&	end			&	$\epsilon$	\\
 \atag{stat-assign-tail}			&	endif			&	$\epsilon$	\\
 \atag{stat-assign-tail}			&	id			&	$\epsilon$	\\
@@ -641,7 +641,7 @@ symbol							&	next token	&	rule									\\
 \atag{stat-assign-tail}			&	/			&	\atag{term-tail}	\\
 \atag{stat-assign-tail}			&	*			&	\atag{term-tail}	\\
 \atag{stat-func-or-assign}		&	(		&	( \atag{expr-list} ) ;	\\
-\atag{stat-func-or-assign}		&	:=			&	\atag{lvalue-tail} := \atag{stat-assign}\\
+\atag{stat-func-or-assign}		&	:=		&	\atag{lvalue-tail} := \atag{stat-assign}\\
 \atag{stat-func-or-assign}		&	[		&	\atag{lvalue-tail} := \atag{stat-assign}	\\
 \atag{stat-if-tail}				&	else		&	else \atag{stat-seq} endif ;	\\
 \atag{stat-if-tail}				&	endif	&	endif ;	\\
@@ -699,7 +699,7 @@ symbol							&	next token	&	rule									\\
 \atag{term-tail}					&	]		&	$\epsilon$		\\
 \atag{term-tail}					&	,		&	$\epsilon$		\\
 \atag{tiger-program}				&	let		&	let \atag{declaration-segment} in \atag{stat-seq} end	\\
-\atag{type}						&	array		&	array [ INTLIT ] of \atag{type-dim} of \atag{type-id}	\\
+\atag{type}						&	array		&	array [ INTLIT ] \atag{type-dim} of \atag{type-id}	\\
 \atag{type}						&	id		&	\atag{type-id}	\\
 \atag{type-declaration-list}		&	type		&	\atag{type-declaration} \atag{type-declaration-list}	\\
 \atag{type-declaration-list}		&	var		&	$\epsilon$	\\

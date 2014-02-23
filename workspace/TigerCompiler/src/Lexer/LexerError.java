@@ -15,7 +15,7 @@ public class LexerError {
 	
 	@Override
 	public String toString(){
-		return "Unexcepted character at position " + position + ": " 
+		return "Unexpected character at position " + position + ": " 
 				+ character
 				+ " at state " + state;
 	}
