@@ -376,7 +376,7 @@ Note, the dollar sign is the end of tokens symbol.
 non-terminal						&	follow set												\\
 \hline
 \atag{lvalue-tail}				&	:=, *, /	, +, -, $=, <, >, <=, >=, <>$, \& \\
-\atag{lvalue-tail}				&	\textbar , if, while, for, break, return, id, endif, end,  \& ,\textbar , ), ,, , ], then, do, to, ; 					\\
+\atag{lvalue-tail}				&	\textbar , if, while, for, break, return, id, endif, end, ), ,, , ], then, do, to, ; 					\\
 \atag{expr-list-tail}			&	)												\\
 \atag{expr-list}					&	)								\\
 \atag{expr-tail}					&	if, while, for, break, return, id, endif, end, ), ,, , ], then, do, to, ;	\\
@@ -407,9 +407,319 @@ Note, if there is no corresponding rule, then that means a parser error is gener
 Note, errors are handled by dropping tokens until a valid token is found.
 
 \begin{longtable}{l|l|l}
-symbol		&	next token	&	rule												\\
+symbol							&	next token	&	rule									\\
 \hline
-
+\atag{addop}						&	+			&										\\
+\atag{addop}						&	-			&										\\
+\atag{andexpr} 					&	(			&		\\
+\atag{andexpr} 					&	nil			&		\\
+\atag{andexpr} 					&	STRLIT		&		\\
+\atag{andexpr} 					&	INTLIT		&		\\
+\atag{andexpr} 					&	id			&		\\
+\atag{andexpr} 					&	-			&		\\
+\atag{andexpr-tail}				&	$=$			&		\\
+\atag{andexpr-tail}				&	$<$			&		\\
+\atag{andexpr-tail}				&	$>$			&		\\
+\atag{andexpr-tail}				&	$>=$			&		\\
+\atag{andexpr-tail}				&	$<=$			&		\\
+\atag{andexpr-tail}				&	$<>$			&		\\
+\atag{andexpr-tail}				&	if			&	$\epsilon$	\\
+\atag{andexpr-tail}				&	while		&	$\epsilon$	\\
+\atag{andexpr-tail}				&	for			&	$\epsilon$	\\
+\atag{andexpr-tail}				&	break		&	$\epsilon$	\\
+\atag{andexpr-tail}				&	return		&	$\epsilon$	\\
+\atag{andexpr-tail}				&	id			&	$\epsilon$	\\
+\atag{andexpr-tail}				&	endif		&	$\epsilon$	\\
+\atag{andexpr-tail}				&	end			&	$\epsilon$	\\
+\atag{andexpr-tail}				&	\&			&	$\epsilon$	\\
+\atag{andexpr-tail}				&	\textbar		&	$\epsilon$	\\
+\atag{andexpr-tail}				&	)			&	$\epsilon$	\\
+\atag{andexpr-tail}				&	,			&	$\epsilon$	\\
+\atag{andexpr-tail}				&	]			&	$\epsilon$	\\
+\atag{andexpr-tail}				&	then			&	$\epsilon$	\\
+\atag{andexpr-tail}				&	do			&	$\epsilon$	\\
+\atag{andexpr-tail}				&	to			&	$\epsilon$	\\
+\atag{andexpr-tail}				&	;			&	$\epsilon$	\\
+\atag{andop}						&	\&			&											\\
+\atag{compare} 					&	(			&		\\
+\atag{compare} 					&	nil			&		\\
+\atag{compare} 					&	STRLIT		&		\\
+\atag{compare} 					&	INTLIT		&		\\
+\atag{compare} 					&	id			&		\\
+\atag{compare} 					&	-			&		\\
+\atag{compare-tail}				&	+			&						\\
+\atag{compare-tail}				&	-			&						\\
+\atag{compare-tail}				&	if			&	$\epsilon$					\\
+\atag{compare-tail}				&	while			&	$\epsilon$					\\
+\atag{compare-tail}				&	for			&	$\epsilon$					\\
+\atag{compare-tail}				&	break			&	$\epsilon$					\\
+\atag{compare-tail}				&	return			&	$\epsilon$					\\
+\atag{compare-tail}				&	id			&	$\epsilon$					\\
+\atag{compare-tail}				&	endif			&	$\epsilon$					\\
+\atag{compare-tail}				&	end			&	$\epsilon$					\\
+\atag{compare-tail}				&	\&			&	$\epsilon$					\\
+\atag{compare-tail}				&	\textbar			&	$\epsilon$					\\
+\atag{compare-tail}				&	)			&	$\epsilon$					\\
+\atag{compare-tail}				&	,			&	$\epsilon$					\\
+\atag{compare-tail}				&	]			&	$\epsilon$					\\
+\atag{compare-tail}				&	then			&	$\epsilon$					\\
+\atag{compare-tail}				&	do			&	$\epsilon$					\\
+\atag{compare-tail}				&	to			&	$\epsilon$					\\
+\atag{compare-tail}				&	;			&	$\epsilon$					\\
+\atag{compare-tail}				&	$=$			&	$\epsilon$					\\
+\atag{compare-tail}				&	$<$			&	$\epsilon$					\\
+\atag{compare-tail}				&	$>$			&	$\epsilon$					\\
+\atag{compare-tail}				&	$<=$			&	$\epsilon$					\\
+\atag{compare-tail}				&	$>=$			&	$\epsilon$					\\
+\atag{compare-tail}				&	$<>$			&	$\epsilon$						\\
+\atag{compop}					&	$=$			&									\\
+\atag{compop}					&	$<$			&									\\
+\atag{compop}					&	$>$			&									\\
+\atag{compop}					&	$<=$			&									\\
+\atag{compop}					&	$>=$			&									\\
+\atag{compop}					&	$<>$			&									\\
+\atag{const}						&	nil			&		\\
+\atag{const}						&	STRLIT		&		\\
+\atag{const}						&	INTLIT		&		\\
+\atag{declaration-segment}		&	function		&		\\
+\atag{declaration-segment}		&	var			&		\\
+\atag{declaration-segment}		&	type			&		\\
+\atag{declaration-segment}		&	in			&	$\epsilon$	\\
+\atag{expr-list}					&	)			&	$\epsilon$				\\
+\atag{expr-list}					&	(			&					\\
+\atag{expr-list}					&	nil			&					\\
+\atag{expr-list}					&	STRLIT		&					\\
+\atag{expr-list}					&	INTLIT			&					\\
+\atag{expr-list}					&	id			&					\\
+\atag{expr-list}					&	-			&					\\
+\atag{expr-list-tail}			&	)			&	$\epsilon$								\\
+\atag{expr-list-tail}			&	,			&											\\
+\atag{expr}						&	(			&		\\
+\atag{expr}						&	nil			&		\\
+\atag{expr}						&	STRLIT			&		\\
+\atag{expr}						&	INTLIT			&		\\
+\atag{expr}						&	id			&		\\
+\atag{expr}						&	-			&		\\
+\atag{expr-tail}					&	\textbar		&			\\
+\atag{expr-tail}					&	if		&		$\epsilon$	\\
+\atag{expr-tail}					&	while		&	$\epsilon$		\\
+\atag{expr-tail}					&	for		&	$\epsilon$		\\
+\atag{expr-tail}					&	break		&	$\epsilon$		\\
+\atag{expr-tail}					&	return		&	$\epsilon$		\\
+\atag{expr-tail}					&	id		&		$\epsilon$	\\
+\atag{expr-tail}					&	endif		&	$\epsilon$		\\
+\atag{expr-tail}					&	end		&	$\epsilon$		\\
+\atag{expr-tail}					&	)		&	$\epsilon$		\\
+\atag{expr-tail}					&	,		&	$\epsilon$		\\
+\atag{expr-tail}					&	]		&	$\epsilon$		\\
+\atag{expr-tail}					&	then		&	$\epsilon$		\\
+\atag{expr-tail}					&	do		&	$\epsilon$		\\
+\atag{expr-tail}					&	to		&	$\epsilon$		\\
+\atag{expr-tail}					&	;		&	$\epsilon$		\\
+\atag{factor}					&	(		&			\\
+\atag{factor}					&	nil		&			\\
+\atag{factor}					&	STRLIT	&			\\
+\atag{factor}					&	INTLIT	&			\\
+\atag{factor}					&	id		&			\\
+\atag{factor}					&	-		&			\\
+\atag{funct-declaration}			&	function		&		\\
+\atag{funct-declaration-list}	&	function		&		\\
+\atag{funct-declaration-list}	&	in		&	$\epsilon$	\\
+\atag{id-list}					&	id		&		\\
+\atag{id-list-tail}				&	:		&	$\epsilon$	\\
+\atag{id-list-tail}				&	,		&		\\
+\atag{lvalue}					&	id		&				\\
+\atag{lvalue-tail}				&	[		&												\\
+\atag{lvalue-tail}				&	:=		&	$\epsilon$											\\
+\atag{lvalue-tail}				&	*		&	$\epsilon$											\\
+\atag{lvalue-tail}				&	/		&	$\epsilon$											\\
+\atag{lvalue-tail}				&	+		&	$\epsilon$											\\
+\atag{lvalue-tail}				&	-		&	$\epsilon$											\\
+\atag{lvalue-tail}				&	$=$		&	$\epsilon$											\\
+\atag{lvalue-tail}				&	$<$		&	$\epsilon$											\\
+\atag{lvalue-tail}				&	$>$		&	$\epsilon$											\\
+\atag{lvalue-tail}				&	$<=$		&	$\epsilon$											\\
+\atag{lvalue-tail}				&	$>=$		&	$\epsilon$											\\
+\atag{lvalue-tail}				&	$<>$		&	$\epsilon$											\\
+\atag{lvalue-tail}				&	\&		&	$\epsilon$											\\
+\atag{lvalue-tail}				&	\textbar		&	$\epsilon$											\\
+\atag{lvalue-tail}				&	if		&		$\epsilon$										\\
+\atag{lvalue-tail}				&	while		&		$\epsilon$										\\
+\atag{lvalue-tail}				&	for		&		$\epsilon$										\\
+\atag{lvalue-tail}				&	break		&	$\epsilon$											\\
+\atag{lvalue-tail}				&	return		&	$\epsilon$											\\
+\atag{lvalue-tail}				&	id		&		$\epsilon$										\\
+\atag{lvalue-tail}				&	endif		&	$\epsilon$											\\
+\atag{lvalue-tail}				&	end		&		$\epsilon$										\\
+\atag{lvalue-tail}				&	)		&	$\epsilon$											\\
+\atag{lvalue-tail}				&	,		&	$\epsilon$											\\
+\atag{lvalue-tail}				&	]		&	$\epsilon$											\\
+\atag{lvalue-tail}				&	then		&	$\epsilon$											\\
+\atag{lvalue-tail}				&	do		&	$\epsilon$											\\
+\atag{lvalue-tail}				&	to		&	$\epsilon$											\\
+\atag{lvalue-tail}				&	;		&	$\epsilon$											\\
+\atag{mulop}						&	*		&														\\
+\atag{mulop}						&	/		&														\\
+\atag{optional-init}				&	:=		&		\\
+\atag{optional-init}				&	function		& $\epsilon$		\\
+\atag{optional-init}				&	in		& $\epsilon$		\\
+\atag{orexpr} 					&	(			&		\\
+\atag{orexpr} 					&	nil			&		\\
+\atag{orexpr} 					&	STRLIT			&		\\
+\atag{orexpr} 					&	INTLIT			&		\\
+\atag{orexpr} 					&	id			&		\\
+\atag{orexpr} 					&	-			&		\\
+\atag{orexpr-tail}				&	\& 		&		\\
+\atag{orexpr-tail}				&	 if		&	$\epsilon$	\\
+\atag{orexpr-tail}				&	 while		&	$\epsilon$	\\
+\atag{orexpr-tail}				&	 for		&	$\epsilon$	\\
+\atag{orexpr-tail}				&	 break		&	$\epsilon$	\\
+\atag{orexpr-tail}				&	 return		&	$\epsilon$	\\
+\atag{orexpr-tail}				&	 id		&	$\epsilon$	\\
+\atag{orexpr-tail}				&	 endif		&	$\epsilon$	\\
+\atag{orexpr-tail}				&	 end		&$\epsilon$		\\
+\atag{orexpr-tail}				&	 \textbar		&	$\epsilon$	\\
+\atag{orexpr-tail}				&	 )		&	$\epsilon$	\\
+\atag{orexpr-tail}				&	 ,		&	$\epsilon$	\\
+\atag{orexpr-tail}				&	 ]		&	$\epsilon$	\\
+\atag{orexpr-tail}				&	 then		&	$\epsilon$	\\
+\atag{orexpr-tail}				&	 do		&	$\epsilon$	\\
+\atag{orexpr-tail}				&	 to		&	$\epsilon$	\\
+\atag{orexpr-tail}				&	 ;		&	$\epsilon$	\\
+\atag{orop} 						&	\textbar		&	\\
+\atag{param}						&	id		&	\\
+\atag{param-list}				&	)		&	$\epsilon$	\\
+\atag{param-list}				&	id		&		\\
+\atag{param-list-tail}			&	)		&	$\epsilon$	\\
+\atag{param-list-tail}			&	,		&		\\
+\atag{ret-type}					&	begin	&	$\epsilon$	\\
+\atag{ret-type}					&	:		&		\\
+\atag{stat-assign}				&	id		&			\\
+\atag{stat-assign}				&	-		&			\\
+\atag{stat-assign}				&	(		&			\\
+\atag{stat-assign}				&	nil		&			\\
+\atag{stat-assign}				&	STRLIT		&			\\
+\atag{stat-assign}				&	INTLIT		&			\\
+\atag{stat-assign-id}			&	end			&	$\epsilon$			\\
+\atag{stat-assign-id}			&	endif		&	$\epsilon$			\\
+\atag{stat-assign-id}			&	id			&	$\epsilon$			\\
+\atag{stat-assign-id}			&	return		&	$\epsilon$			\\
+\atag{stat-assign-id}			&	break		&	$\epsilon$			\\
+\atag{stat-assign-id}			&	for			&	$\epsilon$			\\
+\atag{stat-assign-id}			&	while		&	$\epsilon$			\\
+\atag{stat-assign-id}			&	if			&	$\epsilon$			\\
+\atag{stat-assign-id}			&	\textbar		&				\\
+\atag{stat-assign-id}			&	\&			&				\\
+\atag{stat-assign-id}			&	$<>$			&				\\
+\atag{stat-assign-id}			&	$>=$			&				\\
+\atag{stat-assign-id}			&	$<=$			&				\\
+\atag{stat-assign-id}			&	$>$			&				\\
+\atag{stat-assign-id}			&	$<$			&				\\
+\atag{stat-assign-id}			&	$=$			&				\\
+\atag{stat-assign-id}			&	-			&				\\
+\atag{stat-assign-id}			&	+			&				\\
+\atag{stat-assign-id}			&	/			&				\\
+\atag{stat-assign-id}			&	*			&				\\
+\atag{stat-assign-id}			&	(			&				\\
+\atag{stat-assign-id}			&	[			&				\\
+\atag{stat-assign-tail}			&	end			&	$\epsilon$	\\
+\atag{stat-assign-tail}			&	endif			&	$\epsilon$	\\
+\atag{stat-assign-tail}			&	id			&	$\epsilon$	\\
+\atag{stat-assign-tail}			&	return			&	$\epsilon$	\\
+\atag{stat-assign-tail}			&	break			&	$\epsilon$	\\
+\atag{stat-assign-tail}			&	for			&	$\epsilon$	\\
+\atag{stat-assign-tail}			&	while			&	$\epsilon$	\\
+\atag{stat-assign-tail}			&	if			&	$\epsilon$	\\
+\atag{stat-assign-tail}			&	\textbar		&		\\
+\atag{stat-assign-tail}			&	\&			&		\\
+\atag{stat-assign-tail}			&	$<>$			&		\\
+\atag{stat-assign-tail}			&	$>=$			&		\\
+\atag{stat-assign-tail}			&	$<=$			&		\\
+\atag{stat-assign-tail}			&	$>$			&		\\
+\atag{stat-assign-tail}			&	$<$			&		\\
+\atag{stat-assign-tail}			&	$=$			&		\\
+\atag{stat-assign-tail}			&	-			&		\\
+\atag{stat-assign-tail}			&	+			&		\\
+\atag{stat-assign-tail}			&	/			&		\\
+\atag{stat-assign-tail}			&	*			&		\\
+\atag{stat-func-or-assign}		&	(		&		\\
+\atag{stat-func-or-assign}		&	:=			&	\\
+\atag{stat-func-or-assign}		&	[		&		\\
+\atag{stat-if-tail}				&	else		&		\\
+\atag{stat-if-tail}				&	endif	&		\\
+\atag{stat}						&	if		&			\\
+\atag{stat}						&	while	&			\\
+\atag{stat}						&	for		&			\\
+\atag{stat}						&	break	&			\\
+\atag{stat}						&	return	&			\\
+\atag{stat}						&	id		&			\\
+\atag{stat-seq}					&	if		&			\\
+\atag{stat-seq}					&	while	&			\\
+\atag{stat-seq}					&	for		&			\\
+\atag{stat-seq}					&	break	&			\\
+\atag{stat-seq}					&	return	&			\\
+\atag{stat-seq}					&	id		&			\\
+\atag{stat-seq-tail}				&	endif			&	$\epsilon$	\\
+\atag{stat-seq-tail}				&	end			&	$\epsilon$	\\
+\atag{stat-seq-tail}				&	if			&		\\
+\atag{stat-seq-tail}				&	while			&		\\
+\atag{stat-seq-tail}				&	for			&		\\
+\atag{stat-seq-tail}				&	break			&		\\
+\atag{stat-seq-tail}				&	return			&		\\
+\atag{stat-seq-tail}				&	id			&		\\
+\atag{term}				&	-		&			\\
+\atag{term}				&	id		&			\\
+\atag{term}				&	INTLIT	&			\\
+\atag{term}				&	STRLIT	&			\\
+\atag{term}				&	nil		&			\\
+\atag{term}				&	(		&			\\
+\atag{term-tail}					&	*		&			\\
+\atag{term-tail}					&	/		&			\\
+\atag{term-tail}					&	)		&	$\epsilon$		\\
+\atag{term-tail}					&	\textbar		&	$\epsilon$		\\
+\atag{term-tail}					&	\&		&	$\epsilon$		\\
+\atag{term-tail}					&	end		&	$\epsilon$		\\
+\atag{term-tail}					&	endif	&	$\epsilon$		\\
+\atag{term-tail}					&	id		&	$\epsilon$		\\
+\atag{term-tail}					&	return	&	$\epsilon$		\\
+\atag{term-tail}					&	break	&	$\epsilon$		\\
+\atag{term-tail}					&	for		&	$\epsilon$		\\
+\atag{term-tail}					&	while	&	$\epsilon$		\\
+\atag{term-tail}					&	if		&	$\epsilon$		\\
+\atag{term-tail}					&	-		&	$\epsilon$		\\
+\atag{term-tail}					&	+		&	$\epsilon$		\\
+\atag{term-tail}					&	$<>$		&	$\epsilon$		\\
+\atag{term-tail}					&	$>=$		&	$\epsilon$		\\
+\atag{term-tail}					&	$<=$		&	$\epsilon$		\\
+\atag{term-tail}					&	$>$		&	$\epsilon$		\\
+\atag{term-tail}					&	$<$		&	$\epsilon$		\\
+\atag{term-tail}					&	$=$		&	$\epsilon$		\\
+\atag{term-tail}					&	;		&	$\epsilon$		\\
+\atag{term-tail}					&	to		&	$\epsilon$		\\
+\atag{term-tail}					&	do		&	$\epsilon$		\\
+\atag{term-tail}					&	then		&	$\epsilon$		\\
+\atag{term-tail}					&	]		&	$\epsilon$		\\
+\atag{term-tail}					&	,		&	$\epsilon$		\\
+\atag{tiger-program}				&	let		&		\\
+\atag{type}						&	array		&		\\
+\atag{type}						&	id		&	\\
+\atag{type-declaration-list}		&	type		&		\\
+\atag{type-declaration-list}		&	var		&	$\epsilon$	\\
+\atag{type-declaration-list}		&	function		&	$\epsilon$\\
+\atag{type-declaration-list}		&	in		&	$\epsilon$\\
+\atag{type-declaration}			&	type 	&		\\
+\atag{type-dim}					&	[		&	\\
+\atag{type-dim}					&	of	&	$\epsilon$	\\
+\atag{type-id}					&	id		&		\\
+\atag{unaryminus}				&	(		&		\\
+\atag{unaryminus}				&	nil		&		\\
+\atag{unaryminus}				&	STRLIT		&		\\
+\atag{unaryminus}				&	INTLIT		&		\\
+\atag{unaryminus}				&	id		&		\\
+\atag{var-declaration-list}		&	function		&	$\epsilon$	\\
+\atag{var-declaration-list}		&	in	&		$\epsilon$		\\
+\atag{var-declaration-list}		&	var		& 			\\
+\atag{var-declaration}			&	var 		&		\\
 \end{longtable}
 
 
