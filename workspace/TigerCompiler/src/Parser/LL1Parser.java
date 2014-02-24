@@ -27,16 +27,14 @@ class LL1Parser {
 					p(s(COMPARE), s(ANDEXPR_TAIL)));
 			multiRule(ANDEXPR_TAIL, nexts(EQ, LESS, GREATER, LESSEREQ, GREATEREQ, NEQ),
 					p(s(COMPOP), s(COMPARE), s(COMPARE_TAIL)));
-			multiEpsilon(ANDEXPR_TAIL, nexts(IF, WHILE, FOR, BREAK, RETURN, ID, ENDIF, END, ENDDO, AND,
-					OR, RPAREN, COMMA, RBRACK, THEN, DO, TO, SEMI));			
+			multiEpsilon(ANDEXPR_TAIL, nexts(AND, OR, RPAREN, COMMA, RBRACK, THEN, DO, TO, SEMI));			
 			literal(ANDOP, AND);
 			multiRule(COMPARE, nexts(LPAREN, NIL, STRLIT, INTLIT, ID, MINUS),
 					p(s(TERM), s(COMPARE_TAIL)));
 			multiRule(COMPARE_TAIL, nexts(PLUS, MINUS), 
 					p(s(ADDOP), s(TERM), s(COMPARE_TAIL)));
-			multiEpsilon(COMPARE_TAIL, nexts(IF, WHILE, FOR, BREAK, RETURN, ID, ENDIF, END, ENDDO, 
-					AND, OR, RPAREN, COMMA, RBRACK, THEN, DO, TO, SEMI, EQ, LESS, GREATER, LESSEREQ,
-					GREATEREQ, NEQ));
+			multiEpsilon(COMPARE_TAIL, nexts(AND, OR, RPAREN, COMMA, RBRACK, THEN, DO, TO, SEMI, 
+					EQ, LESS, GREATER, LESSEREQ, GREATEREQ, NEQ));
 			multiLiteral(COMPOP, nexts(EQ, LESS, GREATER, LESSEREQ, GREATEREQ, NEQ));
 			multiLiteral(CONST, nexts(NIL, STRLIT, INTLIT));
 			multiRule(DECLARATION_SEGMENT, nexts(FUNC, VAR, TYPE), 
@@ -50,9 +48,7 @@ class LL1Parser {
 			multiRule(EXPR, nexts(LPAREN, NIL, STRLIT, INTLIT, ID, MINUS),
 					p(s(OREXPR), s(EXPR_TAIL)));
 			rule(EXPR_TAIL, OR, p(s(OROP), s(OREXPR), s(EXPR_TAIL)));
-			multiEpsilon(EXPR_TAIL, nexts(IF, WHILE, FOR, BREAK, RETURN, 
-					ID, ENDIF, END, ENDDO, RPAREN, COMMA,
-					RBRACK, THEN, DO, TO, SEMI));
+			multiEpsilon(EXPR_TAIL, nexts(RPAREN, COMMA, RBRACK, THEN, DO, TO, SEMI));
 			multiRule(FACTOR, nexts(LPAREN, NIL, STRLIT, INTLIT, ID),
 					p(s(UNARYMINUS)));
 			rule(FACTOR, MINUS, p(s(MINUS), s(UNARYMINUS)));
@@ -70,8 +66,7 @@ class LL1Parser {
 			rule(LVALUE_TAIL, LBRACK, 
 					p(s(LBRACK), s(EXPR), s(RBRACK), s(LVALUE_TAIL)));
 			multiEpsilon(LVALUE_TAIL, nexts(ASSIGN, MULT, DIV, PLUS, MINUS,
-					EQ, LESS, GREATER, LESSEREQ, GREATEREQ, NEQ, AND, OR,
-					IF, WHILE, FOR, BREAK, RETURN, ID, ENDIF, END, ENDDO, RPAREN, COMMA,
+					EQ, LESS, GREATER, LESSEREQ, GREATEREQ, NEQ, AND, OR, RPAREN, COMMA,
 					RBRACK, THEN, DO, TO, SEMI));
 			multiLiteral(MULOP, nexts(MULT, DIV));
 			rule(OPTIONAL_INIT, ASSIGN, p(s(ASSIGN), s(CONST)));
@@ -80,8 +75,7 @@ class LL1Parser {
 					p(s(ANDEXPR), s(OREXPR_TAIL)));
 			rule(OREXPR_TAIL, AND, 
 					p(s(ANDOP), s(ANDEXPR), s(OREXPR_TAIL)));
-			multiEpsilon(OREXPR_TAIL, nexts(IF, WHILE, FOR, BREAK, RETURN, ID, ENDIF, END, ENDDO,
-					OR, RPAREN, COMMA, RBRACK, THEN, DO, TO, SEMI));
+			multiEpsilon(OREXPR_TAIL, nexts(OR, RPAREN, COMMA, RBRACK, THEN, DO, TO, SEMI));
 			literal(OROP, OR);
 			rule(PARAM, ID, p(s(ID), s(COLON), s(TYPE_ID)));
 			rule(PARAM_LIST, ID, p(s(PARAM), s(PARAM_LIST_TAIL)));
@@ -130,9 +124,8 @@ class LL1Parser {
 					p(s(FACTOR), s(TERM_TAIL)));
 			multiRule(TERM_TAIL, nexts(MULT, DIV),
 					p(s(MULOP), s(FACTOR), s(TERM_TAIL)));
-			multiEpsilon(TERM_TAIL, nexts(RPAREN, OR, AND, ENDIF, END, ENDDO, ID, RETURN, BREAK,
-					FOR, WHILE, IF, MINUS, PLUS, NEQ, LESSEREQ, GREATEREQ, GREATER, LESS, EQ,
-					SEMI, TO, DO, THEN, RBRACK, COMMA));
+			multiEpsilon(TERM_TAIL, nexts(RPAREN, OR, AND, MINUS, PLUS, NEQ, LESSEREQ, 
+					GREATEREQ, GREATER, LESS, EQ, SEMI, TO, DO, THEN, RBRACK, COMMA));
 			rule(TIGER_PROGRAM, LET, 
 					p(s(LET), s(DECLARATION_SEGMENT), s(IN), s(STAT_SEQ), s(END)));
 			rule(TYPE_LIT, ARRAY, 
