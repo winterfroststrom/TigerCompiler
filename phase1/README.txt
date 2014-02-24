@@ -1,5 +1,5 @@
 ---------------------------------------------------------------------------------
-PROJECT ORGANIZATION
+ORGANIZATION
 ---------------------------------------------------------------------------------
 
 The Scanner and Parser codes are located in workspace/TigerCompiler/src,
@@ -10,10 +10,10 @@ the PDF report submitted with the project.
 
 
 ---------------------------------------------------------------------------------
-RUNNING THE PROJECT
+RUNNING
 ---------------------------------------------------------------------------------
 
-A JAR file is also provided to make it easier to run the project, so by typing:
+A JAR file is provided to make it easier to run the project, so by typing:
 
 java -jar TigerCompiler.jar <tiger_file_path>
 
@@ -22,7 +22,7 @@ generated in the same path of the Tiger file.
 
 
 ---------------------------------------------------------------------------------
-COMPILING THE PROJECT
+COMPILING
 ---------------------------------------------------------------------------------
 
 In case you want to compile the project by yourself, you only have to create a
