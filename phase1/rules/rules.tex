@@ -36,7 +36,7 @@
 \begin{document}
 
 \title{CS 4240 Phase 1}
-\author{David Zhang}
+\author{David Zhang \and Matheus Smythe Svolenski}
 \date{\today}
 
 \newtheorem{Lemma}{Lemma}
@@ -88,7 +88,7 @@ START			&	(								&	START			&	LPAREN				\\
 START			&	)								&	START			&	RPAREN				\\
 START			&	,								&	START			&	COMMA				\\
 START			&	\&								&	START			&	AND					\\
-START			&	|								&	START			&	OR					\\
+START			&	\textbar								&	START			&	OR					\\
 START			&	[								&	START			&	LSQUARE				\\
 START			&	]								&	START			&	RSQUARE				\\
 %START			&	\{								&	START			&	LCURLY				\\
@@ -137,7 +137,7 @@ STRING-LIT-SPACE		&	others					&	ERROR				& drop character				\\
 
 \section{Grammar Rules}
 
-Raw Grammar:
+Given the raw grammar for the Tiger Language, provided in the Tiger Language Reference Manual, and shown below, we have generated a new grammar, by modifying it in order to ensure that it is not ambiguous, by enforcing operator precedences and left associativity, and to ensure that the grammar supports LL(1) parsing, by removing any left recursion and performing left factoring.
 
 \begin{longtable}{l|l}
 symbol							&	rule								\\
@@ -215,7 +215,7 @@ symbol							&	rule								\\
 \atag{lvalue-tail}				&	NULL		\\
 \end{longtable}
 
-Modified Grammar:
+After performing the grammar's modifications, we came to the following grammar.
 
 \begin{longtable}{l|l}
 symbol							&	rule								\\
@@ -316,6 +316,7 @@ symbol							&	rule								\\
 \atag{lvalue-tail}				&	NULL		\\
 \end{longtable}
 
+After ensuring that the new grammar meets all the requirements, the first and follow sets were generated for every non-terminal symbol of the grammar.
 
 \begin{longtable}{l|l}
 non-terminal						&	first set												\\
@@ -399,10 +400,10 @@ non-terminal						&	follow set												\\
 \atag{declaration-segment}		&	in	\\
 \end{longtable}
 
+At last, the LL(1) parser table for Tiger was generated, as shown below.
 
-Note, if there is no corresponding rule, then that means a parser error is generated.
-
-Note, errors are handled by dropping tokens until a valid token is found.
+Note that if there is no corresponding rule, then that means a parser error is generated.
+Also note that errors are handled by dropping tokens until a valid token is found.
 
 \begin{longtable}{l|l|l}
 symbol							&	next token	&	rule									\\
