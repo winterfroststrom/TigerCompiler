@@ -43,6 +43,11 @@
 \newtheorem{Theorem}{Theorem}
 \maketitle
 
+The lexer/parser is run by compiling all the Java files and running the General.Runner class.
+The program takes in one argument for the tiger file, which must have a .tiger extension.
+The program outputs two files programname.tokens and programname.tokens.err, the first is a list of tokens.
+The second is any error output if it exists.
+
 \section{Lexical Rules}
 
 Pre-parse the input to remove comments with the following DFA. The resulting NOT-COMMENT tokens are concatenated together.
@@ -373,17 +378,16 @@ non-terminal						&	first set												\\
 \begin{longtable}{l|l}
 non-terminal						&	follow set												\\
 \hline
-\atag{lvalue-tail}				&	:=, *, /	, +, -, $=, <, >, <=, >=, <>$, \& \\
-\atag{lvalue-tail}				&	\textbar , if, while, for, break, return, id, endif, end, ), ,, , ], then, do, to, ; 					\\
+\atag{lvalue-tail}				&	:=, *, /	, +, -, $=, <, >, <=, >=, <>$, \& , \\
+\atag{lvalue-tail}				&	\textbar , ), ,, , ], then, do, to, ; 	\\
 \atag{expr-list-tail}			&	)												\\
 \atag{expr-list}					&	)								\\
-\atag{expr-tail}					&	if, while, for, break, return, id, endif, end, enddo, ), ,, , ], then, do, to, ;	\\
-\atag{orexpr-tail}				&	if, while, for, break, return, id, endif, end, enddo, \textbar , ), ,, , ], then, do, to, ;	\\
-\atag{andexpr-tail}				&	if, while, for, break, return, id, endif, end, enddo, \& ,\textbar , ), ,, , ], then, do, to, ; 	\\
-\atag{compare-tail}				&	if, while, for, break, return, id, endif, end, enddo	\\
-\atag{compare-tail}				&	\& ,\textbar , ), ,, , ], then, do, to, ;, $=, <, >, <=, >=, <>$	\\
-\atag{term-tail}					&	if, while, for, break, return, id, endif, end, enddo, \& ,\textbar , ) \\
-\atag{term-tail}					&	, , ], then, do, to, ;, $=, <, >, <=, >=, <>$, +, -	\\
+\atag{expr-tail}					&	), ,, , ], then, do, to, ;	\\
+\atag{orexpr-tail}				&	\textbar , ), ,, , ], then, do, to, ;	\\
+\atag{andexpr-tail}				&	\& ,\textbar , ), ,, ], then, do, to, ; 	\\
+\atag{compare-tail}				&	\& ,\textbar , ), ,, ], then, do, to, ;, $=, <, >, <=, >=, <>$	\\
+\atag{term-tail}					&	\& ,\textbar , ), ,, ], then, do, to, ;, $=, <, >, <=, >=, <>$, +, -	\\
+\atag{term-tail}					&	\\
 \atag{stat-assign-tail}			&	;	\\
 \atag{stat-assign-id}			&	;	\\
 \atag{stat-seq-tail}				&	endif, end, enddo, else		\\
@@ -421,15 +425,6 @@ symbol							&	next token	&	rule									\\
 \atag{andexpr-tail}				&	$>=$			&	\atag{compop} \atag{compare} \atag{andexpr-tail}	\\
 \atag{andexpr-tail}				&	$<=$			&	\atag{compop} \atag{compare} \atag{andexpr-tail}	\\
 \atag{andexpr-tail}				&	$<>$			&	\atag{compop} \atag{compare} \atag{andexpr-tail}	\\
-\atag{andexpr-tail}				&	if			&	$\epsilon$	\\
-\atag{andexpr-tail}				&	while		&	$\epsilon$	\\
-\atag{andexpr-tail}				&	for			&	$\epsilon$	\\
-\atag{andexpr-tail}				&	break		&	$\epsilon$	\\
-\atag{andexpr-tail}				&	return		&	$\epsilon$	\\
-\atag{andexpr-tail}				&	id			&	$\epsilon$	\\
-\atag{andexpr-tail}				&	endif		&	$\epsilon$	\\
-\atag{andexpr-tail}				&	end			&	$\epsilon$	\\
-\atag{andexpr-tail}				&	enddo		&	$\epsilon$	\\
 \atag{andexpr-tail}				&	\&			&	$\epsilon$	\\
 \atag{andexpr-tail}				&	\textbar		&	$\epsilon$	\\
 \atag{andexpr-tail}				&	)			&	$\epsilon$	\\
@@ -448,15 +443,6 @@ symbol							&	next token	&	rule									\\
 \atag{compare} 					&	-			&	\atag{term} \atag{compare-tail}	\\
 \atag{compare-tail}				&	+			&	\atag{addop} \atag{term} \atag{compare-tail}	\\
 \atag{compare-tail}				&	-			&	\atag{addop} \atag{term} \atag{compare-tail}	\\
-\atag{compare-tail}				&	if			&	$\epsilon$					\\
-\atag{compare-tail}				&	while			&	$\epsilon$					\\
-\atag{compare-tail}				&	for			&	$\epsilon$					\\
-\atag{compare-tail}				&	break			&	$\epsilon$					\\
-\atag{compare-tail}				&	return			&	$\epsilon$					\\
-\atag{compare-tail}				&	id			&	$\epsilon$					\\
-\atag{compare-tail}				&	endif			&	$\epsilon$					\\
-\atag{compare-tail}				&	end			&	$\epsilon$					\\
-\atag{compare-tail}				&	enddo		&	$\epsilon$					\\
 \atag{compare-tail}				&	\&			&	$\epsilon$					\\
 \atag{compare-tail}				&	\textbar			&	$\epsilon$					\\
 \atag{compare-tail}				&	)			&	$\epsilon$					\\
@@ -500,16 +486,6 @@ symbol							&	next token	&	rule									\\
 \atag{expr}						&	INTLIT			&	\atag{orexpr} \atag{expr-tail}	\\
 \atag{expr}						&	id			&	\atag{orexpr} \atag{expr-tail}	\\
 \atag{expr}						&	-			&	\atag{orexpr} \atag{expr-tail}	\\
-\atag{expr-tail}					&	\textbar		&	\atag{orop} \atag{orexpr} \atag{expr-tail}		\\
-\atag{expr-tail}					&	if		&		$\epsilon$	\\
-\atag{expr-tail}					&	while		&	$\epsilon$		\\
-\atag{expr-tail}					&	for		&	$\epsilon$		\\
-\atag{expr-tail}					&	break		&	$\epsilon$		\\
-\atag{expr-tail}					&	return		&	$\epsilon$		\\
-\atag{expr-tail}					&	id		&		$\epsilon$	\\
-\atag{expr-tail}					&	endif		&	$\epsilon$		\\
-\atag{expr-tail}					&	end		&	$\epsilon$		\\
-\atag{expr-tail}					&	enddo	&	$\epsilon$		\\
 \atag{expr-tail}					&	)		&	$\epsilon$		\\
 \atag{expr-tail}					&	,		&	$\epsilon$		\\
 \atag{expr-tail}					&	]		&	$\epsilon$		\\
@@ -544,15 +520,6 @@ symbol							&	next token	&	rule									\\
 \atag{lvalue-tail}				&	$<>$		&	$\epsilon$											\\
 \atag{lvalue-tail}				&	\&		&	$\epsilon$											\\
 \atag{lvalue-tail}				&	\textbar		&	$\epsilon$											\\
-\atag{lvalue-tail}				&	if		&		$\epsilon$										\\
-\atag{lvalue-tail}				&	while		&		$\epsilon$										\\
-\atag{lvalue-tail}				&	for		&		$\epsilon$										\\
-\atag{lvalue-tail}				&	break		&	$\epsilon$											\\
-\atag{lvalue-tail}				&	return		&	$\epsilon$											\\
-\atag{lvalue-tail}				&	id		&		$\epsilon$										\\
-\atag{lvalue-tail}				&	endif		&	$\epsilon$											\\
-\atag{lvalue-tail}				&	end		&		$\epsilon$										\\
-\atag{lvalue-tail}				&	enddo	&		$\epsilon$										\\
 \atag{lvalue-tail}				&	)		&	$\epsilon$											\\
 \atag{lvalue-tail}				&	,		&	$\epsilon$											\\
 \atag{lvalue-tail}				&	]		&	$\epsilon$											\\
@@ -571,15 +538,6 @@ symbol							&	next token	&	rule									\\
 \atag{orexpr} 					&	id			&\atag{andexpr} \atag{orexpr-tail}		\\
 \atag{orexpr} 					&	-			&	\atag{andexpr} \atag{orexpr-tail}	\\
 \atag{orexpr-tail}				&	\& 		&	\atag{andop} \atag{andexpr} \atag{orexpr-tail}	\\
-\atag{orexpr-tail}				&	 if		&	$\epsilon$	\\
-\atag{orexpr-tail}				&	 while		&	$\epsilon$	\\
-\atag{orexpr-tail}				&	 for		&	$\epsilon$	\\
-\atag{orexpr-tail}				&	 break		&	$\epsilon$	\\
-\atag{orexpr-tail}				&	 return		&	$\epsilon$	\\
-\atag{orexpr-tail}				&	 id		&	$\epsilon$	\\
-\atag{orexpr-tail}				&	 endif		&	$\epsilon$	\\
-\atag{orexpr-tail}				&	 end		&$\epsilon$		\\
-\atag{orexpr-tail}				&	 enddo	&$\epsilon$		\\
 \atag{orexpr-tail}				&	 \textbar		&	$\epsilon$	\\
 \atag{orexpr-tail}				&	 )		&	$\epsilon$	\\
 \atag{orexpr-tail}				&	 ,		&	$\epsilon$	\\
@@ -668,15 +626,6 @@ symbol							&	next token	&	rule									\\
 \atag{term-tail}					&	)		&	$\epsilon$		\\
 \atag{term-tail}					&	\textbar		&	$\epsilon$		\\
 \atag{term-tail}					&	\&		&	$\epsilon$		\\
-\atag{term-tail}					&	end		&	$\epsilon$		\\
-\atag{term-tail}					&	endif	&	$\epsilon$		\\
-\atag{term-tail}					&	enddo	&	$\epsilon$		\\
-\atag{term-tail}					&	id		&	$\epsilon$		\\
-\atag{term-tail}					&	return	&	$\epsilon$		\\
-\atag{term-tail}					&	break	&	$\epsilon$		\\
-\atag{term-tail}					&	for		&	$\epsilon$		\\
-\atag{term-tail}					&	while	&	$\epsilon$		\\
-\atag{term-tail}					&	if		&	$\epsilon$		\\
 \atag{term-tail}					&	-		&	$\epsilon$		\\
 \atag{term-tail}					&	+		&	$\epsilon$		\\
 \atag{term-tail}					&	$<>$		&	$\epsilon$		\\
