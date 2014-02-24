@@ -140,6 +140,158 @@ STRING-LIT-SPACE		&	\textbackslash			&	STRING-LIT			& ignore							\\
 STRING-LIT-SPACE		&	others					&	ERROR				& drop character				\\
 \end{longtable}
 
+Below is the DFA table without any backtracking.
+
+\begin{longtable}{l|l|l|l}
+start state		&	symbol						&	next	 state		&	token		 		\\
+\hline
+START			&	+								&	START			&	PLUS					\\
+START			&	-								&	START			&	MIN					\\
+START			&	*								&	START			&	MULT					\\
+START			&	/								&	START			&	DIV					\\
+START			&	=								&	START			&	EQ					\\
+START			&	(								&	START			&	LPAREN				\\
+START			&	)								&	START			&	RPAREN				\\
+START			&	,								&	START			&	COMMA				\\
+START			&	\&								&	START			&	AND					\\
+START			&	\textbar							&	START			&	OR					\\
+START			&	[								&	START			&	LSQUARE				\\
+START			&	]								&	START			&	RSQUARE				\\
+START			&	;								&	START			&	SEMI					\\
+START			&	$\langle$						&	LANGLE			&						\\
+START			&	$\rangle$						&	RANGLE			&						\\
+START			&	:								&	COLON			&						\\
+START			&	0-9								&	INT-LIT			&						\\
+START			&	``								&	STRING-LIT		&						\\
+START			&	a-zA-Z							&	ID				&						\\
+START			&	whitespace						&	START			&	ignore				\\
+START			&	others							&	ERROR			&	drop character		\\
+LANGLE			&	$\rangle$						&	START			&	NOTEQ				\\
+LANGLE			&	=								&	START			&	LESSEQ				\\
+LANGLE			&	+								&	START			&	LESS	, PLUS			\\
+LANGLE			&	-								&	START			&	LESS	, MIN			\\
+LANGLE			&	*								&	START			&	LESS	, MULT			\\
+LANGLE			&	/								&	START			&	LESS	, DIV			\\
+LANGLE			&	(								&	START			&	LESS	, LPAREN			\\
+LANGLE			&	)								&	START			&	LESS	, RPAREN			\\
+LANGLE			&	,								&	START			&	LESS	, COMMA			\\
+LANGLE			&	\&								&	START			&	LESS	, AND			\\
+LANGLE			&	\textbar							&	START			&	LESS	, OR				\\
+LANGLE			&	[								&	START			&	LESS	, LSQUARE		\\
+LANGLE			&	]								&	START			&	LESS	, RSQUARE		\\
+LANGLE			&	;								&	START			&	LESS	, SEMI			\\
+LANGLE			&	$\langle$						&	LANGLE			&						\\
+LANGLE			&	:								&	COLON			&						\\
+LANGLE			&	0-9								&	INT-LIT			&						\\
+LANGLE			&	``								&	STRING-LIT		&						\\
+LANGLE			&	a-zA-Z							&	ID				&						\\
+LANGLE			&	whitespace						&	START			&	LESS	, ignore			\\
+LANGLE			&	others							&	ERROR			&	LESS	, drop character	\\
+RANGLE			&	=								&	START			&	GREATEREQ			\\
+RANGLE			&	+								&	START			&	GREATER, PLUS		\\
+RANGLE			&	-								&	START			&	GREATER, MIN			\\
+RANGLE			&	*								&	START			&	GREATER, MULT		\\
+RANGLE			&	/								&	START			&	GREATER, DIV			\\
+RANGLE			&	(								&	START			&	GREATER, LPAREN		\\
+RANGLE			&	)								&	START			&	GREATER, RPAREN		\\
+RANGLE			&	,								&	START			&	GREATER, COMMA		\\
+RANGLE			&	\&								&	START			&	GREATER, AND			\\
+RANGLE			&	\textbar							&	START			&	GREATER, OR			\\
+RANGLE			&	[								&	START			&	GREATER, LSQUARE		\\
+RANGLE			&	]								&	START			&	GREATER, RSQUARE		\\
+RANGLE			&	;								&	START			&	GREATER, SEMI		\\
+RANGLE			&	$\langle$						&	LANGLE			&	GREATER				\\
+RANGLE			&	$\rangle$						&	RANGLE			&	GREATER				\\
+RANGLE			&	:								&	COLON			&	GREATER				\\
+RANGLE			&	0-9								&	INT-LIT			&	GREATER				\\
+RANGLE			&	``								&	STRING-LIT		&	GREATER				\\
+RANGLE			&	a-zA-Z							&	ID				&	GREATER				\\
+RANGLE			&	whitespace						&	START			&	GREATER, ignore		\\
+RANGLE			&	others							&	ERROR			&	GREATER, drop character	\\
+COLON			&	=								&	START			&	ASSIGN				\\
+COLON			&	+								&	START			&	COLON, PLUS					\\
+COLON			&	-								&	START			&	COLON, MIN					\\
+COLON			&	*								&	START			&	COLON, MULT					\\
+COLON			&	/								&	START			&	COLON, DIV					\\
+COLON			&	(								&	START			&	COLON, LPAREN				\\
+COLON			&	)								&	START			&	COLON, RPAREN				\\
+COLON			&	,								&	START			&	COLON, COMMA				\\
+COLON			&	\&								&	START			&	COLON, AND					\\
+COLON			&	\textbar							&	START			&	COLON, OR					\\
+COLON			&	[								&	START			&	COLON, LSQUARE				\\
+COLON			&	]								&	START			&	COLON, RSQUARE				\\
+COLON			&	;								&	START			&	COLON, SEMI					\\
+COLON			&	$\langle$						&	LANGLE			&	COLON					\\
+COLON			&	$\rangle$						&	RANGLE			&	COLON					\\
+COLON			&	:								&	COLON			&	COLON					\\
+COLON			&	0-9								&	INT-LIT			&	COLON					\\
+COLON			&	``								&	STRING-LIT		&	COLON					\\
+COLON			&	a-zA-Z							&	ID				&	COLON					\\
+COLON			&	whitespace						&	START			&	COLON, ignore				\\
+COLON			&	others							&	ERROR			&	COLON, drop character		\\
+INT-LIT			&	0-9								&	INT-LIT			&						\\
+INT-LIT			&	+								&	START			&	INT-LIT, PLUS		\\
+INT-LIT			&	-								&	START			&	INT-LIT, MIN				\\
+INT-LIT			&	*								&	START			&	INT-LIT, MULT			\\
+INT-LIT			&	/								&	START			&	INT-LIT, DIV			\\
+INT-LIT			&	=								&	START			&	INT-LIT, EQ			\\
+INT-LIT			&	(								&	START			&	INT-LIT, LPAREN		\\
+INT-LIT			&	)								&	START			&	INT-LIT, RPAREN		\\
+INT-LIT			&	,								&	START			&	INT-LIT, COMMA		\\
+INT-LIT			&	\&								&	START			&	INT-LIT, AND			\\
+INT-LIT			&	\textbar							&	START			&	INT-LIT, OR			\\
+INT-LIT			&	[								&	START			&	INT-LIT, LSQUARE		\\
+INT-LIT			&	]								&	START			&	INT-LIT, RSQUARE		\\
+INT-LIT			&	;								&	START			&	INT-LIT, SEMI				\\
+INT-LIT			&	$\langle$						&	LANGLE			&	INT-LIT, 					\\
+INT-LIT			&	$\rangle$						&	RANGLE			&	INT-LIT, 					\\
+INT-LIT			&	:								&	COLON			&	INT-LIT, 					\\
+INT-LIT			&	``								&	STRING-LIT		&	INT-LIT, 					\\
+INT-LIT			&	a-zA-Z							&	ID				&	INT-LIT, 					\\
+INT-LIT			&	whitespace						&	START			&	INT-LIT, ignore		\\
+INT-LIT			&	others							&	ERROR			&	INT-LIT, 	drop character	\\
+ID			&	a-zA-Z0-9\_						&	ID				&						\\
+ID			&	+								&	START			&	ID, PLUS					\\
+ID			&	-								&	START			&	ID, MIN					\\
+ID			&	*								&	START			&	ID, MULT					\\
+ID			&	/								&	START			&	ID, DIV					\\
+ID			&	=								&	START			&	ID, EQ					\\
+ID			&	(								&	START			&	ID, LPAREN				\\
+ID			&	)								&	START			&	ID, RPAREN				\\
+ID			&	,								&	START			&	ID, COMMA				\\
+ID			&	\&								&	START			&	ID, AND					\\
+ID			&	\textbar							&	START			&	ID, OR					\\
+ID			&	[								&	START			&	ID, LSQUARE				\\
+ID			&	]								&	START			&	ID, RSQUARE				\\
+ID			&	;								&	START			&	ID, SEMI					\\
+ID			&	$\langle$						&	LANGLE			&	ID					\\
+ID			&	$\rangle$						&	RANGLE			&	ID					\\
+ID			&	:								&	COLON			&	ID					\\
+ID			&	``								&	STRING-LIT		&	ID					\\
+ID			&	whitespace						&	START			&	ID, ignore			\\
+ID			&	others							&	ERROR			&	ID, drop character	\\
+STRING-LIT			&	$\Sigma - {\backslash}$	&	STRING-LIT			&						\\
+STRING-LIT			&	''						&	START				&	STRING-LIT			\\
+STRING-LIT			&	\textbackslash			&	STRING-LIT-SLASH		&						\\
+STRING-LIT-SLASH		&	n						&	STRING-LIT			&						\\
+STRING-LIT-SLASH		&	t						&	STRING-LIT			&								\\
+STRING-LIT-SLASH		&	''						&	STRING-LIT			&								\\
+STRING-LIT-SLASH		&	\textbackslash			&	STRING-LIT			&								\\
+STRING-LIT-SLASH		&	\textasciicircum			&	STRING-LIT-CTL		&								\\
+STRING-LIT-SLASH		&	0-9						&	STRING-LIT-CODE-1	&					\\
+STRING-LIT-SLASH		&	whitespace				&	STRING-LIT-SPACE		& ignore 2 characters			\\
+STRING-LIT-SLASH		&	others					&	ERROR				& drop character				\\
+STRING-LIT-CTL		&	@A-Z[\textbackslash]\textasciicircum\_ .		&	STRING-LIT			&			\\
+STRING-LIT-CTL		&	others					&	ERROR				& drop character					\\
+STRING-LIT-CODE-1	&	0-9						&	STRING-LIT-CODE-2			&					\\
+STRING-LIT-CODE-1	&	others					&	ERROR			&	drop character				\\
+STRING-LIT-CODE-2	&	0-9						&	STRING-LIT		&								\\
+STRING-LIT-CODE-2	&	others					&	ERROR			&	drop character				\\
+STRING-LIT-SPACE		&	whitespace				&	STRING-LIT-SPACE		& ignore							\\
+STRING-LIT-SPACE		&	\textbackslash			&	STRING-LIT			& ignore							\\
+STRING-LIT-SPACE		&	others					&	ERROR				& drop character				\\
+\end{longtable}
+
 \section{Grammar Rules}
 
 Given the raw grammar for the Tiger Language, provided in the Tiger Language Reference Manual, and shown below, we have generated a new grammar, by modifying it in order to ensure that it is not ambiguous, by enforcing operator precedences and left associativity, and to ensure that the grammar supports LL(1) parsing, by removing any left recursion and performing left factoring.
