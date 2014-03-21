@@ -12,7 +12,9 @@ public class TigerFileHandler implements AutoCloseable{
 	public static final String TIGER_FILE_TYPE = ".tiger";
 	public static final String TIGER_LEXER_OUTPUT_TYPE = ".tokens";
 	public static final String TIGER_LEXER_ERROR_TYPE = ".err";
-	private boolean redirectedConsole;
+	//private static final boolean REDIRECTING_CONSOLE = true;
+	private static final boolean REDIRECTING_CONSOLE = false;
+	private static boolean redirectedConsole;
 	private PrintStream out;
 	private PrintStream err;
 	private String[] args;
@@ -22,21 +24,26 @@ public class TigerFileHandler implements AutoCloseable{
 	}
 
 	public void redirectConsole() throws IOException{
-		if(!redirectedConsole){
-			String filename = checkFilename();
-			String outputName = createOutputFilename(filename);
-			String errorName = createErrorFilename(filename);
-			out = new PrintStream(outputName);
-			err = new PrintStream(errorName);
-			System.setOut(out);
-			System.setErr(err);
+		if(REDIRECTING_CONSOLE){
+			if(!redirectedConsole){
+				String filename = checkFilename();
+				String outputName = createOutputFilename(filename);
+				String errorName = createErrorFilename(filename);
+				out = new PrintStream(outputName);
+				err = new PrintStream(errorName);
+				System.setOut(out);
+				System.setErr(err);
+				redirectedConsole = true;
+			}
 		}
 	}
 	
 	@Override
 	public void close(){
-		out.close();
-		err.close();
+		if(REDIRECTING_CONSOLE){
+			out.close();
+			err.close();
+		}
 	}
 	
 	public String getInput() throws IOException{

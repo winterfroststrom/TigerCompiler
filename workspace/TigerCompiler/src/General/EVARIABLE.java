@@ -11,5 +11,24 @@ public enum EVARIABLE {
 	TYPE_DECLARATION, FUNCT_DECLARATION_LIST, VAR_DECLARATION_LIST, 
 	TYPE_DECLARATION_LIST, DECLARATION_SEGMENT, TIGER_PROGRAM;
 	public static final int length = EVARIABLE.values().length;
-
+	
+	public boolean isTail(){
+		switch(this){
+		case LVALUE_TAIL:
+		case EXPR_LIST_TAIL:
+		case TERM_TAIL:
+		case COMPARE_TAIL:
+		case ANDEXPR_TAIL:
+		case EXPR_TAIL:
+		case STAT_ASSIGN_TAIL:
+		case STAT_IF_TAIL:
+		case STAT_SEQ_TAIL:
+		case PARAM_LIST_TAIL:
+		case ID_LIST_TAIL:
+		case VAR_DECLARATION_LIST:
+			return true;
+		default :
+			return false;
+		}
+	}
 }

@@ -211,15 +211,21 @@ class LL1Parser {
 	}
 	
 	public boolean parse(List<Token> tokens){
+		ParseTreeNode tree = new ParseTreeNode(null);
+		ParseTreeNode curr = tree;
 		init(tokens);
 		initializeTable();
 		while(!symbols.isEmpty()){
 			Symbol current = symbols.pop();
+//			System.out.println(current);
+//			System.out.println(current + " : " +tree);
 			if(debugging){
 				System.err.println(current);
 			}
 			if(current.isTerminal()){
 				if(current.getTerminal().equals(input.get(position))){
+//					System.out.println(current);
+					curr = curr.addTerminal(s(input.get(position)));
 					position++;
 				} else {
 					errors.add(new ParserError(input.get(position), position, current.getTerminal()));
@@ -248,10 +254,17 @@ class LL1Parser {
 						System.err.println(errors.get(errors.size() - 1));
 					}
 				} else {
+//					System.out.println(current + " : " + rule);
+					curr = curr.addRule(current, rule);
 					rule.addToStack(symbols);
 				}
 			}
 		}
+		System.out.println(tree);
+//		tree = tree.simplify();
+//		System.out.println(tree);
+//		tree.simplify2();
+//		System.out.println(tree);
 		return errors.isEmpty();
 	}
 	
