@@ -203,13 +203,15 @@ class GeneralDFA {
 	private void doAction(Action action) {
 		switch(action.action){
 		case TOKE:
-			tokens.add(new Token(action.token, charBufferToString()));
+			String token = charBufferToString();
+			tokens.add(new Token(action.token, token, position - token.length()));
 			charBuffer.clear();
 			break;
 		case BACK:
 			position--;
 			charBuffer.remove(charBuffer.size() - 1);
-			tokens.add(new Token(action.token, charBufferToString()));
+			String backToken = charBufferToString();
+			tokens.add(new Token(action.token, backToken, position - backToken.length()));
 			charBuffer.clear();
 			break;
 		case IGN2:

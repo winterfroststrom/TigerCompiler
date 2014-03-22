@@ -1,12 +1,16 @@
 package Parser;
 
 import java.util.ArrayList;
+import java.util.List;
+
+import General.ETERMINAL;
+import General.EVARIABLE;
 
 
 public class ParseTreeNode {
 	private ParseTreeNode parent;
 	private Symbol symbol;
-	private ArrayList<ParseTreeNode> children;
+	private List<ParseTreeNode> children;
 	private int index;
 	
 	public ParseTreeNode(ParseTreeNode parent){
@@ -54,6 +58,45 @@ public class ParseTreeNode {
 			next = next.parent;
 		}
 		return next;
+	}
+	
+	private List<ParseTreeNode> createExpressionTree(List<ParseTreeNode> terminals){
+		return terminals;
+	}
+	
+	public void flattenExpressions(){
+		if(symbol.equals(EVARIABLE.EXPR)){
+			setChildren(createExpressionTree(allTerminals()));
+		} else if(symbol.equals(EVARIABLE.STAT_ASSIGN)){
+			setChildren(createExpressionTree(allTerminals()));
+		} else {
+			for(int i = 0; i < children.size();i++){
+				children.get(i).flattenExpressions();
+			}
+		}
+	}
+	
+	private void setChildren(List<ParseTreeNode> newChildren){
+		children = newChildren;
+		index = children.size();
+		for(ParseTreeNode child : children){
+			child.parent = this;
+		}
+	}
+	
+	public List<ParseTreeNode> allTerminals(){
+		return allTerminals(this, new ArrayList<ParseTreeNode>());
+	}
+	
+	private List<ParseTreeNode> allTerminals(ParseTreeNode curr, List<ParseTreeNode> list){
+		if(curr.symbol.isTerminal()){
+			list.add(curr);
+		} else {
+			for(ParseTreeNode child : curr.children){
+				allTerminals(child, list);
+			}
+		}
+		return list;
 	}
 	
 //	public ParseTreeNode simplify(){

@@ -10,6 +10,7 @@ import Parser.ParserError;
 
 public class Runner {
 	public static void main(String[] args) {
+		args = new String[]{"resources/ex8.tiger"};
 		Lexer lexer = new Lexer();
 		Parser parser = new Parser();
 		try(TigerFileHandler tfh = new TigerFileHandler(args)){

@@ -5,14 +5,16 @@ import static General.ETERMINAL.*;
 public class Token {
 	public final ETERMINAL token;
 	public final String text;
+	public final int position;
 	
-	public Token(ETERMINAL token, String text){
+	public Token(ETERMINAL token, String text, int position){
 		if(token.equals(ID)){
 			this.token = idToken(text);
 		} else {
 			this.token = token;
 		}
 		this.text = text;
+		this.position = position;
 	}
 	
 	private static final ETERMINAL idToken(String text){
@@ -70,6 +72,6 @@ public class Token {
 	
 	@Override
 	public String toString(){
-		return "[" + token.name() + " : " + text + "]";
+		return "[" + token.name() + " : " + text + " : " + position + "]";
 	}
 }

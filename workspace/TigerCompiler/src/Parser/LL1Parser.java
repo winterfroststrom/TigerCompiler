@@ -16,7 +16,7 @@ class LL1Parser {
 	private static final boolean debugging = false;
 	private static boolean initialized;
 	private Stack<Symbol> symbols;
-	private List<ETERMINAL> input;
+	private List<Token> input;
 	private List<ParserError> errors;
 	private int position;
 	
@@ -155,6 +155,11 @@ class LL1Parser {
 		return new Symbol(v);
 	}
 	
+	private Symbol s(Token t){
+		return new Symbol(t);
+	}
+	
+	
 	private Symbol s(ETERMINAL t){
 		return new Symbol(t);
 	}
@@ -204,7 +209,7 @@ class LL1Parser {
 		symbols.push(new Symbol(EVARIABLE.TIGER_PROGRAM));
 		input = new ArrayList<>();
 		for(Token token : tokens){
-			input.add(token.token);
+			input.add(token);
 		}
 		position = 0;
 		errors = new LinkedList<>();
@@ -223,12 +228,12 @@ class LL1Parser {
 				System.err.println(current);
 			}
 			if(current.isTerminal()){
-				if(current.getTerminal().equals(input.get(position))){
+				if(current.getTerminal().equals(input.get(position).token)){
 //					System.out.println(current);
 					curr = curr.addTerminal(s(input.get(position)));
 					position++;
 				} else {
-					errors.add(new ParserError(input.get(position), position, current.getTerminal()));
+					errors.add(new ParserError(input.get(position).token, position, current.getTerminal()));
 					if(debugging){
 						for(int i = 0; i < position;i++){
 							System.err.print(input.get(i) + " ");
@@ -240,10 +245,10 @@ class LL1Parser {
 				}
 			} else {
 				Production rule = GRAMMAR_TABLE[current.getVariable().ordinal()]
-						[input.get(position).ordinal()];
+						[input.get(position).token.ordinal()];
 
 				if(rule == null){
-					errors.add(new ParserError(input.get(position), position, 
+					errors.add(new ParserError(input.get(position).token, position, 
 							validTerminals(current.getVariable())));
 					if(debugging){
 						for(int i = 0; i < position;i++){
@@ -260,6 +265,7 @@ class LL1Parser {
 				}
 			}
 		}
+		tree.flattenExpressions();
 		System.out.println(tree);
 //		tree = tree.simplify();
 //		System.out.println(tree);
