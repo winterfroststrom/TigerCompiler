@@ -103,9 +103,9 @@ class LL1Parser {
 			multiRule(STAT_ASSIGN_TAIL, nexts(PLUS, MINUS), p(s(COMPARE_TAIL)));
 			multiRule(STAT_ASSIGN_TAIL, nexts(MULT, DIV), p(s(TERM_TAIL)));
 			rule(STAT_FUNC_OR_ASSIGN, LPAREN, 
-					p(s(LPAREN), s(EXPR_LIST), s(RPAREN), s(SEMI)));
+					p(s(LPAREN), s(EXPR_LIST), s(RPAREN)));
 			multiRule(STAT_FUNC_OR_ASSIGN, nexts(ASSIGN, LBRACK), 
-					p(s(LVALUE_TAIL), s(ASSIGN), s(STAT_ASSIGN), s(SEMI)));
+					p(s(LVALUE_TAIL), s(ASSIGN), s(STAT_ASSIGN)));
 			rule(STAT_IF_TAIL, ELSE, 
 					p(s(ELSE), s(STAT_SEQ), s(ENDIF), s(SEMI)));
 			rule(STAT_IF_TAIL, ENDIF, p(s(ENDIF), s(SEMI)));
@@ -114,7 +114,7 @@ class LL1Parser {
 			rule(STAT, FOR, p(s(FOR), s(ID), s(ASSIGN), s(EXPR), s(TO), s(EXPR), s(DO), s(STAT_SEQ), s(ENDDO), s(SEMI)));
 			rule(STAT, BREAK, p(s(BREAK), s(SEMI)));
 			rule(STAT, RETURN, p(s(RETURN), s(EXPR), s(SEMI)));
-			rule(STAT, ID, p(s(ID), s(STAT_FUNC_OR_ASSIGN)));
+			rule(STAT, ID, p(s(ID), s(STAT_FUNC_OR_ASSIGN), s(SEMI)));
 			multiRule(STAT_SEQ, nexts(IF, WHILE, FOR, BREAK, RETURN, ID), 
 					p(s(STAT), s(STAT_SEQ_TAIL)));
 			multiEpsilon(STAT_SEQ_TAIL, nexts(ELSE, ENDIF, END, ENDDO));
@@ -222,14 +222,11 @@ class LL1Parser {
 		initializeTable();
 		while(!symbols.isEmpty()){
 			Symbol current = symbols.pop();
-//			System.out.println(current);
-//			System.out.println(current + " : " +tree);
 			if(debugging){
 				System.err.println(current);
 			}
 			if(current.isTerminal()){
 				if(current.getTerminal().equals(input.get(position).token)){
-//					System.out.println(current);
 					curr = curr.addTerminal(s(input.get(position)));
 					position++;
 				} else {
@@ -259,7 +256,6 @@ class LL1Parser {
 						System.err.println(errors.get(errors.size() - 1));
 					}
 				} else {
-//					System.out.println(current + " : " + rule);
 					curr = curr.addRule(current, rule);
 					rule.addToStack(symbols);
 				}
@@ -267,10 +263,6 @@ class LL1Parser {
 		}
 		tree.flattenExpressions();
 		System.out.println(tree);
-//		tree = tree.simplify();
-//		System.out.println(tree);
-//		tree.simplify2();
-//		System.out.println(tree);
 		return errors.isEmpty();
 	}
 	
