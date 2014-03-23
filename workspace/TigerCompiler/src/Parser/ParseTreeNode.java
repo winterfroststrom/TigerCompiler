@@ -204,13 +204,56 @@ public class ParseTreeNode {
 	}
 	
 	public void flattenExpressions(){
+		associativeExpressions();
+		removeStatFuncOrAssign();
+	}
+		
+	private void removeStatFuncOrAssign(){
+		//stat -> id stat_func_or_assign ;
+		//stat_func_or_assign -> ( expr_list )
+		//stat_func_or_assign -> lvalue_tail := stat_assign
+		if(symbol.equals(EVARIABLE.STAT) && children.get(0).symbol.equals(ETERMINAL.ID)){
+			ParseTreeNode statFuncOrAssign = children.get(1);
+			if(children.get(1).children.get(0).symbol.equals(ETERMINAL.LPAREN)){
+				List<ParseTreeNode> newChildren = new ArrayList<>();
+				newChildren.add(children.get(0)); // add id
+				for(ParseTreeNode child : statFuncOrAssign.children){
+					newChildren.add(child); // add ( expr_list )
+				}
+				newChildren.add(children.get(2)); // add ;
+				setChildren(newChildren);
+			} else {
+				List<ParseTreeNode> newChildren = new ArrayList<>();
+				
+				ParseTreeNode lvalue = new ParseTreeNode(this, new Symbol(EVARIABLE.LVALUE));
+				List<ParseTreeNode> newLvalueChildren = new ArrayList<>();
+				newLvalueChildren.add(children.get(0)); // add id
+				for(ParseTreeNode child : statFuncOrAssign.children.get(0).children){
+					newLvalueChildren.add(child); // add lvalue_tail.children
+				}
+				lvalue.setChildren(newLvalueChildren);
+
+				newChildren.add(lvalue); // add lvalue
+				newChildren.add(statFuncOrAssign.children.get(1)); // add :=
+				newChildren.add(statFuncOrAssign.children.get(2)); // add stat_assign
+				newChildren.add(children.get(2)); // add ;
+				setChildren(newChildren);
+			}
+		} else {
+			for(int i = 0; i < children.size();i++){
+				children.get(i).removeStatFuncOrAssign();
+			}
+		}
+	}
+	
+	private void associativeExpressions() {
 		if(symbol.equals(EVARIABLE.EXPR)){
 			setChildren(createExpressionTree(allTerminals()));
 		} else if(symbol.equals(EVARIABLE.STAT_ASSIGN)){
 			setChildren(createExpressionTree(allTerminals()));
 		} else {
 			for(int i = 0; i < children.size();i++){
-				children.get(i).flattenExpressions();
+				children.get(i).associativeExpressions();
 			}
 		}
 	}

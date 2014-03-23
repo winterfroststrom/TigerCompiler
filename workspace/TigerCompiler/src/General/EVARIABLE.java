@@ -26,6 +26,8 @@ public enum EVARIABLE {
 		case PARAM_LIST_TAIL:
 		case ID_LIST_TAIL:
 		case VAR_DECLARATION_LIST:
+		case FUNCT_DECLARATION_LIST:
+		case TYPE_DECLARATION_LIST:
 			return true;
 		default :
 			return false;
