@@ -12,7 +12,9 @@ public class ParseTreeNode {
 	private Symbol symbol;
 	private List<ParseTreeNode> children;
 	private int index;
-	
+	private static final String PARSE_TREE_NODE_DELIMITER = "\n";
+	private static final String PARSE_TREE_NODE_PREFIX = " ";
+
 	public ParseTreeNode(ParseTreeNode parent){
 		this(parent, null);
 	}
@@ -61,7 +63,144 @@ public class ParseTreeNode {
 	}
 	
 	private List<ParseTreeNode> createExpressionTree(List<ParseTreeNode> terminals){
-		return terminals;
+		for(ParseTreeNode terminal : terminals){
+			terminal.setChildren(new ArrayList<ParseTreeNode>());
+		}
+		if(terminals.size() < 2){
+			return terminals;
+		} else if(terminals.get(0).symbol.equals(ETERMINAL.ID) 
+				&& terminals.get(1).symbol.equals(ETERMINAL.LPAREN)){
+			return createExpressionTreeFunction(terminals);
+		} else {
+			return shuntingYardAlgorithm(handleLvalue(terminals));
+		}
+	}
+
+	private List<ParseTreeNode> handleLvalue(List<ParseTreeNode> terminals) {
+		List<ParseTreeNode> newTerminals = new ArrayList<>();
+		int index = 0;
+		while(index < terminals.size() - 2){
+			while(index < terminals.size() - 2 
+					&& !(terminals.get(index).symbol.equals(ETERMINAL.ID) 
+							&& terminals.get(index + 1).symbol.equals(ETERMINAL.LBRACK))){
+				newTerminals.add(terminals.get(index++));
+			}
+			if(index < terminals.size() - 2){		
+				ParseTreeNode lvalue = new ParseTreeNode(this, new Symbol(EVARIABLE.LVALUE));
+				List<ParseTreeNode> lvalueChildren = new ArrayList<>();
+				lvalueChildren.add(terminals.get(index++));
+				
+				while(index < terminals.size() && terminals.get(index).symbol.equals(ETERMINAL.LBRACK)){
+					lvalueChildren.add(terminals.get(index++));
+					ParseTreeNode lvalueExpr = new ParseTreeNode(lvalue, new Symbol(EVARIABLE.EXPR));
+					List<ParseTreeNode> lvalueExprChildren = new ArrayList<>();
+					int lbracks = 0;
+					while(index < terminals.size()){
+						if(lbracks == 0 && terminals.get(index).symbol.equals(ETERMINAL.RBRACK)){
+							break;
+						} else if(terminals.get(index).symbol.equals(ETERMINAL.RBRACK)){
+							lbracks--;
+							lvalueExprChildren.add(terminals.get(index++));
+						} else if(terminals.get(index).symbol.equals(ETERMINAL.LBRACK)){
+							lbracks++;
+							lvalueExprChildren.add(terminals.get(index++));
+						} else {
+							lvalueExprChildren.add(terminals.get(index++));
+						}
+					}
+					lvalueExpr.setChildren(lvalueExprChildren);
+					lvalueExpr.createExpressionTree(lvalueExprChildren);
+					lvalueChildren.add(lvalueExpr);
+					lvalueChildren.add(terminals.get(index++));	
+				}
+				
+				lvalue.setChildren(lvalueChildren);
+				newTerminals.add(lvalue);
+			}
+		}
+		while(index < terminals.size()){
+			newTerminals.add(terminals.get(index++));
+		}
+		return newTerminals;
+	}
+	
+	private List<ParseTreeNode> shuntingYardAlgorithm(List<ParseTreeNode> nodes){
+		List<ParseTreeNode> stack = new ArrayList<>();
+		List<ParseTreeNode> postfix = new ArrayList<>();
+		for(int i = 0; i < nodes.size();i++){
+			if(nodes.get(i).symbol.isValue()){
+				postfix.add(nodes.get(i));
+			} else {
+				if(nodes.get(i).symbol.equals(ETERMINAL.MINUS) 
+						&& (i == 0 || (nodes.get(i - 1).symbol.isTerminal() 
+								&& nodes.get(i - 1).symbol.getTerminal().isOperator()))){
+					nodes.get(i).symbol.changeMinusToUMinus();			
+				}
+				if(stack.isEmpty()){
+					stack.add(nodes.get(i));
+				} else if(nodes.get(i).symbol.equals(ETERMINAL.RPAREN)){
+					while(!stack.get(stack.size() - 1).symbol.equals(ETERMINAL.LPAREN)){
+						postfix.add(stack.remove(stack.size() - 1));
+					}
+					stack.remove(stack.size() - 1);
+				} else if(nodes.get(i).symbol.equals(ETERMINAL.LPAREN)){
+					stack.add(nodes.get(i));					
+				} else {
+					int precedence = nodes.get(i).symbol.getTerminal().precedence();
+					while(!stack.isEmpty() && 
+							stack.get(stack.size() - 1).symbol.getTerminal().precedence() <= precedence
+							&& !stack.get(stack.size() - 1).symbol.equals(ETERMINAL.LPAREN)){
+						postfix.add(stack.remove(stack.size() - 1));
+					}
+					stack.add(nodes.get(i));
+				}
+			}
+		}
+		while(!stack.isEmpty()){
+			postfix.add(stack.remove(stack.size() - 1));
+		}
+		return convertFromPostFixToTree(postfix);
+	}
+	
+	private List<ParseTreeNode> convertFromPostFixToTree(List<ParseTreeNode> postfix){
+		List<ParseTreeNode> stack = new ArrayList<>();
+		for(int i = 0; i < postfix.size();i++){
+			if(!postfix.get(i).symbol.isValue()){
+				int operands = postfix.get(i).symbol.getTerminal().operands();
+				List<ParseTreeNode> operand = new ArrayList<>();
+				for(int j = 0; j < operands;j++){
+					operand.add(0, stack.remove(stack.size() - 1));
+				}
+				postfix.get(i).setChildren(operand);
+			}
+			stack.add(postfix.get(i));
+		}
+		return stack;
+	}
+	
+	private List<ParseTreeNode> createExpressionTreeFunction(List<ParseTreeNode> terminals) {
+		List<ParseTreeNode> newExpr = new ArrayList<>();
+		List<ParseTreeNode> params = new ArrayList<>();
+		for(int i = 2; i < terminals.size() - 1; i++){
+			params.add(terminals.get(i));
+		}
+		List<List<ParseTreeNode>> paramExpr = new ArrayList<>();
+		paramExpr.add(new ArrayList<ParseTreeNode>());
+		int index = 0;
+		for(ParseTreeNode node : params){
+			if(node.symbol.equals(ETERMINAL.COMMA)){
+				paramExpr.add(new ArrayList<ParseTreeNode>());
+				index++;
+			} else {
+				paramExpr.get(index).add(node);
+			}
+		}
+		for(List<ParseTreeNode> param : paramExpr){
+			ParseTreeNode para = new ParseTreeNode(this, new Symbol(EVARIABLE.EXPR));
+			para.setChildren(createExpressionTree(param));
+			newExpr.add(para);
+		}
+		return newExpr;
 	}
 	
 	public void flattenExpressions(){
@@ -91,57 +230,23 @@ public class ParseTreeNode {
 	private List<ParseTreeNode> allTerminals(ParseTreeNode curr, List<ParseTreeNode> list){
 		if(curr.symbol.isTerminal()){
 			list.add(curr);
-		} else {
-			for(ParseTreeNode child : curr.children){
-				allTerminals(child, list);
-			}
+		}
+		for(ParseTreeNode child : curr.children){
+			allTerminals(child, list);
 		}
 		return list;
 	}
 	
-//	public ParseTreeNode simplify(){
-//		if(children.size() == 1){
-//			return children.get(0).simplify();
-//		}
-//		for(int i = 0; i < children.size();i++){
-//			children.set(i, children.get(i).simplify());
-//		}
-//		return this;
-//	}
-//	
-//	public void simplify2(){
-//		if(children.size() > 0){
-//			ParseTreeNode lastChild = children.get(children.size() - 1);
-//			
-//			if(!lastChild.symbol.isTerminal() && lastChild.symbol.getVariable().isTail()){
-//				children.remove(children.size() - 1);
-//				for(ParseTreeNode grandChild : lastChild.children){
-//					children.add(grandChild);
-//					grandChild.parent = this;
-//				}
-//			}
-//			for(ParseTreeNode child : children){
-//				child.simplify2();
-//			}
-//		}
-//	}
-	
 	@Override
 	public String toString(){
-		String params = "";
-		if(children != null){
-			for(ParseTreeNode child : children){
-				params += "\n" + child.toString(" ");
-			}
-		}
-		return "(" + symbol + params + ")";
+		return toString("");
 	}
 	
 	public String toString(String prefix){
 		String params = "";
 		if(children != null){
 			for(ParseTreeNode child : children){
-				params += "\n" + child.toString(prefix + " ");
+				params += PARSE_TREE_NODE_DELIMITER + child.toString(prefix + PARSE_TREE_NODE_PREFIX);
 			}
 		}
 		return prefix + "(" + symbol + params + ")";

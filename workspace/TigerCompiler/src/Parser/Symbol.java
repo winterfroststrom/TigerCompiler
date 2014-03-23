@@ -32,6 +32,19 @@ class Symbol {
 		return variable;
 	}
 	
+	public void changeMinusToUMinus(){
+		if(isTerminal() && token.token.equals(ETERMINAL.MINUS)){
+			token = new Token(ETERMINAL.UMINUS, token.text, token.position);
+		} else {
+			throw new IllegalArgumentException("Cannot change non-minus to uminus");
+		}
+	}
+	
+	public boolean isValue(){
+		return equals(ETERMINAL.INTLIT) || equals(ETERMINAL.STRLIT) 
+				|| equals(ETERMINAL.ID) || equals(EVARIABLE.LVALUE);
+	}
+	
 	@Override
 	public String toString(){
 		if(isTerminal()){
@@ -51,7 +64,7 @@ class Symbol {
 	
 	public boolean equals(ETERMINAL terminal){
 		if(isTerminal()){
-			return this.variable.equals(terminal);
+			return this.token.token.equals(terminal);
 		} else {
 			return false;
 		}

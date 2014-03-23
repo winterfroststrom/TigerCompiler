@@ -74,4 +74,12 @@ public class Token {
 	public String toString(){
 		return "[" + token.name() + " : " + text + " : " + position + "]";
 	}
+	
+	public boolean equals(ETERMINAL terminal){
+		if(terminal != null){
+			return token.equals(terminal);
+		} else {
+			return false;
+		}
+	}
 }
