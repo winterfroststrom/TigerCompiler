@@ -107,9 +107,9 @@ class LL1Parser {
 			multiRule(STAT_FUNC_OR_ASSIGN, nexts(ASSIGN, LBRACK), 
 					p(s(LVALUE_TAIL), s(ASSIGN), s(STAT_ASSIGN)));
 			rule(STAT_IF_TAIL, ELSE, 
-					p(s(ELSE), s(STAT_SEQ), s(ENDIF), s(SEMI)));
-			rule(STAT_IF_TAIL, ENDIF, p(s(ENDIF), s(SEMI)));
-			rule(STAT, IF, p(s(IF), s(EXPR), s(THEN), s(STAT_SEQ), s(STAT_IF_TAIL)));
+					p(s(ELSE), s(STAT_SEQ), s(ENDIF)));
+			rule(STAT_IF_TAIL, ENDIF, p(s(ENDIF)));
+			rule(STAT, IF, p(s(IF), s(EXPR), s(THEN), s(STAT_SEQ), s(STAT_IF_TAIL), s(SEMI)));
 			rule(STAT, WHILE, p(s(WHILE), s(EXPR), s(DO), s(STAT_SEQ), s(ENDDO), s(SEMI)));
 			rule(STAT, FOR, p(s(FOR), s(ID), s(ASSIGN), s(EXPR), s(TO), s(EXPR), s(DO), s(STAT_SEQ), s(ENDDO), s(SEMI)));
 			rule(STAT, BREAK, p(s(BREAK), s(SEMI)));
