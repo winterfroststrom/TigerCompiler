@@ -248,11 +248,14 @@ public class ParseTreeNode {
 				ParseTreeNode lvalue = new ParseTreeNode(this, new Symbol(EVARIABLE.LVALUE));
 				List<ParseTreeNode> newLvalueChildren = new ArrayList<>();
 				newLvalueChildren.add(children.get(0)); // add id
-				for(ParseTreeNode child : statFuncOrAssign.children.get(0).children){
-					newLvalueChildren.add(child); // add lvalue_tail.children
+				ParseTreeNode lvalueTail = statFuncOrAssign.getChild(0);
+				while(!lvalueTail.children.isEmpty()){
+					newLvalueChildren.add(lvalueTail.children.get(0)); // add lvalue_tail.[
+					newLvalueChildren.add(lvalueTail.children.get(1)); // add lvalue_tail.expr
+					newLvalueChildren.add(lvalueTail.children.get(2)); // add lvalue_tail.]
+					lvalueTail = lvalueTail.children.get(3);
 				}
 				lvalue.setChildren(newLvalueChildren);
-
 				newChildren.add(lvalue); // add lvalue
 				newChildren.add(statFuncOrAssign.children.get(1)); // add :=
 				newChildren.add(statFuncOrAssign.children.get(2)); // add stat_assign

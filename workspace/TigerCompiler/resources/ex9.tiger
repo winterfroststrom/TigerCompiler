@@ -1,16 +1,18 @@
 let
 		type s = int;
+		type z = array [3][3][3] of int;
 		var s : s;
 		var v : s;
 		var d : int;
-				
-		function return_it(n:s, s:string) : int begin
+		var x : z;
+		function return_it(n:int, s:string) : int begin
 				for n := 3 to 4 do
-					return_it(n, s);
+					d := x[3][4][6];
+					x["" < "5"][2]["3" = "f"] := 4;
 				enddo;
                 return(n);
         end;
 in
-        return_it(s + v, "");
-        d := return_it(s, "");
+        return_it(d, "");
+        d := return_it(d, "");
 end
