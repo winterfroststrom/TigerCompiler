@@ -7,7 +7,7 @@ public class Type {
 	public final boolean array;
 	public final String name;
 	public final Type type;
-	public final List<Integer> dimensions;
+	private final List<Integer> dimensions;
 	public final static Type INT = new Type("int", null);
 	public final static Type STRING = new Type("string", null);
 	
@@ -35,6 +35,22 @@ public class Type {
 			return this;
 		} else {
 			return type.baseType();
+		}
+	}
+	
+	public Type dereference(int amount){
+		if(amount == 0){
+			return this;
+		} else if(array){
+			if(amount == dimensions.size()){
+				return type;	
+			} else if(amount > dimensions.size()){
+				return type.dereference(amount - dimensions.size());
+			} else {
+				return null;
+			}
+		} else {
+			return null;
 		}
 	}
 	

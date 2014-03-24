@@ -1,11 +1,11 @@
 let        
-	type board_array_t = array [9] of int;
 	type win_array_t = array [24] of int;
+	type board_array_t = array [9][2] of win_array_t;
 	var win_cond : win_array_t;
 	var i :int;
-	var board : board_array_t := 4;
+	var board : board_array_t;
 	function check_win(board : board_array_t) : int begin
-		return board[win_cond[i*3]-1] ;
+		return board[win_cond[i*3]-1][1][2] ;
 	end;
 in
 	printi ( 3) ;

@@ -241,14 +241,13 @@ class SymbolTableChecker {
 			ParseTreeNode id = tree.getChild(0);
 			int numIndices = (tree.getChildren().size() - 1) / 3;
 			Type arrayType = table.getTypeOfId(scope, id.getSymbol().getText(), id.getSymbol().getPosition());
-			if(numIndices == 0){
-				return arrayType;	
-			} else if(numIndices == arrayType.dimensions.size()) {
-				return arrayType.type;
-			} else {
+			Type dereferencedType = arrayType.dereference(numIndices);
+			if(dereferencedType == null){
 				errors.add(new SemanticError("Indices must be used in full or not at all at position "
 						+ id.getSymbol().getPosition()));
 				return arrayType;
+			} else {
+				return dereferencedType;
 			}
 		} else if(tree.getSymbol().equals(ETERMINAL.STRLIT)){
 			return Type.STRING;
