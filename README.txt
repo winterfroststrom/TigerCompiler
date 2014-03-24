@@ -8,6 +8,22 @@ respectively inside the folders Lexer and Parser.
 The hand-written tables for the DFA, Tiger grammar and parser can be found in
 the PDF report submitted with the project.
 
+The Parser also generates a parse tree represented by the ParseTreeNode class.
+The parse tree adds left associativity by collapsing expr and stat-assign 
+sub-trees and usings an implementation of the shunting-yard algorithm to 
+generate a basic abstract syntax tree.
+
+The Parser gives the resulting tree to the Semantic Checker, which traverses 
+the tree to build a symbol table.
+Because it was simplier, the process of building the symbol table actually
+does minor amounts of type checking.
+The symbol table stores three hashmaps : 
+* one for types
+* one for the L1 namespace of functions and variables
+* one for the parameter types of functions
+
+The Semantic Checker traverses the tree with the symbol table and type checks 
+the rest of the tree.
 
 ---------------------------------------------------------------------------------
 RUNNING
