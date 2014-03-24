@@ -7,12 +7,13 @@ import java.util.List;
 import General.Configuration;
 import General.ETERMINAL;
 import General.EVARIABLE;
+import General.Type;
 import Parser.ParseTreeNode;
 
 class SymbolTable {
-	HashMap<String, Type> types;
-	HashMap<String, ScopedName> names;
-	HashMap<String, List<Type>> functionParams;
+	private HashMap<String, Type> types;
+	private HashMap<String, ScopedName> names;
+	private HashMap<String, List<Type>> functionParams;
 	List<SemanticError> errors;
 	
 	public SymbolTable(List<SemanticError> errors){
@@ -123,19 +124,19 @@ class SymbolTable {
 		if(!optionalInit.getChildren().isEmpty()){
 			int position = optionalInit.getChild(1).getChild(0).getSymbol().getPosition();
 			if(optionalInit.getChild(1).getChild(0).getSymbol().equals(ETERMINAL.STRLIT)){
-				if(!type.equals(Type.STRING)){
+				if(!type.baseType().equals(Type.STRING)){
 					errors.add(new SemanticError("Type mismatch : expected " 
 							+ type + " but was " + Type.STRING + " at position " + position));
 				}
 			} else {
-				if(!type.equals(Type.INT)){
+				if(!type.baseType().equals(Type.INT)){
 					errors.add(new SemanticError("Type mismatch : expected "
 							+ type + " but was " + Type.INT + " at position " + position));
 				}
 			}
 		}
 	}
-
+	
 	private void buildIdList(List<String> ids, ParseTreeNode idListTail) {
 		if(!idListTail.getChildren().isEmpty()){
 			ids.add(idListTail.getChild(1).getSymbol().getText());
@@ -182,7 +183,7 @@ class SymbolTable {
 		} else if(typeDef.equals("string")) {
 			return Type.STRING;
 		} else if(types.containsKey(typeDef)){
-			return types.get(typeDef).type;
+			return types.get(typeDef);
 		} else {
 			errors.add(new SemanticError("Undefined type " + typeDef 
 					+ " near position " + typeId.getChild(0).getSymbol().getPosition()));
@@ -194,4 +195,28 @@ class SymbolTable {
 	public String toString(){
 		return "Symbol Table :\nTypes : " + types + "\nNames : " + names + "\nKinds : " + functionParams;
 	}
+
+	public Type getTypeOfId(String scope, String id, int position) {
+		if(names.containsKey(ScopedName.addScopeToName(scope, id))){
+			return names.get(ScopedName.addScopeToName(scope, id)).type;
+		} else if(names.containsKey(ScopedName.addScopeToName(Configuration.GLOBAL_SCOPE_NAME, id))){
+			return names.get(ScopedName.addScopeToName(Configuration.GLOBAL_SCOPE_NAME, id)).type; 
+		} else {
+			errors.add(new SemanticError("Missing variable " + id  
+					+ " in scope of " + scope + " at position " + position));
+			return Configuration.DEFAULT_TYPE_ON_ERROR;
+		}
+	}
+
+	public List<Type> getTypesOfParams(String name, int position) {
+		name = ScopedName.addScopeToName(Configuration.GLOBAL_SCOPE_NAME, name);
+		if(functionParams.containsKey(name)){
+			return functionParams.get(name);
+		} else {
+			errors.add(new SemanticError("Undefined function " + name + " at position " + position ));
+			return new LinkedList<>();
+		}
+	}
+	
+	
 }

@@ -1,6 +1,7 @@
 package SemanticChecking;
 
 import General.Configuration;
+import General.Type;
 
 public class ScopedName {
 	public final boolean function;

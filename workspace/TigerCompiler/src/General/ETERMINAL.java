@@ -72,6 +72,20 @@ public enum ETERMINAL {
 		}
 	}
 	
+	public boolean stringAllowed(){
+		switch(this){
+		case EQ:
+		case NEQ:
+		case GREATER:
+		case LESS:
+		case GREATEREQ:
+		case LESSEREQ:
+			return true;
+		default:
+			return false;
+		}
+	}
+	
 	public int operands(){
 		switch(this){
 		case UMINUS:

@@ -1,4 +1,4 @@
-package SemanticChecking;
+package General;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -28,6 +28,14 @@ public class Type {
 	
 	public boolean equals(Type other){
 		return name.equals(other.name);
+	}
+	
+	public Type baseType(){
+		if(equals(Type.INT) || equals(Type.STRING)|| array){
+			return this;
+		} else {
+			return type.baseType();
+		}
 	}
 	
 	@Override

@@ -9,7 +9,6 @@ import General.ETERMINAL;
 import General.EVARIABLE;
 import General.Symbol;
 
-
 public class ParseTreeNode {
 	private ParseTreeNode parent;
 	private Symbol symbol;

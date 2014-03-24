@@ -1,0 +1,11 @@
+let
+		type s = int;
+		var s : s;
+		var v : s;
+				
+		function return_it(n:s, s:string) : int begin
+                return(n);
+        end;
+in
+        return_it(s + v, "");
+end
