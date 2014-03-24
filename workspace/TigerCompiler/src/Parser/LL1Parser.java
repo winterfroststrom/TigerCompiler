@@ -98,12 +98,12 @@ class LL1Parser {
 			rule(STAT_ASSIGN_ID, LPAREN, 
 					p(s(LPAREN), s(EXPR_LIST), s(RPAREN)));
 			epsilon(STAT_ASSIGN_TAIL, SEMI);
-			rule(STAT_ASSIGN_TAIL, OR, p(s(EXPR_TAIL)));
-			rule(STAT_ASSIGN_TAIL, AND, p(s(OREXPR_TAIL)));
+			rule(STAT_ASSIGN_TAIL, OR, p(s(EXPR_TAIL), s(STAT_ASSIGN_TAIL)));
+			rule(STAT_ASSIGN_TAIL, AND, p(s(OREXPR_TAIL), s(STAT_ASSIGN_TAIL)));
 			multiRule(STAT_ASSIGN_TAIL, nexts(EQ, LESS, GREATER, LESSEREQ, GREATEREQ, NEQ), 
-					p(s(ANDEXPR_TAIL)));
-			multiRule(STAT_ASSIGN_TAIL, nexts(PLUS, MINUS), p(s(COMPARE_TAIL)));
-			multiRule(STAT_ASSIGN_TAIL, nexts(MULT, DIV), p(s(TERM_TAIL)));
+					p(s(ANDEXPR_TAIL), s(STAT_ASSIGN_TAIL)));
+			multiRule(STAT_ASSIGN_TAIL, nexts(PLUS, MINUS), p(s(COMPARE_TAIL), s(STAT_ASSIGN_TAIL)));
+			multiRule(STAT_ASSIGN_TAIL, nexts(MULT, DIV), p(s(TERM_TAIL), s(STAT_ASSIGN_TAIL)));
 			rule(STAT_FUNC_OR_ASSIGN, LPAREN, 
 					p(s(LPAREN), s(EXPR_LIST), s(RPAREN)));
 			multiRule(STAT_FUNC_OR_ASSIGN, nexts(ASSIGN, LBRACK), 
