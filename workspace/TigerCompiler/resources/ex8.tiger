@@ -11,8 +11,8 @@ let
         function x() begin
         	d := 3;
         end;
-        function y(n:int ,x:int) begin
-        	d := 3;
+        function y(n:int, x:int, y:int) begin
+        	d := n + x;
         end;
 in
         return_it(5);

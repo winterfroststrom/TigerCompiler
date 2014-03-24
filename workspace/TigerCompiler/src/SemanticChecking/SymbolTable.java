@@ -54,6 +54,23 @@ class SymbolTable {
 				names.put(functName, new ScopedName(true, functName, type));
 				functionParams.put(functName, paramTypes);
 			}
+			boolean hasReturn = false;
+			for(ParseTreeNode terminal : functDeclaration.getChild(7).allTerminals()){
+				if(terminal.getSymbol().equals(ETERMINAL.RETURN)){
+					hasReturn = true;
+					break;
+				}
+			}
+			if(type == null && hasReturn){
+				errors.add(new SemanticError("Function " + functName 
+						+ " returns when it does not have return type at position " 
+						+ functDeclaration.getChild(0).getSymbol().getPosition()));
+			} else if(type != null && !hasReturn){				
+				errors.add(new SemanticError("Function " + functName 
+						+ " does not returns when it has return type at position " 
+						+ functDeclaration.getChild(0).getSymbol().getPosition()));
+			}
+			
 			buildFunctions(functDeclarationList.getChild(1));
 		}
 	}
@@ -164,5 +181,10 @@ class SymbolTable {
 					+ " near position " + typeId.getChild(0).getSymbol().getPosition()));
 			return null;
 		}
+	}
+	
+	@Override
+	public String toString(){
+		return "Symbol Table :\nTypes : " + types + "\nNames : " + names + "\nKinds : " + functionParams;
 	}
 }

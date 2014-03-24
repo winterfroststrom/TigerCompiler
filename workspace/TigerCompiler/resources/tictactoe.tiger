@@ -65,7 +65,7 @@ let
 
 
 
-        function get_input(turn : string) begin
+        function get_input(turn : string) : int begin
 
                 /* print to stdout: "Where would you like to place X/O (1-9)? " */
                 tmp_str := concat("Where would you like to place ", turn);
@@ -129,7 +129,7 @@ let
         end;
 
 
-        function check_win(board : board_array_t) begin
+        function check_win(board : board_array_t) : int begin
                 for i := 0 to 8 do
                         if (board[win_cond[i*3]-1] = board[win_cond[i*3+1]-1]) & (board[win_cond[i*3+1]-1] = board[win_cond[i*3+2]-1]) then
                                 return board[win_cond[i*3]-1];

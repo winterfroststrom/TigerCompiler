@@ -3,6 +3,7 @@ package SemanticChecking;
 import java.util.LinkedList;
 import java.util.List;
 
+import General.Configuration;
 import Parser.ParseTreeNode;
 
 public class SymbolTableChecker {
@@ -12,7 +13,9 @@ public class SymbolTableChecker {
 		errors = new LinkedList<>();
 		SymbolTable table = new SymbolTable(errors);
 		table.build(tree);
-		//System.out.println(tree);
+		if(Configuration.PRINT_TABLE){
+			System.out.println(table);
+		}//System.out.println(tree);
 		//traverse(tree);
 		
 		return !errors.isEmpty();
