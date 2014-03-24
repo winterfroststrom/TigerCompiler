@@ -1,0 +1,7 @@
+
+
+print:
+        call, printi, n 
+
+main:
+        call, print, 5
