@@ -15,7 +15,7 @@ let
         function y(n:int, x:int, y:rad) begin
         	return_it(sdf, n); /*should error*/
         	n := return_it(x + x, n);
-        	
+        	bad[1][1][1] := bad[1][1][1];
         	d := n + y + bad[1][1][1];
         end;
 in

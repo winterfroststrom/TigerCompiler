@@ -1,6 +1,7 @@
 package Parser;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 import General.Configuration;
@@ -70,7 +71,6 @@ public class ParseTreeNode {
 			return terminals;
 		} else if(terminals.get(0).symbol.equals(ETERMINAL.ID) 
 				&& terminals.get(1).symbol.equals(ETERMINAL.LPAREN)){
-			System.out.println(terminals);
 			return createExpressionTreeFunction(terminals);
 		} else {
 			return shuntingYardAlgorithm(handleLvalue(terminals));
@@ -189,12 +189,14 @@ public class ParseTreeNode {
 			params.add(terminals.get(i));
 		}
 		List<List<ParseTreeNode>> paramExpr = new ArrayList<>();
+		List<ParseTreeNode> commas = new LinkedList<>();
 		paramExpr.add(new ArrayList<ParseTreeNode>());
 		int index = 0;
 		for(ParseTreeNode node : params){
 			if(node.symbol.equals(ETERMINAL.COMMA)){
 				paramExpr.add(new ArrayList<ParseTreeNode>());
 				index++;
+				commas.add(node);
 			} else {
 				paramExpr.get(index).add(node);
 			}
@@ -203,14 +205,23 @@ public class ParseTreeNode {
 		newExpr.add(exprList);
 		for(List<ParseTreeNode> param : paramExpr){
 			ParseTreeNode para = new ParseTreeNode(this, new Symbol(EVARIABLE.EXPR));
-			para.setChildren(createExpressionTree(param));
 			List<ParseTreeNode> exprListChildren = new ArrayList<>();
-			exprListChildren.add(para);
-			exprListChildren.add(new ParseTreeNode(exprList, new Symbol(EVARIABLE.EXPR_LIST_TAIL)));
-			exprList.setChildren(exprListChildren);
-			exprList = exprList.getChild(1);
+			para.setChildren(createExpressionTree(param));
+			if(exprList.symbol.equals(EVARIABLE.EXPR_LIST_TAIL)){
+				exprListChildren.add(commas.remove(0));
+				exprListChildren.add(para);
+				exprListChildren.add(new ParseTreeNode(exprList, new Symbol(EVARIABLE.EXPR_LIST_TAIL)));
+				exprList.setChildren(exprListChildren);
+				exprList = exprList.getChild(2);
+			} else {
+				exprListChildren.add(para);
+				exprListChildren.add(new ParseTreeNode(exprList, new Symbol(EVARIABLE.EXPR_LIST_TAIL)));
+				exprList.setChildren(exprListChildren);
+				exprList = exprList.getChild(1);	
+			}
 		}
-		newExpr.add(terminals.get(terminals.size() - 1));
+		newExpr.add(terminals.get(terminals.size() - 1)); // )
+		System.out.println(commas);
 		return newExpr;
 	}
 	
