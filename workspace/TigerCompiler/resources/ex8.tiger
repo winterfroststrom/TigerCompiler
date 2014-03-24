@@ -16,8 +16,8 @@ let
         	return_it(sdf, n); /*should error*/
         	n := return_it(x + x, n);
         	bad[1][1][1] := bad[1][1][1];
-        	d := n + y + bad[1][1][1];
+        	d := n + y + bad[1][1][1]; /* should error */
         end;
 in
-        return_it(5);
+        return_it(5); /* should error */
 end

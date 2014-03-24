@@ -3,12 +3,16 @@ let
 	type board_array_t = array [9][2] of win_array_t;
 	type foo_t = int;
 	type doo_t = int;
+	type X = array[100][100] of int;
+	type Y = array[100][100] of int;
 	var win_cond : win_array_t := 9;
 	var i :int := 2;
 	var x :string;
 	var board : board_array_t;
 	var a : foo_t := 0;
 	var h : doo_t;
+	var b : X;
+	var n : X;
 	function check_win(board : board_array_t) : int begin
 		return board[win_cond[i*3]-1][1][2] = 3;
 		/*i := 3 - 4 <> 4;*/
@@ -19,6 +23,7 @@ let
 		enddo;
 	end;
 in
+	b := n;
 	printi ( 3) ;
 	x := "hellow";
 end

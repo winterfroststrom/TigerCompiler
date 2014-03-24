@@ -2,7 +2,7 @@ package General;
 
 
 public class Configuration {
-	public static final boolean RELEASE = true;
+	public static final boolean RELEASE = false;
 	public static final boolean PRINT_TOKENS = RELEASE || true;
 	public static final boolean PRINT_TREE = RELEASE || false;
 	public static final boolean PRINT_TABLE = RELEASE || true;
@@ -15,6 +15,6 @@ public class Configuration {
 	public static final String TIGER_FILE_TYPE = ".tiger";
 	public static final String TIGER_LEXER_OUTPUT_TYPE = ".tokens";
 	public static final String TIGER_LEXER_ERROR_TYPE = ".err";
-	public static final String FORCED_LOAD_FILE = RELEASE ? null : "resources/ex10.tiger";
+	public static final String FORCED_LOAD_FILE = RELEASE ? null : "resources/ex11.tiger";
 	public static final boolean REDIRECTING_CONSOLE = RELEASE || false;
 }

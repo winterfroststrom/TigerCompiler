@@ -28,10 +28,10 @@ class SymbolTableChecker {
 	
 	private void traverse(String scope, ParseTreeNode tree){
 		if(tree.getSymbol().equals(EVARIABLE.FUNCT_DECLARATION)){
-			scope = ScopedName.addScopeToName(scope, tree.getChild(1).getSymbol().getText());
 			String functionName = tree.getChild(1).getSymbol().getText();
 			Type functionType = table.getTypeOfId(scope, functionName, 
 					tree.getChild(1).getSymbol().getPosition());
+			scope = ScopedName.addScopeToName(scope, tree.getChild(1).getSymbol().getText());
 			if(functionType != null){
 				Type returnType = returnType(scope, tree.getChild(7));
 				if(returnType == null || !functionType.equals(returnType)){

@@ -1,0 +1,5 @@
+let        
+	var i :int;
+in
+	i := 3 - 4 <> 4;
+end
