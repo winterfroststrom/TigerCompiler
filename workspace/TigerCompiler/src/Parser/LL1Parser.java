@@ -9,6 +9,7 @@ import static General.ETERMINAL.*;
 import static General.EVARIABLE.*;
 import General.EVARIABLE;
 import General.ETERMINAL;
+import General.Symbol;
 import General.Token;
 
 class LL1Parser {
@@ -215,7 +216,7 @@ class LL1Parser {
 		errors = new LinkedList<>();
 	}
 	
-	public boolean parse(List<Token> tokens){
+	public ParseTreeNode parse(List<Token> tokens){
 		ParseTreeNode tree = new ParseTreeNode(null);
 		ParseTreeNode curr = tree;
 		init(tokens);
@@ -261,9 +262,7 @@ class LL1Parser {
 				}
 			}
 		}
-		tree.flattenExpressions();
-		System.out.println(tree);
-		return errors.isEmpty();
+		return tree;
 	}
 	
 	public List<ParserError> errors(){

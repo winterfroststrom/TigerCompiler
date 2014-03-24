@@ -4,17 +4,16 @@ import java.io.IOException;
 import java.util.List;
 
 import Lexer.Lexer;
-import Lexer.LexerError;
 import Parser.Parser;
-import Parser.ParserError;
+import SemanticChecking.Checker;
 
 public class Runner {
 	public static void main(String[] args) {
-		args = new String[]{"resources/ex8.tiger"};
 		args = new String[]{"resources/tictactoe.tiger"};
 		
 		Lexer lexer = new Lexer();
 		Parser parser = new Parser();
+		Checker checker = new Checker();
 		try(TigerFileHandler tfh = new TigerFileHandler(args)){
 			tfh.redirectConsole();
 			List<Token> tokens = lexer.lex(tfh.getInput());
@@ -23,35 +22,29 @@ public class Runner {
 			}
 			System.out.println();
 			
-			if(parser.parse(tokens)){
+			boolean hasSemanticError = checker.check(parser.parse(tokens));
+			if(parser.errors().isEmpty()){
 				System.out.println("successful parse");
 			}  else {
 				System.out.println("unsuccessful parse");				
 			}
-			printLexerErrors(lexer.errors());
-			printParserErrors(parser.errors());
+			if(hasSemanticError){
+				System.out.println("semantic error");
+			}
+			printErrors("Lexer", lexer.errors());
+			printErrors("Parser", parser.errors());
+			printErrors("Semantic", checker.errors());
 		} catch(IOException e){
 			System.err.println(e.getMessage());
 		}
 	}
 
-	private static void printParserErrors(List<ParserError> errors ) {
-		System.err.println("Parser Errors:");
+	private static void printErrors(String type, List<? extends Object> errors){
+		System.err.println(type + " Errors:");
 		if(errors.isEmpty()){
 			System.err.println("No errors");
 		} else {
-			for(ParserError error : errors){
-				System.err.println(error);
-			}
-		}
-	}
-
-	private static void printLexerErrors(List<LexerError> errors) {
-		System.err.println("Lexer Errors:");
-		if(errors.isEmpty()){
-			System.err.println("No errors");
-		} else {
-			for(LexerError error : errors){
+			for(Object error : errors){
 				System.err.println(error);
 			}
 		}

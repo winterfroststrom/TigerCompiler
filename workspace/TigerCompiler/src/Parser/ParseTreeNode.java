@@ -5,6 +5,7 @@ import java.util.List;
 
 import General.ETERMINAL;
 import General.EVARIABLE;
+import General.Symbol;
 
 
 public class ParseTreeNode {
@@ -25,7 +26,7 @@ public class ParseTreeNode {
 		this.children = new ArrayList<>();
 	}
 	
-	public ParseTreeNode addRule(Symbol current, Production rule){
+	ParseTreeNode addRule(Symbol current, Production rule){
 		if(symbol == null){
 			symbol = current;
 			for(Symbol s : rule){
@@ -52,7 +53,7 @@ public class ParseTreeNode {
 		}
 	}
 	
-	public ParseTreeNode addTerminal(Symbol current){
+	ParseTreeNode addTerminal(Symbol current){
 		children.get(index).symbol = current;
 		index++;
 		ParseTreeNode next = this;
@@ -280,12 +281,20 @@ public class ParseTreeNode {
 		return list;
 	}
 	
+	public List<ParseTreeNode> getChildren(){
+		return children;
+	}
+	
+	public Symbol getSymbol(){
+		return symbol;
+	}
+	
 	@Override
 	public String toString(){
 		return toString("");
 	}
 	
-	public String toString(String prefix){
+	private String toString(String prefix){
 		String params = "";
 		if(children != null){
 			for(ParseTreeNode child : children){

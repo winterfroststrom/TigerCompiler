@@ -8,7 +8,7 @@ import General.Token;
 public class Parser {
 	private LL1Parser parser;
 	
-	public boolean parse(List<Token> tokens){
+	public ParseTreeNode parse(List<Token> tokens){
 		parser = new LL1Parser();
 		return parser.parse(tokens);
 	}

@@ -5,6 +5,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Stack;
 
+import General.Symbol;
+
 class Production implements Iterable<Symbol>{
 	private List<Symbol> rule;
 	
