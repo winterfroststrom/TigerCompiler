@@ -90,6 +90,7 @@ class LL1Parser {
 					p(s(CONST), s(STAT_ASSIGN_TAIL)));
 			rule(STAT_ASSIGN, ID, p(s(ID), s(STAT_ASSIGN_ID)));
 			rule(STAT_ASSIGN, MINUS, p(s(MINUS), s(UNARYMINUS), s(STAT_ASSIGN_TAIL)));
+			rule(STAT_ASSIGN, LPAREN, p(s(LPAREN), s(EXPR), s(RPAREN), s(STAT_ASSIGN_TAIL)));
 			epsilon(STAT_ASSIGN_ID, SEMI);
 			multiRule(STAT_ASSIGN_ID, nexts(OR, AND, NEQ, LESSEREQ, GREATEREQ, LESS, GREATER, EQ,
 					PLUS, MINUS, DIV, MULT, LBRACK),
@@ -224,7 +225,9 @@ class LL1Parser {
 		while(!symbols.isEmpty()){
 			Symbol current = symbols.pop();
 			if(Configuration.LL1PARSER_DEBUGGING){
-				System.err.println(current);
+				System.err.println();
+				System.err.println("Current : " + current);
+				System.err.println("Lookahead : " + input.get(position));
 			}
 			if(current.isTerminal()){
 				if(current.getTerminal().equals(input.get(position).token)){
@@ -233,12 +236,7 @@ class LL1Parser {
 				} else {
 					errors.add(new ParserError(input.get(position).token, position, current.getTerminal()));
 					if(Configuration.LL1PARSER_DEBUGGING){
-						for(int i = 0; i < position;i++){
-							System.err.print(input.get(i) + " ");
-						}
-						System.err.println();
-						System.err.println(symbols);
-						System.err.println(errors.get(errors.size() - 1));
+						debuggingErrorMessage();
 					}
 				}
 			} else {
@@ -249,12 +247,7 @@ class LL1Parser {
 					errors.add(new ParserError(input.get(position).token, position, 
 							validTerminals(current.getVariable())));
 					if(Configuration.LL1PARSER_DEBUGGING){
-						for(int i = 0; i < position;i++){
-							System.err.print(input.get(i) + " ");
-						}
-						System.err.println();
-						System.err.println(symbols);
-						System.err.println(errors.get(errors.size() - 1));
+						debuggingErrorMessage();
 					}
 				} else {
 					curr = curr.addRule(current, rule);
@@ -266,6 +259,16 @@ class LL1Parser {
 			tree.flattenExpressions();
 		}
 		return tree;
+	}
+
+	private void debuggingErrorMessage() {
+		System.err.print("Processed : ");
+		for(int i = 0; i < position;i++){
+			System.err.print(input.get(i) + " ");
+		}
+		System.err.println();
+		System.err.println("Symbols : " + symbols);
+		System.err.println(errors.get(errors.size() - 1));
 	}
 	
 	public List<ParserError> errors(){

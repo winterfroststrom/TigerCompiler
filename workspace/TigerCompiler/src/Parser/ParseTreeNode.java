@@ -130,11 +130,7 @@ public class ParseTreeNode {
 			if(nodes.get(i).symbol.isValue()){
 				postfix.add(nodes.get(i));
 			} else {
-				if(nodes.get(i).symbol.equals(ETERMINAL.MINUS) 
-						&& (i == 0 || (nodes.get(i - 1).symbol.isTerminal() 
-								&& nodes.get(i - 1).symbol.getTerminal().isOperator()))){
-					nodes.get(i).symbol.changeMinusToUMinus();			
-				}
+				handleUMinus(nodes, i);
 				if(stack.isEmpty()){
 					stack.add(nodes.get(i));
 				} else if(nodes.get(i).symbol.equals(ETERMINAL.RPAREN)){
@@ -159,6 +155,14 @@ public class ParseTreeNode {
 			postfix.add(stack.remove(stack.size() - 1));
 		}
 		return convertFromPostFixToTree(postfix);
+	}
+
+	private void handleUMinus(List<ParseTreeNode> nodes, int i) {
+		if(nodes.get(i).symbol.equals(ETERMINAL.MINUS) 
+				&& (i == 0 || (nodes.get(i - 1).symbol.isTerminal() 
+						&& nodes.get(i - 1).symbol.getTerminal().isOperator()))){
+			nodes.get(i).symbol.changeMinusToUMinus();			
+		}
 	}
 	
 	private List<ParseTreeNode> convertFromPostFixToTree(List<ParseTreeNode> postfix){

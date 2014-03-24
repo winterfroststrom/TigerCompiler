@@ -6,7 +6,7 @@ import java.util.List;
 public class Type {
 	public final boolean array;
 	public final String name;
-	public final Type type;
+	private final Type type;
 	private final List<Integer> dimensions;
 	public final static Type INT = new Type("int", null);
 	public final static Type STRING = new Type("string", null);
@@ -28,6 +28,14 @@ public class Type {
 	
 	public boolean equals(Type other){
 		return name.equals(other.name);
+	}
+	
+	public Type arrayBaseType(){
+		if(array){
+			return type.baseType();
+		} else {
+			return baseType();
+		}
 	}
 	
 	public Type baseType(){
