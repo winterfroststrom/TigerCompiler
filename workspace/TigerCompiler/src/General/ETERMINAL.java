@@ -72,7 +72,7 @@ public enum ETERMINAL {
 		}
 	}
 	
-	public boolean stringAllowed(){
+	public boolean comparisionOperators(){
 		switch(this){
 		case EQ:
 		case NEQ:

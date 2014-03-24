@@ -220,7 +220,6 @@ public class ParseTreeNode {
 			}
 		}
 		newExpr.add(terminals.get(terminals.size() - 1)); // )
-		System.out.println(commas);
 		return newExpr;
 	}
 	
@@ -271,7 +270,10 @@ public class ParseTreeNode {
 		if(symbol.equals(EVARIABLE.EXPR)){
 			setChildren(createExpressionTree(allTerminals()));
 		} else if(symbol.equals(EVARIABLE.STAT_ASSIGN)){
-			setChildren(createExpressionTree(allTerminals()));
+			List<ParseTreeNode> expr = new ArrayList<>();
+			expr.add(new ParseTreeNode(this, new Symbol(EVARIABLE.EXPR)));
+			expr.get(0).setChildren(createExpressionTree(allTerminals()));
+			setChildren(expr);
 		} else {
 			for(int i = 0; i < children.size();i++){
 				children.get(i).associativeExpressions();

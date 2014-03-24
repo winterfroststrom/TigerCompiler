@@ -2,10 +2,15 @@ let
 		type s = int;
 		var s : s;
 		var v : s;
+		var d : int;
 				
 		function return_it(n:s, s:string) : int begin
+				for n := 3 to 4 do
+					return_it(n, s);
+				enddo;
                 return(n);
         end;
 in
         return_it(s + v, "");
+        d := return_it(s, "");
 end

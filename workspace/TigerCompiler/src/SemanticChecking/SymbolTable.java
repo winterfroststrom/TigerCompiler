@@ -18,9 +18,34 @@ class SymbolTable {
 	
 	public SymbolTable(List<SemanticError> errors){
 		types = new HashMap<>();
+		types.put("int", Type.INT);
+		types.put("string", Type.STRING);
 		names = new HashMap<>();
 		functionParams = new HashMap<>();
+		addFunction("print", null, Type.STRING);
+		addFunction("printi", null, Type.INT);
+		addFunction("flush", null);
+		addFunction("getchar", Type.STRING);
+		addFunction("ord", Type.INT, Type.STRING);
+		addFunction("chr", Type.STRING, Type.INT);
+		addFunction("size", Type.INT, Type.STRING);
+		addFunction("substring", Type.STRING, Type.STRING, Type.INT, Type.INT);
+		addFunction("concat", Type.STRING, Type.STRING, Type.STRING);
+		addFunction("not", Type.INT, Type.INT);
+		addFunction("exit", null, Type.INT);
+
+		
 		this.errors = errors;
+	}
+	
+	private void addFunction(String name, Type retType, Type... types){
+		name = ScopedName.addScopeToName(Configuration.GLOBAL_SCOPE_NAME, name);
+		names.put(name, new ScopedName(true, name, retType));
+		List<Type> type = new LinkedList<>();
+		for(Type t : types){
+			type.add(t);
+		}
+		functionParams.put(name, type);
 	}
 	
 	public void build(ParseTreeNode root){
@@ -198,9 +223,11 @@ class SymbolTable {
 
 	public Type getTypeOfId(String scope, String id, int position) {
 		if(names.containsKey(ScopedName.addScopeToName(scope, id))){
-			return names.get(ScopedName.addScopeToName(scope, id)).type;
+			ScopedName name = names.get(ScopedName.addScopeToName(scope, id));
+			return name.type;
 		} else if(names.containsKey(ScopedName.addScopeToName(Configuration.GLOBAL_SCOPE_NAME, id))){
-			return names.get(ScopedName.addScopeToName(Configuration.GLOBAL_SCOPE_NAME, id)).type; 
+			ScopedName name = names.get(ScopedName.addScopeToName(Configuration.GLOBAL_SCOPE_NAME, id));
+			return name.type; 
 		} else {
 			errors.add(new SemanticError("Missing variable " + id  
 					+ " in scope of " + scope + " at position " + position));
