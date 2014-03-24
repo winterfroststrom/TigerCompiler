@@ -188,6 +188,10 @@ class GeneralDFA {
 			doAction(action);
 			state = nextState;
 		}
+		if(charBufferToString().equals("end")){
+			String token = charBufferToString();
+			tokens.add(new Token(ETERMINAL.END, token, position - token.length()));
+		}
 		return tokens;
 	}
 	

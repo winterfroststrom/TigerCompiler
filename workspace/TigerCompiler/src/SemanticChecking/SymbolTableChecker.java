@@ -48,7 +48,8 @@ class SymbolTableChecker {
 			while(index < tree.getChildren().size()){
 				Type exprType = typeOfExpr(scope, tree.getChild(index));
 				if(!Type.INT.equals(exprType)){
-					errors.add(new SemanticError("Type mismatch, expected int but was "
+					System.out.println(tree);
+						errors.add(new SemanticError("Type mismatch, expected int but was "
 							+ exprType + " for index of lvalue at position " 
 							+ tree.getChild(0).getSymbol().getPosition()));
 				}

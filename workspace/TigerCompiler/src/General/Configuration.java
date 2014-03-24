@@ -2,7 +2,7 @@ package General;
 
 
 public class Configuration {
-	public static final String FORCED_LOAD_FILE = "resources/ex9.tiger";
+	public static final String FORCED_LOAD_FILE = "resources/ex10.tiger";
 	//public static final String FORCED_LOAD_FILE = null;
 	public static final boolean PRINT_TOKENS = false;
 	public static final boolean PRINT_TREE = false;

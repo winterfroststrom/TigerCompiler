@@ -217,6 +217,7 @@ class LL1Parser {
 	}
 	
 	public ParseTreeNode parse(List<Token> tokens){
+		System.out.println(tokens);
 		ParseTreeNode tree = new ParseTreeNode(null);
 		ParseTreeNode curr = tree;
 		init(tokens);
