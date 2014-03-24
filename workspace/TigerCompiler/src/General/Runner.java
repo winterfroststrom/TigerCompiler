@@ -30,10 +30,10 @@ public class Runner {
 				if(Configuration.PRINT_TREE){
 					if(parser.errors().isEmpty()){
 						System.out.println("successful parse");
+						System.out.println(tree);
 					}  else {
 						System.out.println("unsuccessful parse");				
 					}
-					System.out.println(tree);
 				}
 				
 				if(parser.errors().isEmpty()){

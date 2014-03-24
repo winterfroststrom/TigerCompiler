@@ -9,11 +9,6 @@ import java.nio.file.Paths;
 
 
 public class TigerFileHandler implements AutoCloseable{
-	public static final String TIGER_FILE_TYPE = ".tiger";
-	public static final String TIGER_LEXER_OUTPUT_TYPE = ".tokens";
-	public static final String TIGER_LEXER_ERROR_TYPE = ".err";
-	//private static final boolean REDIRECTING_CONSOLE = true;
-	private static final boolean REDIRECTING_CONSOLE = false;
 	private static boolean redirectedConsole;
 	private PrintStream out;
 	private PrintStream err;
@@ -24,7 +19,7 @@ public class TigerFileHandler implements AutoCloseable{
 	}
 
 	public void redirectConsole() throws IOException{
-		if(REDIRECTING_CONSOLE){
+		if(Configuration.REDIRECTING_CONSOLE){
 			if(!redirectedConsole){
 				String filename = checkFilename();
 				String outputName = createOutputFilename(filename);
@@ -40,7 +35,7 @@ public class TigerFileHandler implements AutoCloseable{
 	
 	@Override
 	public void close(){
-		if(REDIRECTING_CONSOLE){
+		if(Configuration.REDIRECTING_CONSOLE){
 			out.close();
 			err.close();
 		}
@@ -52,11 +47,11 @@ public class TigerFileHandler implements AutoCloseable{
 	}
 	
 	private boolean isTigerFile(String name) {
-		if(name.length() <= TIGER_FILE_TYPE.length()) {
+		if(name.length() <= Configuration.TIGER_FILE_TYPE.length()) {
 			return false;
 		}
-		String fileType = name.substring(name.length() - TIGER_FILE_TYPE.length());
-		return fileType.equalsIgnoreCase(TIGER_FILE_TYPE);
+		String fileType = name.substring(name.length() - Configuration.TIGER_FILE_TYPE.length());
+		return fileType.equalsIgnoreCase(Configuration.TIGER_FILE_TYPE);
 	}
 	
 	private String checkFilename() throws IOException {
@@ -83,16 +78,16 @@ public class TigerFileHandler implements AutoCloseable{
 	private String createErrorFilename(String filename){
 		File inputFile = new File(filename);
 		String inputFilename = inputFile.getName();
-		String inputName = inputFilename.substring(0, inputFilename.length() - TIGER_FILE_TYPE.length());
-		return inputFile.getParent() + File.separator + inputName + TIGER_LEXER_OUTPUT_TYPE + TIGER_LEXER_ERROR_TYPE;
+		String inputName = inputFilename.substring(0, inputFilename.length() - Configuration.TIGER_FILE_TYPE.length());
+		return inputFile.getParent() + File.separator + inputName + Configuration.TIGER_LEXER_OUTPUT_TYPE + Configuration.TIGER_LEXER_ERROR_TYPE;
 	}
 	
 	
 	private String createOutputFilename(String filename){
 		File inputFile = new File(filename);
 		String inputFilename = inputFile.getName();
-		String inputName = inputFilename.substring(0, inputFilename.length() - TIGER_FILE_TYPE.length());
-		return inputFile.getParent() + File.separator + inputName + TIGER_LEXER_OUTPUT_TYPE;
+		String inputName = inputFilename.substring(0, inputFilename.length() - Configuration.TIGER_FILE_TYPE.length());
+		return inputFile.getParent() + File.separator + inputName + Configuration.TIGER_LEXER_OUTPUT_TYPE;
 	}
 	
 	private String readFile(String path, Charset encoding) throws IOException {

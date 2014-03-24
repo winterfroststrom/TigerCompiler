@@ -149,14 +149,17 @@ class SymbolTable {
 		if(!optionalInit.getChildren().isEmpty()){
 			int position = optionalInit.getChild(1).getChild(0).getSymbol().getPosition();
 			if(optionalInit.getChild(1).getChild(0).getSymbol().equals(ETERMINAL.STRLIT)){
-				if(!type.baseType().equals(Type.STRING)){
+				if(!type.baseType().equals(Type.STRING) 
+						&& !(type.array && type.type.baseType().equals(Type.STRING))){
+					
 					errors.add(new SemanticError("Type mismatch : expected " 
-							+ type + " but was " + Type.STRING + " at position " + position));
+							+ type + " but was " + Type.STRING + " in optional init at position " + position));
 				}
 			} else {
-				if(!type.baseType().equals(Type.INT)){
+				if(!type.baseType().equals(Type.INT)
+						&& !(type.array && type.type.baseType().equals(Type.INT))){
 					errors.add(new SemanticError("Type mismatch : expected "
-							+ type + " but was " + Type.INT + " at position " + position));
+							+ type + " but was " + Type.INT + " in optional init at position " + position));
 				}
 			}
 		}

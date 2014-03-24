@@ -108,8 +108,7 @@ public class ParseTreeNode {
 							lvalueExprChildren.add(terminals.get(index++));
 						}
 					}
-					lvalueExpr.setChildren(lvalueExprChildren);
-					lvalueExpr.createExpressionTree(lvalueExprChildren);
+					lvalueExpr.setChildren(lvalueExpr.createExpressionTree(lvalueExprChildren));
 					lvalueChildren.add(lvalueExpr);
 					lvalueChildren.add(terminals.get(index++));	
 				}
