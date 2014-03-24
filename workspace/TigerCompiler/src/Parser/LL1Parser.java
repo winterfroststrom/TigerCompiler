@@ -7,6 +7,7 @@ import java.util.Stack;
 
 import static General.ETERMINAL.*;
 import static General.EVARIABLE.*;
+import General.Configuration;
 import General.EVARIABLE;
 import General.ETERMINAL;
 import General.Symbol;
@@ -14,7 +15,6 @@ import General.Token;
 
 class LL1Parser {
 	private static Production[][] GRAMMAR_TABLE = new Production[EVARIABLE.length][ETERMINAL.length];
-	private static final boolean debugging = false;
 	private static boolean initialized;
 	private Stack<Symbol> symbols;
 	private List<Token> input;
@@ -223,7 +223,7 @@ class LL1Parser {
 		initializeTable();
 		while(!symbols.isEmpty()){
 			Symbol current = symbols.pop();
-			if(debugging){
+			if(Configuration.LL1PARSER_DEBUGGING){
 				System.err.println(current);
 			}
 			if(current.isTerminal()){
@@ -232,7 +232,7 @@ class LL1Parser {
 					position++;
 				} else {
 					errors.add(new ParserError(input.get(position).token, position, current.getTerminal()));
-					if(debugging){
+					if(Configuration.LL1PARSER_DEBUGGING){
 						for(int i = 0; i < position;i++){
 							System.err.print(input.get(i) + " ");
 						}
@@ -248,7 +248,7 @@ class LL1Parser {
 				if(rule == null){
 					errors.add(new ParserError(input.get(position).token, position, 
 							validTerminals(current.getVariable())));
-					if(debugging){
+					if(Configuration.LL1PARSER_DEBUGGING){
 						for(int i = 0; i < position;i++){
 							System.err.print(input.get(i) + " ");
 						}

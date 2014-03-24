@@ -4,31 +4,37 @@ import java.io.IOException;
 import java.util.List;
 
 import Lexer.Lexer;
+import Parser.ParseTreeNode;
 import Parser.Parser;
 import SemanticChecking.Checker;
 
 public class Runner {
 	public static void main(String[] args) {
-		args = new String[]{"resources/tictactoe.tiger"};
-		
+		if(Configuration.FORCED_LOAD_FILE != null){
+			args = new String[]{Configuration.FORCED_LOAD_FILE};
+		}
 		Lexer lexer = new Lexer();
 		Parser parser = new Parser();
 		Checker checker = new Checker();
 		try(TigerFileHandler tfh = new TigerFileHandler(args)){
 			tfh.redirectConsole();
 			List<Token> tokens = lexer.lex(tfh.getInput());
-			for(Token token : tokens){
-				System.out.print(token.token + " ");	
+			if(Configuration.PRINT_TOKENS){
+				for(Token token : tokens){
+					System.out.print(token.token + " ");	
+				}
+				System.out.println();
 			}
-			System.out.println();
-			
-			boolean hasSemanticError = checker.check(parser.parse(tokens));
+			ParseTreeNode tree = parser.parse(tokens);
+			if(Configuration.PRINT_TREE){
+				System.out.println(tree);
+			}
 			if(parser.errors().isEmpty()){
 				System.out.println("successful parse");
 			}  else {
 				System.out.println("unsuccessful parse");				
 			}
-			if(hasSemanticError){
+			if(checker.check(tree)){
 				System.out.println("semantic error");
 			}
 			printErrors("Lexer", lexer.errors());

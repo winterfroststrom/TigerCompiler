@@ -3,6 +3,7 @@ package Parser;
 import java.util.ArrayList;
 import java.util.List;
 
+import General.Configuration;
 import General.ETERMINAL;
 import General.EVARIABLE;
 import General.Symbol;
@@ -13,9 +14,7 @@ public class ParseTreeNode {
 	private Symbol symbol;
 	private List<ParseTreeNode> children;
 	private int index;
-	private static final String PARSE_TREE_NODE_DELIMITER = "\n";
-	private static final String PARSE_TREE_NODE_PREFIX = " ";
-
+	
 	public ParseTreeNode(ParseTreeNode parent){
 		this(parent, null);
 	}
@@ -298,7 +297,7 @@ public class ParseTreeNode {
 		String params = "";
 		if(children != null){
 			for(ParseTreeNode child : children){
-				params += PARSE_TREE_NODE_DELIMITER + child.toString(prefix + PARSE_TREE_NODE_PREFIX);
+				params += Configuration.PARSE_TREE_NODE_DELIMITER + child.toString(prefix + Configuration.PARSE_TREE_NODE_PREFIX);
 			}
 		}
 		return prefix + "(" + symbol + params + ")";
