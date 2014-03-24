@@ -50,12 +50,14 @@ class SymbolTable {
 	
 	public void build(ParseTreeNode root){
 		ParseTreeNode declarationSegment = root.getChildren().get(1);
-		ParseTreeNode typeDeclarationList = declarationSegment.getChildren().get(0);
-		ParseTreeNode varDeclarationList = declarationSegment.getChildren().get(1);
-		ParseTreeNode functDeclarationList = declarationSegment.getChildren().get(2);
-		buildTypes(typeDeclarationList);
-		buildVariables(varDeclarationList);
-		buildFunctions(functDeclarationList);
+		if(!declarationSegment.getChildren().isEmpty()){
+			ParseTreeNode typeDeclarationList = declarationSegment.getChildren().get(0);
+			ParseTreeNode varDeclarationList = declarationSegment.getChildren().get(1);
+			ParseTreeNode functDeclarationList = declarationSegment.getChildren().get(2);
+			buildTypes(typeDeclarationList);
+			buildVariables(varDeclarationList);
+			buildFunctions(functDeclarationList);
+		}
 	}
 		
 	private void buildFunctions(ParseTreeNode functDeclarationList) {

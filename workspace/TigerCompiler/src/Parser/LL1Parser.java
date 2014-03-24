@@ -228,6 +228,9 @@ class LL1Parser {
 				System.err.println();
 				System.err.println("Current : " + current);
 				System.err.println("Lookahead : " + input.get(position));
+				if(Configuration.LL1PARSER_DEBUGGING_VERBOSE){
+					debuggingErrorMessage();
+				}
 			}
 			if(current.isTerminal()){
 				if(current.getTerminal().equals(input.get(position).token)){
@@ -235,7 +238,8 @@ class LL1Parser {
 					position++;
 				} else {
 					errors.add(new ParserError(input.get(position).token, position, current.getTerminal()));
-					if(Configuration.LL1PARSER_DEBUGGING){
+					if(Configuration.LL1PARSER_DEBUGGING
+							&& !Configuration.LL1PARSER_DEBUGGING_VERBOSE){
 						debuggingErrorMessage();
 					}
 				}
@@ -246,7 +250,8 @@ class LL1Parser {
 				if(rule == null){
 					errors.add(new ParserError(input.get(position).token, position, 
 							validTerminals(current.getVariable())));
-					if(Configuration.LL1PARSER_DEBUGGING){
+					if(Configuration.LL1PARSER_DEBUGGING 
+							&& !Configuration.LL1PARSER_DEBUGGING_VERBOSE){
 						debuggingErrorMessage();
 					}
 				} else {
@@ -268,7 +273,7 @@ class LL1Parser {
 		}
 		System.err.println();
 		System.err.println("Symbols : " + symbols);
-		System.err.println(errors.get(errors.size() - 1));
+		System.err.println("Latest Error : " + (errors.isEmpty() ? "" : errors.get(errors.size() - 1)));
 	}
 	
 	public List<ParserError> errors(){
