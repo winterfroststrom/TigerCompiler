@@ -70,6 +70,7 @@ public class ParseTreeNode {
 			return terminals;
 		} else if(terminals.get(0).symbol.equals(ETERMINAL.ID) 
 				&& terminals.get(1).symbol.equals(ETERMINAL.LPAREN)){
+			System.out.println(terminals);
 			return createExpressionTreeFunction(terminals);
 		} else {
 			return shuntingYardAlgorithm(handleLvalue(terminals));
@@ -181,6 +182,9 @@ public class ParseTreeNode {
 	private List<ParseTreeNode> createExpressionTreeFunction(List<ParseTreeNode> terminals) {
 		List<ParseTreeNode> newExpr = new ArrayList<>();
 		List<ParseTreeNode> params = new ArrayList<>();
+		newExpr.add(terminals.get(0)); // id
+		newExpr.add(terminals.get(1)); // (
+		
 		for(int i = 2; i < terminals.size() - 1; i++){
 			params.add(terminals.get(i));
 		}
@@ -195,11 +199,18 @@ public class ParseTreeNode {
 				paramExpr.get(index).add(node);
 			}
 		}
+		ParseTreeNode exprList = new ParseTreeNode(this, new Symbol(EVARIABLE.EXPR_LIST));
+		newExpr.add(exprList);
 		for(List<ParseTreeNode> param : paramExpr){
 			ParseTreeNode para = new ParseTreeNode(this, new Symbol(EVARIABLE.EXPR));
 			para.setChildren(createExpressionTree(param));
-			newExpr.add(para);
+			List<ParseTreeNode> exprListChildren = new ArrayList<>();
+			exprListChildren.add(para);
+			exprListChildren.add(new ParseTreeNode(exprList, new Symbol(EVARIABLE.EXPR_LIST_TAIL)));
+			exprList.setChildren(exprListChildren);
+			exprList = exprList.getChild(1);
 		}
+		newExpr.add(terminals.get(terminals.size() - 1));
 		return newExpr;
 	}
 	

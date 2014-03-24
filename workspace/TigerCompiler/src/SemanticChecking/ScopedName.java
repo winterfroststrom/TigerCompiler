@@ -26,7 +26,7 @@ public class ScopedName {
 		}
 	}
 	
-	public static String createScopedName(String scope, String name){
+	public static String addScopeToName(String scope, String name){
 		return scope + Configuration.SCOPE_DELIMITER + name;
 	}
 	

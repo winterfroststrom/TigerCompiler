@@ -2,17 +2,21 @@ let
 		type sad = int;
 		type rad = sad;
 		type bad = array [3][2][2] of sad;
-		var sad:int := 32;
+		var sdf:rad := 32;
 		var df:int;
+		var bad : bad;
 		var s, d, f : int := 3;
-        function return_it(n:int) : int begin
+        function return_it(n:int, s:int) : int begin
                 return(n);
         end;
-        function x() begin
+        function x(a:int, f:int) begin
         	d := 3;
         end;
-        function y(n:int, x:int, y:int) begin
-        	d := n + x;
+        function y(n:int, x:int, y:rad) begin
+        	return_it(sdf, n); /*should error*/
+        	n := return_it(x + x, n);
+        	
+        	d := n + y + bad[1][1][1];
         end;
 in
         return_it(5);

@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 
+import General.Configuration;
 import General.ETERMINAL;
 import General.EVARIABLE;
 import Parser.ParseTreeNode;
@@ -34,7 +35,8 @@ class SymbolTable {
 	private void buildFunctions(ParseTreeNode functDeclarationList) {
 		if(!functDeclarationList.getChildren().isEmpty()){
 			ParseTreeNode functDeclaration = functDeclarationList.getChild(0);
-			String functName = functDeclaration.getChild(1).getSymbol().getText();
+			String functName = ScopedName.addScopeToName(Configuration.GLOBAL_SCOPE_NAME, 
+					functDeclaration.getChild(1).getSymbol().getText());
 			ParseTreeNode retType = functDeclaration.getChild(5);
 			Type type = null;
 			if(!retType.getChildren().isEmpty()){
@@ -85,7 +87,7 @@ class SymbolTable {
 
 	private void handleParam(String functName, List<Type> paramTypes,
 			ParseTreeNode param) {
-		String paramName = ScopedName.createScopedName(functName, param.getChild(0).getSymbol().getText()); 
+		String paramName = ScopedName.addScopeToName(functName, param.getChild(0).getSymbol().getText()); 
 		Type paramType = getTypeId(param.getChild(2));
 		if(names.containsKey(paramName)){
 			errors.add(new SemanticError("Redeclared name " + paramName + " at position " 
@@ -104,6 +106,7 @@ class SymbolTable {
 			buildIdList(ids, varDeclaration.getChild(1).getChild(1));
 			Type type = getTypeId(varDeclaration.getChild(3));
 			for(String id : ids){
+				id = ScopedName.addScopeToName(Configuration.GLOBAL_SCOPE_NAME, id);
 				if(names.containsKey(id)){
 					errors.add(new SemanticError("Redeclared name " + id  + " in global scope at position " 
 							+ varDeclaration.getChild(0).getSymbol().getPosition()));
@@ -111,21 +114,25 @@ class SymbolTable {
 					names.put(id, new ScopedName(false, id, type));
 				}
 			}
-			if(!varDeclaration.getChild(4).getChildren().isEmpty()){
-				int position = varDeclaration.getChild(4).getChild(1).getChild(0).getSymbol().getPosition();
-				if(varDeclaration.getChild(4).getChild(1).getChild(0).getSymbol().equals(ETERMINAL.STRLIT)){
-					if(!type.equals(Type.STRING)){
-						errors.add(new SemanticError("Type mismatch : expected " 
-								+ type + " but was " + Type.STRING + " at position " + position));
-					}
-				} else {
-					if(!type.equals(Type.INT)){
-						errors.add(new SemanticError("Type mismatch : expected "
-								+ type + " but was " + Type.INT + " at position " + position));
-					}
+			optionalInitTypeCheck(varDeclaration.getChild(4), type);
+			buildVariables(varDeclarationList.getChild(1));
+		}
+	}
+
+	private void optionalInitTypeCheck(ParseTreeNode optionalInit, Type type) {
+		if(!optionalInit.getChildren().isEmpty()){
+			int position = optionalInit.getChild(1).getChild(0).getSymbol().getPosition();
+			if(optionalInit.getChild(1).getChild(0).getSymbol().equals(ETERMINAL.STRLIT)){
+				if(!type.equals(Type.STRING)){
+					errors.add(new SemanticError("Type mismatch : expected " 
+							+ type + " but was " + Type.STRING + " at position " + position));
+				}
+			} else {
+				if(!type.equals(Type.INT)){
+					errors.add(new SemanticError("Type mismatch : expected "
+							+ type + " but was " + Type.INT + " at position " + position));
 				}
 			}
-			buildVariables(varDeclarationList.getChild(1));
 		}
 	}
 
@@ -148,7 +155,7 @@ class SymbolTable {
 			} else {
 				ParseTreeNode typeLit = typeDeclaration.getChildren().get(3);
 				if(typeLit.getChildren().get(0).getSymbol().equals(EVARIABLE.TYPE_ID)){
-					types.put(typeName, new Type(typeName, getTypeId(typeLit.getChildren().get(0))));
+					types.put(typeName, new Type(typeName, getTypeId(typeLit.getChild(0))));
 				} else {
 					List<Integer> dimensions = new LinkedList<Integer>();
 					dimensions.add(Integer.parseInt(typeLit.getChildren().get(2).getSymbol().getText()));
