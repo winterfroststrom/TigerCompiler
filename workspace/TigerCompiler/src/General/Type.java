@@ -9,7 +9,9 @@ public class Type {
 	private final Type type;
 	private final List<Integer> dimensions;
 	public final static Type INT = new Type("int", null);
+	public final static Type CINT = new Type("Constant|int", INT);
 	public final static Type STRING = new Type("string", null);
+	public final static Type CSTRING = new Type("Constant|string", STRING);
 	
 	public Type(String name, Type type){
 		this(name, false, type, new LinkedList<Integer>());
@@ -26,8 +28,16 @@ public class Type {
 		this.type = type;
 	}
 	
+	public boolean isConstant(){
+		return this == CINT || this == CSTRING;
+	}
+	
 	public boolean equals(Type other){
-		return name.equals(other.name);
+		if(this.isConstant() || other.isConstant()){
+			return baseType().equals(other.baseType());
+		} else {
+			return name.equals(other.name);
+		}
 	}
 	
 	public Type arrayBaseType(){
@@ -39,7 +49,7 @@ public class Type {
 	}
 	
 	public Type baseType(){
-		if(equals(Type.INT) || equals(Type.STRING)|| array){
+		if(this == Type.INT || this == Type.STRING || array){
 			return this;
 		} else {
 			return type.baseType();

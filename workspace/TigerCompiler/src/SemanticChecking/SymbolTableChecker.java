@@ -223,6 +223,11 @@ class SymbolTableChecker {
 				}
 			}
 			Type type = childTypes.get(0);
+			for(Type t : childTypes){
+				if(t != null && !t.isConstant()){
+					type = t;
+				}
+			}
 			if(!tree.getSymbol().getTerminal().comparisionOperators() && type.baseType().equals(Type.STRING)){
 				errors.add(new SemanticError("Type mismatch : operator at position " 
 						+ tree.getSymbol().getPosition() 
@@ -250,9 +255,9 @@ class SymbolTableChecker {
 				return dereferencedType;
 			}
 		} else if(tree.getSymbol().equals(ETERMINAL.STRLIT)){
-			return Type.STRING;
+			return Type.CSTRING;
 		} else if(tree.getSymbol().equals(ETERMINAL.INTLIT)){
-			return Type.INT;
+			return Type.CINT;
 		} else {
 			ParseTreeNode id = tree;
 			return table.getTypeOfId(scope, id.getSymbol().getText(), id.getSymbol().getPosition());
