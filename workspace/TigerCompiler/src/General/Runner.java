@@ -25,34 +25,43 @@ public class Runner {
 				}
 				System.out.println();
 			}
-			ParseTreeNode tree = parser.parse(tokens);
-			if(Configuration.PRINT_TREE){
-				System.out.println(tree);
+			if(lexer.errors().isEmpty()){
+				ParseTreeNode tree = parser.parse(tokens);
+				if(Configuration.PRINT_TREE){
+					if(parser.errors().isEmpty()){
+						System.out.println("successful parse");
+					}  else {
+						System.out.println("unsuccessful parse");				
+					}
+					System.out.println(tree);
+				}
+				
+				if(parser.errors().isEmpty()){
+					if(checker.check(tree)){
+						System.out.println("semantic error");
+					}
+				}
 			}
-			if(parser.errors().isEmpty()){
-				System.out.println("successful parse");
-			}  else {
-				System.out.println("unsuccessful parse");				
+			if(printErrors("Lexer", lexer.errors())){
+				if(printErrors("Parser", parser.errors())){
+					printErrors("Semantic", checker.errors());		
+				}
 			}
-			if(checker.check(tree)){
-				System.out.println("semantic error");
-			}
-			printErrors("Lexer", lexer.errors());
-			printErrors("Parser", parser.errors());
-			printErrors("Semantic", checker.errors());
 		} catch(IOException e){
 			System.err.println(e.getMessage());
 		}
 	}
 
-	private static void printErrors(String type, List<? extends Object> errors){
+	private static boolean printErrors(String type, List<? extends Object> errors){
 		System.err.println(type + " Errors:");
 		if(errors.isEmpty()){
 			System.err.println("No errors");
+			return true;
 		} else {
 			for(Object error : errors){
 				System.err.println(error);
 			}
+			return false;
 		}
 	}
 }

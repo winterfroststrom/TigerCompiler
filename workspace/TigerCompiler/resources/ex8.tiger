@@ -1,5 +1,19 @@
 let
-        var i :int;
+		type sad = int;
+		type rad = sad;
+		type bad = array [3][2][2] of sad;
+		var sad:int := 32;
+		var df:int;
+		var s, d, f : int := 3;
+        function return_it(n:int) : int begin
+                return(n);
+        end;
+        function x() begin
+        	d := 3;
+        end;
+        function y(n:int ,x:int) begin
+        	d := 3;
+        end;
 in
-        i := 2 - 2 - 2;
+        return_it(5);
 end

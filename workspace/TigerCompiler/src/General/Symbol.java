@@ -29,6 +29,22 @@ public class Symbol {
 		return variable;
 	}
 	
+	public String getText(){
+		if(isTerminal()){
+			return token.text;
+		} else {
+			throw new IllegalArgumentException("Symbol is not a terminal");
+		}
+	}
+	
+	public int getPosition(){
+		if(isTerminal()){
+			return token.position;
+		} else {
+			throw new IllegalArgumentException("Symbol is not a terminal");
+		}
+	}
+	
 	public void changeMinusToUMinus(){
 		if(isTerminal() && token.token.equals(ETERMINAL.MINUS)){
 			token = new Token(ETERMINAL.UMINUS, token.text, token.position);

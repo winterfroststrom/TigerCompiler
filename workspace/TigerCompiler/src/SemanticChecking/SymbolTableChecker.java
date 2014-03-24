@@ -1,5 +1,6 @@
 package SemanticChecking;
 
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -10,14 +11,16 @@ public class SymbolTableChecker {
 	
 	public boolean check(ParseTreeNode tree) {
 		errors = new LinkedList<>();
-		
-		traverse(tree);
+		SymbolTable table = new SymbolTable(errors);
+		table.build(tree);
+		//System.out.println(tree);
+		//traverse(tree);
 		
 		return !errors.isEmpty();
 	}
-
+	
 	private void traverse(ParseTreeNode tree){
-		System.out.println(tree.getSymbol());
+		//System.out.println(tree.getSymbol());
 		for(ParseTreeNode child : tree.getChildren()){
 			traverse(child);
 		}

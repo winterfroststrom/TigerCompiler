@@ -284,6 +284,10 @@ public class ParseTreeNode {
 		return children;
 	}
 	
+	public ParseTreeNode getChild(int index){
+		return children.get(index);
+	}
+	
 	public Symbol getSymbol(){
 		return symbol;
 	}

@@ -262,6 +262,7 @@ class LL1Parser {
 				}
 			}
 		}
+		tree.flattenExpressions();
 		return tree;
 	}
 	
