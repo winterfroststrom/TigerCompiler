@@ -224,6 +224,12 @@ class LL1Parser {
 		initializeTable();
 		while(!symbols.isEmpty()){
 			Symbol current = symbols.pop();
+			if(position >= input.size()){
+				System.out.println(position);
+				System.out.println(input.size());
+				errors.add(new ParserError(input.get(input.size() - 1).token, position));
+				break;
+			}
 			if(Configuration.LL1PARSER_DEBUGGING){
 				System.err.println();
 				System.err.println("Current : " + current);

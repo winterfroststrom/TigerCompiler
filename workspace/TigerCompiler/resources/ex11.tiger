@@ -1,4 +1,10 @@
 let
+	type foo = array[200] of int;
+	type bar = array[100] of foo;
+	var x : bar;
+	var i, j : int;
 in
 	i := 3 * 4 + 4;
+	printi(x[i]); /* x[i] is of type foo */
+	printi(x[i][j]); /* x[i][j] is of type int */
 end

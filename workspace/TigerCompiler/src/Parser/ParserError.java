@@ -10,6 +10,13 @@ public class ParserError {
 	private List<ETERMINAL> expecteds;
 	private int position;
 	private boolean terminalError;
+	private boolean endOfInputError;
+	
+	public ParserError(ETERMINAL unexpected, int position){
+		this.unexpected = unexpected;
+		this.position = position;
+		this.endOfInputError = true;
+	}
 	
 	public ParserError(ETERMINAL unexpected, int position, List<ETERMINAL> expecteds){
 		this.unexpected = unexpected;
@@ -26,9 +33,12 @@ public class ParserError {
 	
 	@Override
 	public String toString(){
-		if(terminalError){
+		if(endOfInputError){
+			return "End of input reached on terminal " 
+					+ unexpected + " at position " + position;
+		} else if(terminalError){
 			return "Unexpected terminal " + unexpected 
-			+ " at position " + position + " expecting " + expected;
+					+ " at position " + position + " expecting " + expected;
 		} else {
 			return "Unexpected terminal " + unexpected 
 					+ " at position " + position + 
