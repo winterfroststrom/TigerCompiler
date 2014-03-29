@@ -245,7 +245,8 @@ class SymbolTableChecker {
 		if(tree.getSymbol().equals(EVARIABLE.LVALUE)){
 			ParseTreeNode id = tree.getChild(0);
 			int numIndices = (tree.getChildren().size() - 1) / 3;
-			Type arrayType = table.getTypeOfId(scope, id.getSymbol().getText(), id.getSymbol().getPosition());
+			Type arrayType = table.getTypeOfId(scope, id.getSymbol().getText(), 
+					id.getSymbol().getPosition());
 			Type dereferencedType = arrayType.dereference(numIndices);
 			if(dereferencedType == null){
 				errors.add(new SemanticError("Indices must be used in full or not at all at position "

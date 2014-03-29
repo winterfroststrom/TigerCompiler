@@ -57,13 +57,14 @@ public class Type {
 	}
 	
 	public Type dereference(int amount){
+		Type base = baseType();
 		if(amount == 0){
 			return this;
-		} else if(array){
-			if(amount == dimensions.size()){
-				return type;	
-			} else if(amount > dimensions.size()){
-				return type.dereference(amount - dimensions.size());
+		} else if(base.array){
+			if(amount == base.dimensions.size()){
+				return base.type;
+			} else if(amount > base.dimensions.size()){
+				return base.type.dereference(amount - base.dimensions.size());
 			} else {
 				return null;
 			}
