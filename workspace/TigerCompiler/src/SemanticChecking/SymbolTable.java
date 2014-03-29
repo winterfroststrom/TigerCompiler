@@ -10,10 +10,10 @@ import General.EVARIABLE;
 import General.Type;
 import Parser.ParseTreeNode;
 
-class SymbolTable {
+public class SymbolTable {
 	private HashMap<String, Type> types;
 	private HashMap<String, ScopedName> names;
-	private HashMap<String, List<Type>> functionParams;
+	private HashMap<String, List<List<Type>>> functionParams;
 	List<SemanticError> errors;
 	
 	public SymbolTable(List<SemanticError> errors){
@@ -41,11 +41,11 @@ class SymbolTable {
 	private void addFunction(String name, Type retType, Type... types){
 		name = ScopedName.addScopeToName(Configuration.GLOBAL_SCOPE_NAME, name);
 		names.put(name, new ScopedName(true, name, retType));
-		List<Type> type = new LinkedList<>();
+		List<Type> typeList = new LinkedList<>();
 		for(Type t : types){
-			type.add(t);
+			typeList.add(t);
 		}
-		functionParams.put(name, type);
+		putFunctionParams(name, typeList);
 	}
 	
 	public void build(ParseTreeNode root){
@@ -76,13 +76,13 @@ class SymbolTable {
 				handleParam(functName, paramTypes, param);
 				buildParams(functName, paramTypes, functDeclaration.getChild(3).getChild(1));
 			}
-			if(names.containsKey(functName)){
+			if(containsFunctionAndParams(functName, paramTypes)){
 				errors.add(new SemanticError("Redeclared name " + functName 
 						+ " in global scope at position " 
 						+ functDeclaration.getChild(0).getSymbol().getPosition()));
 			} else {
 				names.put(functName, new ScopedName(true, functName, type));
-				functionParams.put(functName, paramTypes);
+				putFunctionParams(functName, paramTypes);
 			}
 			boolean hasReturn = false;
 			for(ParseTreeNode terminal : functDeclaration.getChild(7).allTerminals()){
@@ -103,6 +103,40 @@ class SymbolTable {
 			
 			buildFunctions(functDeclarationList.getChild(1));
 		}
+	}
+
+	boolean containsFunctionAndParams(String scope, String name, List<Type> params){
+		return containsFunctionAndParams(ScopedName.addScopeToName(
+					Configuration.GLOBAL_SCOPE_NAME, name), params) 
+				|| containsFunctionAndParams(ScopedName.addScopeToName(scope, name), params);
+	}
+	
+	boolean containsFunctionAndParams(String name, List<Type> params){
+		if(names.containsKey(name)){
+			for(List<Type> types : functionParams.get(name)){
+				if(types.size() != params.size()){
+					continue;
+				} else {
+					boolean same = true; 
+					for(int i = 0; i < types.size() && same;i++){
+						if(!types.get(i).equals(params.get(i))){
+							same = false;
+						}
+					}
+					if(same){
+						return true;
+					}
+				}
+			}
+		}
+		return false;
+	}
+	
+	private void putFunctionParams(String functName, List<Type> paramTypes) {
+		if(!functionParams.containsKey(functName)){
+			functionParams.put(functName, new LinkedList<List<Type>>());
+		}
+		functionParams.get(functName).add(paramTypes);
 	}
 
 	private void buildParams(String functName, List<Type> paramTypes, ParseTreeNode paramListTail) {
@@ -171,7 +205,7 @@ class SymbolTable {
 		}
 	}
 
-	public void buildTypes(ParseTreeNode tree){
+	private void buildTypes(ParseTreeNode tree){
 		if(!tree.getChildren().isEmpty()){
 			ParseTreeNode typeDeclaration = tree.getChildren().get(0);
 			String typeName = typeDeclaration.getChildren().get(1).getSymbol().getText();
@@ -223,13 +257,13 @@ class SymbolTable {
 		return "Symbol Table :\nTypes : " + types + "\nNames : " + names + "\nKinds : " + functionParams;
 	}
 
-	public Type getTypeOfId(String scope, String id, int position) {
+	Type getTypeOfId(String scope, String id, int position) {
 		if(names.containsKey(ScopedName.addScopeToName(scope, id))){
 			ScopedName name = names.get(ScopedName.addScopeToName(scope, id));
 			return name.type;
 		} else if(names.containsKey(ScopedName.addScopeToName(Configuration.GLOBAL_SCOPE_NAME, id))){
 			ScopedName name = names.get(ScopedName.addScopeToName(Configuration.GLOBAL_SCOPE_NAME, id));
-			return name.type; 
+			return name.type;
 		} else {
 			errors.add(new SemanticError("Missing variable " + id  
 					+ " in scope of " + scope + " at position " + position));
@@ -237,7 +271,19 @@ class SymbolTable {
 		}
 	}
 
-	public List<Type> getTypesOfParams(String name, int position) {
+	public Type getBaseTypeOfId(String scope, String id) {
+		if(names.containsKey(ScopedName.addScopeToName(scope, id))){
+			ScopedName name = names.get(ScopedName.addScopeToName(scope, id));
+			return name.type.baseType();
+		} else if(names.containsKey(ScopedName.addScopeToName(Configuration.GLOBAL_SCOPE_NAME, id))){
+			ScopedName name = names.get(ScopedName.addScopeToName(Configuration.GLOBAL_SCOPE_NAME, id));
+			return name.type.baseType();
+		} else {
+			return null;
+		}
+	}
+	
+	List<List<Type>> getTypesOfParams(String scope, String name, int position) {
 		name = ScopedName.addScopeToName(Configuration.GLOBAL_SCOPE_NAME, name);
 		if(functionParams.containsKey(name)){
 			return functionParams.get(name);

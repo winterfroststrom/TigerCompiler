@@ -14,7 +14,7 @@ class SymbolTableChecker {
 	List<SemanticError> errors;
 	private SymbolTable table;
 	
-	public boolean check(ParseTreeNode tree) {
+	public SymbolTable check(ParseTreeNode tree) {
 		errors = new LinkedList<>();
 		table = new SymbolTable(errors);
 		table.build(tree);
@@ -22,8 +22,7 @@ class SymbolTableChecker {
 			System.out.println(table);
 		}
 		traverse(Configuration.GLOBAL_SCOPE_NAME, tree);
-		
-		return !errors.isEmpty();
+		return table;
 	}
 	
 	private void traverse(String scope, ParseTreeNode tree){
@@ -98,8 +97,7 @@ class SymbolTableChecker {
 		} else if(tree.getChild(0).getSymbol().equals(ETERMINAL.FOR)){
 			handleForLoop(scope, tree);
 		} else if(tree.getChild(0).getSymbol().equals(ETERMINAL.RETURN)){
-			//	TODO:	Function return values and types must agree
-			// Handle this somewhere else
+			// Handled in returnType
 		} else if(tree.getChild(0).getSymbol().equals(ETERMINAL.ID)){
 			System.out.println(tree);
 		} else if(tree.getChild(0).getSymbol().equals(EVARIABLE.LVALUE)){
@@ -170,9 +168,8 @@ class SymbolTableChecker {
 	}
 
 	private Type handleStatFunction(String scope, ParseTreeNode tree) {
+		String functName = tree.getChild(0).getSymbol().getText();
 		int position = tree.getChild(0).getSymbol().getPosition();
-		List<Type> typesOfFunctionParams = table.getTypesOfParams(tree.getChild(0).getSymbol().getText(),
-				position);
 		List<Type> exprListTypes = new LinkedList<>();
 		if(!tree.getChild(2).getChildren().isEmpty()){
 			if(!tree.getChild(2).getChild(0).getChildren().isEmpty()){
@@ -180,20 +177,14 @@ class SymbolTableChecker {
 				typesOfExprListTail(scope, exprListTypes, tree.getChild(2).getChild(1));
 			}
 		}
-		if(exprListTypes.size() != typesOfFunctionParams.size()){
-			errors.add(new SemanticError("Invalid number of arguments, expected " 
-					+ typesOfFunctionParams.size() + " but was " + exprListTypes.size()
+		if(!table.containsFunctionAndParams(scope, tree.getChild(0).getSymbol().getText(), exprListTypes)){
+			errors.add(new SemanticError("Type mismatch : expected parameters to be ones of types "
+					+ table.getTypesOfParams(scope, functName, position) + " but was " + exprListTypes
+					+ "for function " +  functName 
 					+ " at position " + position));
-		} else {
-			for(int i = 0; i < typesOfFunctionParams.size();i++){
-				if(!typesOfFunctionParams.get(i).equals(exprListTypes.get(i))){
-					errors.add(new SemanticError("Type mismatch : expected parameter to be of type "
-							+ typesOfFunctionParams.get(i) + " but was " + exprListTypes.get(i)
-							+ " at position " + position));
-				}
-			}
+			
 		}
-		return table.getTypeOfId(scope, tree.getChild(0).getSymbol().getText(), position);
+		return table.getTypeOfId(scope, functName, position);
 	}
 
 	private void typesOfExprListTail(String scope, List<Type> exprListTypes, ParseTreeNode exprListTail) {

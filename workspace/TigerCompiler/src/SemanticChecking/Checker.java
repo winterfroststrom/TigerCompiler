@@ -8,7 +8,7 @@ import Parser.ParseTreeNode;
 public class Checker {
 	private SymbolTableChecker checker;
 
-	public boolean check(ParseTreeNode tree){
+	public SymbolTable check(ParseTreeNode tree){
 		checker = new SymbolTableChecker();
 		return checker.check(tree);
 	}

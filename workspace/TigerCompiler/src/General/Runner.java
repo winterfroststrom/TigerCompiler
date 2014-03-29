@@ -3,10 +3,12 @@ package General;
 import java.io.IOException;
 import java.util.List;
 
+import IRGeneration.Generator;
 import Lexer.Lexer;
 import Parser.ParseTreeNode;
 import Parser.Parser;
 import SemanticChecking.Checker;
+import SemanticChecking.SymbolTable;
 
 public class Runner {
 	public static void main(String[] args) {
@@ -16,6 +18,7 @@ public class Runner {
 		Lexer lexer = new Lexer();
 		Parser parser = new Parser();
 		Checker checker = new Checker();
+		Generator gen = new Generator();
 		try(TigerFileHandler tfh = new TigerFileHandler(args)){
 			tfh.redirectConsole();
 			List<Token> tokens = lexer.lex(tfh.getInput());
@@ -37,7 +40,15 @@ public class Runner {
 				}
 				
 				if(parser.errors().isEmpty()){
-					if(checker.check(tree)){
+					SymbolTable table = checker.check(tree);
+					if(checker.errors().isEmpty()){
+						List<String> ir = gen.generate(tree, table);
+						if(Configuration.PRINT_IR){
+							for(String instruction : ir){
+								System.out.println(instruction);
+							}
+						}
+					} else {
 						System.out.println("semantic error");
 					}
 				}
