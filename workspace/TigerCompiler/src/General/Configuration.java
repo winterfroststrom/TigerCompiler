@@ -2,7 +2,7 @@ package General;
 
 
 public class Configuration {
-	public static final boolean RELEASE = false;
+	public static final boolean RELEASE = true;
 	public static final boolean REDIRECTING_CONSOLE = RELEASE || false;
 	
 	public static final boolean PRINT_TOKENS = RELEASE || false;
