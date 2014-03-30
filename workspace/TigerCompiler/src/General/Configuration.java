@@ -2,7 +2,7 @@ package General;
 
 
 public class Configuration {
-	public static final boolean RELEASE = true;
+	public static final boolean RELEASE = false;
 	public static final boolean REDIRECTING_CONSOLE = RELEASE || false;
 	
 	public static final boolean PRINT_TOKENS = RELEASE || false;
@@ -13,7 +13,7 @@ public class Configuration {
 	public static final boolean LL1PARSER_DEBUGGING = !RELEASE && false;
 	public static final boolean LL1PARSER_DEBUGGING_VERBOSE = !RELEASE && false;
 	
-	public static final String FORCED_LOAD_FILE = RELEASE ? null : "resources/tictactoe.tiger";
+	public static final String FORCED_LOAD_FILE = RELEASE ? null : "resources/ex12.tiger";
 	
 	public static final String TIGER_FILE_TYPE = ".tiger";
 	public static final String TIGER_LEXER_OUTPUT_TYPE = ".tokens";
@@ -33,9 +33,10 @@ public class Configuration {
 	public static final String LOOP_END = "LoopEnd_";
 	public static final String IF_FALSE = "Else_";
 	public static final String IF_END = "FI_";
-	public static final String COMPARE_FALSE = "COMP_FALSE_";
-	public static final String COMPARE_END = "COMP_END_";
+	public static final String COMPARE_FALSE = "CompFalse_";
+	public static final String COMPARE_END = "CompEnd_";
 	public static final String TEMP_PREFIX = "t";
+	public static final String SHORT_CIRCUIT = "ShortCircuit_";
 	
 	
 }

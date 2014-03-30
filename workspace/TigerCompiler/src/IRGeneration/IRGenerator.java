@@ -234,68 +234,75 @@ public class IRGenerator {
 			code.add(new IRInstruction(MULT, temp, value, "-1"));
 			return temp;
 		}
-		
+		EIROPCODE opcode = convertOperatorEnum(tree.getSymbol().getTerminal());
 		String left = handleExpr(scope, tree.getChild(0), table);
+		if(opcode.equals(AND)){
+			code.add(new IRInstruction(ASSIGN, temp, "0"));
+			code.add(new IRInstruction(BREQ, left, "0",Configuration.SHORT_CIRCUIT + temp));
+		} else if(opcode.equals(OR)){
+			code.add(new IRInstruction(ASSIGN, temp, "1"));
+			code.add(new IRInstruction(BRNEQ, left, "0", Configuration.SHORT_CIRCUIT + temp));
+		}
 		String right = handleExpr(scope, tree.getChild(1), table);
 		if(tree.getSymbol().getTerminal().comparisionOperators()){
-			EIROPCODE opcode;
-			switch(tree.getSymbol().getTerminal()){
-			case EQ:
-				opcode = BRNEQ;
-				break;
-			case NEQ:
-				opcode = BREQ;
-				break;
-			case LESS:
-				opcode = BRGEQ;
-				break;
-			case LESSEREQ:
-				opcode = BRGT;
-				break;
-			case GREATER:
-				opcode = BRLT;
-				break;
-			case GREATEREQ:
-				opcode = BRLEQ;
-				break;
-			default:
-				opcode = null;
-				break;
-			}
 			code.add(new IRInstruction(opcode, left, right, Configuration.COMPARE_FALSE + temp));
 			code.add(new IRInstruction(ADD, temp, "0", "1"));
 			code.add(new IRInstruction(GOTO, Configuration.COMPARE_END + temp));
 			code.add(new IRInstruction(LABEL, Configuration.COMPARE_FALSE + temp));
 			code.add(new IRInstruction(ADD, temp, "0", "0"));
 			code.add(new IRInstruction(LABEL, Configuration.COMPARE_END + temp));
-			return temp;
 		} else {
-			EIROPCODE opcode;
-			switch(tree.getSymbol().getTerminal()){
-			case PLUS:
-				opcode = ADD;
-				break;
-			case MULT:
-				opcode = MULT;
-				break;
-			case DIV:
-				opcode = DIV;
-				break;
-			case MINUS:
-				opcode = SUB;
-				break;
-			case AND:
-				opcode = AND;
-				break;
-			case OR:
-				opcode = OR;
-				break;
-			default:
-				opcode = null;
-			}
 			code.add(new IRInstruction(opcode, temp, left, right));
-			return temp;
 		}
+		if(opcode.equals(OR) || opcode.equals(AND)){
+			code.add(new IRInstruction(LABEL, Configuration.SHORT_CIRCUIT + temp));
+		}
+		return temp;
+	}
+
+	private EIROPCODE convertOperatorEnum(ETERMINAL terminal) {
+		EIROPCODE opcode;
+		switch(terminal){
+		case EQ:
+			opcode = BRNEQ;
+			break;
+		case NEQ:
+			opcode = BREQ;
+			break;
+		case LESS:
+			opcode = BRGEQ;
+			break;
+		case LESSEREQ:
+			opcode = BRGT;
+			break;
+		case GREATER:
+			opcode = BRLT;
+			break;
+		case GREATEREQ:
+			opcode = BRLEQ;
+			break;
+		case PLUS:
+			opcode = ADD;
+			break;
+		case MULT:
+			opcode = MULT;
+			break;
+		case DIV:
+			opcode = DIV;
+			break;
+		case MINUS:
+			opcode = SUB;
+			break;
+		case AND:
+			opcode = AND;
+			break;
+		case OR:
+			opcode = OR;
+			break;
+		default:
+			opcode = null;
+		}
+		return opcode;
 	}
 	
 	private String handleLvalue(String scope, ParseTreeNode tree,
