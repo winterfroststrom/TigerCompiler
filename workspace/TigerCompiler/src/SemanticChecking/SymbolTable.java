@@ -83,7 +83,7 @@ public class SymbolTable {
 				handleParam(functName, paramTypes, paramNames, param);
 				buildParams(functName, paramTypes, paramNames, functDeclaration.getChild(3).getChild(1));
 			}
-			if(containsFunctionAndParams(functName, paramTypes)){
+			if(containsFunctionAndParamsHelper(functName, paramTypes)){
 				errors.add(new SemanticError("Redeclared name " + functName 
 						+ " in global scope at position " 
 						+ functDeclaration.getChild(0).getSymbol().getPosition()));
@@ -113,12 +113,12 @@ public class SymbolTable {
 	}
 
 	boolean containsFunctionAndParams(String scope, String name, List<Type> params){
-		return containsFunctionAndParams(ScopedName.addScopeToName(
+		return containsFunctionAndParamsHelper(ScopedName.addScopeToName(
 					Configuration.GLOBAL_SCOPE_NAME, name), params) 
-				|| containsFunctionAndParams(ScopedName.addScopeToName(scope, name), params);
+				|| containsFunctionAndParamsHelper(ScopedName.addScopeToName(scope, name), params);
 	}
 	
-	private boolean containsFunctionAndParams(String name, List<Type> params){
+	private boolean containsFunctionAndParamsHelper(String name, List<Type> params){
 		if(names.containsKey(name)){
 			for(Cons<List<Type>, List<String>> cons : functionParams.get(name)){
 				List<Type> possibleTypes = cons.a;
@@ -320,15 +320,15 @@ public class SymbolTable {
 		return types;
 	}
 	public List<String> matchingParamNames(String scope, String name, List<Type> paramTypes){
-		List<String> names = matchingParamNames(ScopedName.addScopeToName(
+		List<String> names = matchingParamNamesHelper(ScopedName.addScopeToName(
 				Configuration.GLOBAL_SCOPE_NAME, name), paramTypes);
 		if(names != null){
 			return names; 
 		}
-		return matchingParamNames(ScopedName.addScopeToName(scope, name), paramTypes);
+		return matchingParamNamesHelper(ScopedName.addScopeToName(scope, name), paramTypes);
 	}
 	
-	private List<String> matchingParamNames(String name, List<Type> paramTypes){
+	private List<String> matchingParamNamesHelper(String name, List<Type> paramTypes){
 		if(names.containsKey(name)){
 			for(Cons<List<Type>, List<String>> cons : functionParams.get(name)){
 				List<Type> possibleTypes = cons.a;

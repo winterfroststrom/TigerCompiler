@@ -153,39 +153,6 @@ public class IRGenerator {
 		}		
 	}
 	
-	private String handleAssignFunction(String scope, ParseTreeNode tree,
-			SymbolTable table) {
-		String ret = temp();
-		String functName = tree.getChild(0).getSymbol().getText();
-		List<String> params = new LinkedList<>();
-		params.add(ret);
-		params.add(table.getFullNameOfId(scope, functName));
-		handleParams(scope, tree, table, functName, params);
-		code.add(new IRInstruction(EIROPCODE.CALLR, params));
-		return ret;
-	}
-
-	private void handleParams(String scope, ParseTreeNode tree,
-			SymbolTable table, String functionName, List<String> params) {
-		Cons<List<String>, List<Type>> functionParams = new Cons<List<String>, List<Type>>(
-				new LinkedList<String>(), new LinkedList<Type>());
-		handleExprList(scope, tree.getChild(2), table, functionParams);
-		List<String> functionParamNames = handleRenamingFunctionParams(
-				scope, table, functionName, functionParams);
-		for(String functionParam : functionParamNames){
-			params.add(functionParam);
-		}
-	}
-
-	private List<String> handleRenamingFunctionParams(String scope, SymbolTable table, 
-			String functionName, Cons<List<String>, List<Type>> params) {
-		List<String> names = table.matchingParamNames(scope, functionName, params.b);
-		for(int i = 0; i < names.size();i++){
-			code.add(new IRInstruction(ASSIGN, names.get(i), params.a.get(i)));
-		}
-		return names;
-	}
-
 	private void handleWhile(String scope, ParseTreeNode tree, SymbolTable table) {
 		String loopSuffix = loop();
 		code.add(new IRInstruction(LABEL, Configuration.LOOP_BEGIN + loopSuffix));
@@ -213,11 +180,46 @@ public class IRGenerator {
 
 	private void handleStatFunction(String scope, ParseTreeNode tree,
 			SymbolTable table) {
-		String functName = tree.getChild(0).getSymbol().getText();
+		code.add(new IRInstruction(EIROPCODE.CALL, handleParams(scope, tree, table)));
+	}
+
+	private String handleAssignFunction(String scope, ParseTreeNode tree,
+			SymbolTable table) {
+		String ret = temp();
+		List<String> params = handleParams(scope, tree, table);
+		params.add(0, ret);
+		code.add(new IRInstruction(EIROPCODE.CALLR, params));
+		return ret;
+	}
+
+	private List<String> handleParams(String scope, ParseTreeNode tree,
+			SymbolTable table) {
 		List<String> params = new LinkedList<>();
+		String functName = tree.getChild(0).getSymbol().getText();
 		params.add(table.getFullNameOfId(scope, functName));
-		handleParams(scope, tree, table, functName, params);
-		code.add(new IRInstruction(EIROPCODE.CALL, params));
+		handleParamsHelper(scope, tree, table, functName, params);
+		return params;
+	}
+	
+	private void handleParamsHelper(String scope, ParseTreeNode tree,
+			SymbolTable table, String functionName, List<String> params) {
+		Cons<List<String>, List<Type>> functionParams = new Cons<List<String>, List<Type>>(
+				new LinkedList<String>(), new LinkedList<Type>());
+		handleExprList(scope, tree.getChild(2), table, functionParams);
+		List<String> functionParamNames = handleRenamingFunctionParams(
+				scope, table, functionName, functionParams);
+		for(String functionParam : functionParamNames){
+			params.add(functionParam);
+		}
+	}
+
+	private List<String> handleRenamingFunctionParams(String scope, SymbolTable table, 
+			String functionName, Cons<List<String>, List<Type>> params) {
+		List<String> names = table.matchingParamNames(scope, functionName, params.b);
+		for(int i = 0; i < names.size();i++){
+			code.add(new IRInstruction(ASSIGN, names.get(i), params.a.get(i)));
+		}
+		return names;
 	}
 
 	
