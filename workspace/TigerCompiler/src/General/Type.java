@@ -66,7 +66,7 @@ public class Type {
 		Type base = baseType();
 		if(base.array){
 			int size = 1;
-			for(int dim : dimensions){
+			for(int dim : base.dimensions){
 				size *= dim;
 			}
 			return size * base.type.length();

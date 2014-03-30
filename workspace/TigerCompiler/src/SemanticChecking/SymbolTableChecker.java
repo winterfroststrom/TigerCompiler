@@ -100,6 +100,8 @@ class SymbolTableChecker {
 			// Handled in returnType
 		} else if(tree.getChild(0).getSymbol().equals(EVARIABLE.LVALUE)){
 			handleStatLvalue(scope, tree);
+		} else if(tree.getChild(0).getSymbol().equals(ETERMINAL.BREAK)){
+			// no type checking necessary
 		} else {
 			System.err.println("This should never occur. "
 					+ "All cases for stat expressions should be coverd.");

@@ -241,7 +241,7 @@ public class SymbolTable {
 			buildDimensions(dimensions, typeDim.getChild(3));
 		}
 	}
-
+	
 	private Type getTypeId(ParseTreeNode typeId){
 		String typeDef = typeId.getChild(0).getSymbol().getText();
 		if(typeDef.equals("int")){

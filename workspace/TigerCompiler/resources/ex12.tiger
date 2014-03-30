@@ -1,0 +1,15 @@
+let
+	type foo = array[200] of int;
+	type bar = array[100] of foo;
+	type quux = bar;
+	var x : bar;
+	var i, j : int;
+	var v : quux;
+in
+	while 5 = 4 = 5 do
+		break;
+	enddo;
+	i := 3 * 5 | 3;
+/*	printi(x[i][j]);
+	printi(v[i][j]);*/
+end

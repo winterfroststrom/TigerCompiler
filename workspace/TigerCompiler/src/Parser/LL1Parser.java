@@ -27,7 +27,7 @@ class LL1Parser {
 			multiRule(ANDEXPR, nexts(LPAREN, NIL, STRLIT, INTLIT, ID, MINUS), 
 					p(s(COMPARE), s(ANDEXPR_TAIL)));
 			multiRule(ANDEXPR_TAIL, nexts(EQ, LESS, GREATER, LESSEREQ, GREATEREQ, NEQ),
-					p(s(COMPOP), s(COMPARE), s(COMPARE_TAIL)));
+					p(s(COMPOP), s(COMPARE), s(ANDEXPR_TAIL)));
 			multiEpsilon(ANDEXPR_TAIL, nexts(AND, OR, RPAREN, COMMA, RBRACK, THEN, DO, TO, SEMI));			
 			literal(ANDOP, AND);
 			multiRule(COMPARE, nexts(LPAREN, NIL, STRLIT, INTLIT, ID, MINUS),
