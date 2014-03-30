@@ -163,9 +163,7 @@ public class SymbolTable {
 	private void buildVariables(ParseTreeNode varDeclarationList) {
 		if(!varDeclarationList.getChildren().isEmpty()){
 			ParseTreeNode varDeclaration = varDeclarationList.getChild(0);
-			List<String> ids = new LinkedList<>(); 
-			ids.add(varDeclaration.getChild(1).getChild(0).getSymbol().getText());
-			buildIdList(ids, varDeclaration.getChild(1).getChild(1));
+			List<String> ids = buildIdList(varDeclaration.getChild(1));
 			Type type = getTypeId(varDeclaration.getChild(3));
 			for(String id : ids){
 				id = ScopedName.addScopeToName(Configuration.GLOBAL_SCOPE_NAME, id);
@@ -196,6 +194,13 @@ public class SymbolTable {
 				}
 			}
 		}
+	}
+	
+	private List<String> buildIdList(ParseTreeNode idList){
+		List<String> ids = new LinkedList<>(); 
+		ids.add(idList.getChild(0).getSymbol().getText());
+		buildIdList(ids, idList.getChild(1));
+		return ids;
 	}
 	
 	private void buildIdList(List<String> ids, ParseTreeNode idListTail) {
@@ -271,15 +276,25 @@ public class SymbolTable {
 		}
 	}
 
-	public Type getBaseTypeOfId(String scope, String id) {
+	public Type getTypeOfId(String scope, String id){
 		if(names.containsKey(ScopedName.addScopeToName(scope, id))){
 			ScopedName name = names.get(ScopedName.addScopeToName(scope, id));
-			return name.type.baseType();
+			return name.type;
 		} else if(names.containsKey(ScopedName.addScopeToName(Configuration.GLOBAL_SCOPE_NAME, id))){
 			ScopedName name = names.get(ScopedName.addScopeToName(Configuration.GLOBAL_SCOPE_NAME, id));
-			return name.type.baseType();
+			return name.type;
 		} else {
 			return null;
+		}
+	}
+	
+	public String getFullNameOfId(String scope, String id) {
+		if(names.containsKey(ScopedName.addScopeToName(scope, id))){
+			return ScopedName.addScopeToName(scope, id);
+		} else if(names.containsKey(ScopedName.addScopeToName(Configuration.GLOBAL_SCOPE_NAME, id))){
+			return ScopedName.addScopeToName(Configuration.GLOBAL_SCOPE_NAME, id);
+		} else {
+			return Configuration.MISSING_NAME;
 		}
 	}
 	

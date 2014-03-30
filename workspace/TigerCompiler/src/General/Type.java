@@ -4,7 +4,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 public class Type {
-	public final boolean array;
+	private final boolean array;
 	public final String name;
 	private final Type type;
 	private final List<Integer> dimensions;
@@ -46,6 +46,38 @@ public class Type {
 		} else {
 			return baseType();
 		}
+	}
+	
+	public List<Integer> totalDimensions(){
+		Type base = baseType();
+		List<Integer> dims = new LinkedList<>();
+		if(base.array){
+			for(Integer i : base.dimensions){
+				dims.add(i);
+			}
+			for(Integer i : base.type.totalDimensions()){
+				dims.add(i);
+			}
+		}
+		return dims;
+	}
+	
+	public int length(){
+		Type base = baseType();
+		if(base.array){
+			int size = 1;
+			for(int dim : dimensions){
+				size *= dim;
+			}
+			return size * base.type.length();
+		} else {
+			return 1;
+		}
+	}
+	
+	public boolean isArray(){
+		Type base = baseType();
+		return base.array;
 	}
 	
 	public Type baseType(){

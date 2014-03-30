@@ -42,9 +42,9 @@ public class Runner {
 				if(parser.errors().isEmpty()){
 					SymbolTable table = checker.check(tree);
 					if(checker.errors().isEmpty()){
-						List<String> ir = gen.generate(tree, table);
+						List<IRInstruction> ir = gen.generate(tree, table);
 						if(Configuration.PRINT_IR){
-							for(String instruction : ir){
+							for(IRInstruction instruction : ir){
 								System.out.println(instruction);
 							}
 						}

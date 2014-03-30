@@ -98,8 +98,6 @@ class SymbolTableChecker {
 			handleForLoop(scope, tree);
 		} else if(tree.getChild(0).getSymbol().equals(ETERMINAL.RETURN)){
 			// Handled in returnType
-		} else if(tree.getChild(0).getSymbol().equals(ETERMINAL.ID)){
-			System.out.println(tree);
 		} else if(tree.getChild(0).getSymbol().equals(EVARIABLE.LVALUE)){
 			handleStatLvalue(scope, tree);
 		} else {
