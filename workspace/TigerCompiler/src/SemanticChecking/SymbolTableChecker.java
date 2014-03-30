@@ -131,18 +131,20 @@ class SymbolTableChecker {
 	private void handleStatLvalue(String scope, ParseTreeNode tree) {
 		ParseTreeNode id = tree.getChild(0).getChild(0);
 		Type lvalueType = typeOfValue(scope, tree.getChild(0));
-		if(tree.getChild(2).getChild(0).getSymbol().equals(EVARIABLE.EXPR)){
+		if(tree.getChild(2).getChild(0).getChildren().size() > 1 
+				&& tree.getChild(2).getChild(0).getChild(0).getSymbol().equals(ETERMINAL.ID)
+				&& tree.getChild(2).getChild(0).getChild(1).getSymbol().equals(ETERMINAL.LPAREN)){
+			Type functionType = handleStatFunction(scope, tree.getChild(2).getChild(0));
+			if(!lvalueType.equals(functionType)){
+				errors.add(new SemanticError("Type mismatch : assignment from function expected "
+						+ lvalueType + " but was " + functionType + " at position "
+						+ id.getSymbol().getPosition()));
+			}	
+		} else {
 			Type exprType = typeOfExpr(scope, tree.getChild(2).getChild(0));
 			if(!lvalueType.equals(exprType)){
 				errors.add(new SemanticError("Type mismatch : assignment from expression expected "
 						+ lvalueType + " but was " + exprType + " at position "
-						+ id.getSymbol().getPosition()));
-			}	
-		} else {
-			Type functionType = handleStatFunction(scope, tree.getChild(2));
-			if(!lvalueType.equals(functionType)){
-				errors.add(new SemanticError("Type mismatch : assignment from function expected "
-						+ lvalueType + " but was " + functionType + " at position "
 						+ id.getSymbol().getPosition()));
 			}	
 		}
@@ -180,7 +182,7 @@ class SymbolTableChecker {
 		if(!table.containsFunctionAndParams(scope, tree.getChild(0).getSymbol().getText(), exprListTypes)){
 			errors.add(new SemanticError("Type mismatch : expected parameters to be ones of types "
 					+ table.getTypesOfParams(scope, functName, position) + " but was " + exprListTypes
-					+ "for function " +  functName 
+					+ " for function " +  functName 
 					+ " at position " + position));
 			
 		}

@@ -18,6 +18,8 @@ public class IRGenerator {
 	private List<IRInstruction> code;
 	private int tempCounter;
 	private int loopCounter;
+	private int ifCounter;
+	
 	
 	public IRGenerator(){
 		code = new LinkedList<>();
@@ -118,7 +120,7 @@ public class IRGenerator {
 
 	private void handleIf(String scope, String breakLabel, ParseTreeNode tree,
 			SymbolTable table) {
-		String ifSuffix = temp();
+		String ifSuffix = iffi();
 		String flag = handleExpr(scope, tree.getChild(1).getChild(0), table);
 		code.add(new IRInstruction(BREQ, flag, "0", Configuration.IF_FALSE + ifSuffix));
 		handleStatSeq(scope, breakLabel, tree.getChild(3), table);
@@ -133,10 +135,16 @@ public class IRGenerator {
 	private void handleStatLvalue(String scope, ParseTreeNode tree,
 			SymbolTable table) {
 		String assigned = tree.getChild(0).getChild(0).getSymbol().getText();
-		String value = handleExpr(scope, tree.getChild(2).getChild(0).getChild(0), table);
+		String value;
+		if(tree.getChild(2).getChild(0).getChildren().size() > 1 
+				&& tree.getChild(2).getChild(0).getChild(0).getSymbol().equals(ETERMINAL.ID)
+				&& tree.getChild(2).getChild(0).getChild(1).getSymbol().equals(ETERMINAL.LPAREN)){
+			value = handleAssignFunction(scope, tree.getChild(2).getChild(0), table);
+		} else {
+			value = handleExpr(scope, tree.getChild(2).getChild(0).getChild(0), table);	
+		}
 		Type type = table.getTypeOfId(scope, assigned);
 		if(type.isArray()){
-			System.out.println(tree);
 			String index = buildLvalueIndex(scope, tree.getChild(0), table);
 			code.add(new IRInstruction(ARRAY_STORE, table.getFullNameOfId(scope, assigned), index, value));
 		} else {
@@ -144,6 +152,18 @@ public class IRGenerator {
 		}		
 	}
 	
+	private String handleAssignFunction(String scope, ParseTreeNode tree,
+			SymbolTable table) {
+		String ret = temp();
+		String functName = tree.getChild(0).getSymbol().getText();
+		List<String> params = new LinkedList<>();
+		params.add(ret);
+		params.add(table.getFullNameOfId(scope, functName));
+		handleExprList(scope, tree.getChild(2), table, params);
+		code.add(new IRInstruction(EIROPCODE.CALLR, params));
+		return ret;
+	}
+
 	private void handleWhile(String scope, ParseTreeNode tree, SymbolTable table) {
 		String loopSuffix = loop();
 		code.add(new IRInstruction(LABEL, Configuration.LOOP_BEGIN + loopSuffix));
@@ -180,8 +200,18 @@ public class IRGenerator {
 	private void handleExprList(String scope, ParseTreeNode tree,
 			SymbolTable table, List<String> params) {
 		if(!tree.getChildren().isEmpty()){
-			params.add(handleExpr(scope, tree.getChild(0).getChild(0), table));
-			handleExprList(scope, tree.getChild(1), table, params);
+			if(!tree.getChild(0).getChildren().isEmpty()){
+				params.add(handleExpr(scope, tree.getChild(0).getChild(0), table));
+			}
+			handleExprListTail(scope, tree.getChild(1), table, params);
+		}
+	}
+	
+	private void handleExprListTail(String scope, ParseTreeNode tree,
+			SymbolTable table, List<String> params) {
+		if(!tree.getChildren().isEmpty()){
+			params.add(handleExpr(scope, tree.getChild(1).getChild(0), table));
+			handleExprList(scope, tree.getChild(2), table, params);
 		}
 	}
 
@@ -232,12 +262,12 @@ public class IRGenerator {
 				opcode = null;
 				break;
 			}
-			code.add(new IRInstruction(opcode, left, right, Configuration.IF_FALSE + temp));
+			code.add(new IRInstruction(opcode, left, right, Configuration.COMPARE_FALSE + temp));
 			code.add(new IRInstruction(ADD, temp, "0", "1"));
-			code.add(new IRInstruction(GOTO, Configuration.IF_END + temp));
-			code.add(new IRInstruction(LABEL, Configuration.IF_FALSE + temp));
+			code.add(new IRInstruction(GOTO, Configuration.COMPARE_END + temp));
+			code.add(new IRInstruction(LABEL, Configuration.COMPARE_FALSE + temp));
 			code.add(new IRInstruction(ADD, temp, "0", "0"));
-			code.add(new IRInstruction(LABEL, Configuration.IF_END + temp));
+			code.add(new IRInstruction(LABEL, Configuration.COMPARE_END + temp));
 			return temp;
 		} else {
 			EIROPCODE opcode;
@@ -299,6 +329,10 @@ public class IRGenerator {
 
 	private String loop(){
 		return "" + loopCounter++;
+	}
+	
+	private String iffi(){
+		return "" + ifCounter++;
 	}
 	
 	private String temp(){

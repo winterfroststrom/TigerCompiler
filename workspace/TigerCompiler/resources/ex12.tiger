@@ -1,15 +1,11 @@
 let
-	type foo = array[200] of int;
-	type bar = array[100] of foo;
-	type quux = bar;
-	var x : bar;
-	var i, j : int;
-	var v : quux;
+	var v : int;
+	function x(i : int) : int begin
+		return 3;
+	end;
+	function x(m : int, j : int) : int begin
+		return 4;
+	end;
 in
-	while 5 = 4 = 5 do
-		break;
-	enddo;
-	i := 3 * 5 | 3;
-/*	printi(x[i][j]);
-	printi(v[i][j]);*/
+	v := x(4);
 end
