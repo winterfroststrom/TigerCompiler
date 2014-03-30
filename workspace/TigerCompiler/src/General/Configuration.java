@@ -2,7 +2,7 @@ package General;
 
 
 public class Configuration {
-	public static final boolean RELEASE = true;
+	public static final boolean RELEASE = false;
 	public static final boolean REDIRECTING_CONSOLE = RELEASE || false;
 	
 	public static final boolean PRINT_TOKENS = RELEASE || false;
@@ -12,8 +12,8 @@ public class Configuration {
 	
 	public static final boolean LL1PARSER_DEBUGGING = !RELEASE && false;
 	public static final boolean LL1PARSER_DEBUGGING_VERBOSE = !RELEASE && false;
-	
-	public static final String FORCED_LOAD_FILE = RELEASE ? null : "resources/ex12.tiger";
+
+	public static final String FORCED_LOAD_FILE = RELEASE ? null : "resources/tictactoe.tiger";
 	
 	public static final String TIGER_FILE_TYPE = ".tiger";
 	public static final String TIGER_LEXER_OUTPUT_TYPE = ".tokens";

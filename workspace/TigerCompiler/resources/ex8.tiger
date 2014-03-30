@@ -13,11 +13,11 @@ let
         	d := 3;
         end;
         function y(n:int, x:int, y:rad) begin
-        	return_it(sdf, n); /*should error*/
+        	return_it(df, n);
         	n := return_it(x + x, n);
         	bad[1][1][1] := bad[1][1][1];
-        	d := n + y + bad[1][1][1]; /* should error */
+        	d := n + x;
         end;
 in
-        return_it(5); /* should error */
+        return_it(5, 5);
 end

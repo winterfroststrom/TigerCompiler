@@ -181,7 +181,7 @@ class SymbolTableChecker {
 		}
 		if(!table.containsFunctionAndParams(scope, tree.getChild(0).getSymbol().getText(), exprListTypes)){
 			errors.add(new SemanticError("Type mismatch : expected parameters to be ones of types "
-					+ table.getTypesOfParams(scope, functName, position) + " but was " + exprListTypes
+					+ table.getParams(scope, functName, position) + " but was " + exprListTypes
 					+ " for function " +  functName 
 					+ " at position " + position));
 			

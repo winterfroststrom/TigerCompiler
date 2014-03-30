@@ -5,6 +5,7 @@ import java.util.List;
 
 import static General.EIROPCODE.*;
 import General.Configuration;
+import General.Cons;
 import General.Type;
 import General.EIROPCODE;
 import General.ETERMINAL;
@@ -106,7 +107,7 @@ public class IRGenerator {
 		} else if(tree.getChild(0).getSymbol().equals(ETERMINAL.FOR)){
 			handleForLoop(scope, tree, table);
 		} else if(tree.getChild(0).getSymbol().equals(ETERMINAL.RETURN)){
-			String expr = handleExpr(scope, tree.getChild(1).getChild(0), table);
+			String expr = handleExpr(scope, tree.getChild(1).getChild(0), table).a;
 			code.add(new IRInstruction(RETURN, expr));
 		} else if(tree.getChild(0).getSymbol().equals(EVARIABLE.LVALUE)){
 			handleStatLvalue(scope, tree, table);
@@ -121,7 +122,7 @@ public class IRGenerator {
 	private void handleIf(String scope, String breakLabel, ParseTreeNode tree,
 			SymbolTable table) {
 		String ifSuffix = iffi();
-		String flag = handleExpr(scope, tree.getChild(1).getChild(0), table);
+		String flag = handleExpr(scope, tree.getChild(1).getChild(0), table).a;
 		code.add(new IRInstruction(BREQ, flag, "0", Configuration.IF_FALSE + ifSuffix));
 		handleStatSeq(scope, breakLabel, tree.getChild(3), table);
 		code.add(new IRInstruction(GOTO, Configuration.IF_END + ifSuffix));
@@ -141,12 +142,12 @@ public class IRGenerator {
 				&& tree.getChild(2).getChild(0).getChild(1).getSymbol().equals(ETERMINAL.LPAREN)){
 			value = handleAssignFunction(scope, tree.getChild(2).getChild(0), table);
 		} else {
-			value = handleExpr(scope, tree.getChild(2).getChild(0).getChild(0), table);	
+			value = handleExpr(scope, tree.getChild(2).getChild(0).getChild(0), table).a;	
 		}
 		Type type = table.getTypeOfId(scope, assigned);
 		if(type.isArray()){
-			String index = buildLvalueIndex(scope, tree.getChild(0), table);
-			code.add(new IRInstruction(ARRAY_STORE, table.getFullNameOfId(scope, assigned), index, value));
+			Cons<String, Type> index = buildLvalueIndex(scope, tree.getChild(0), table);
+			code.add(new IRInstruction(ARRAY_STORE, table.getFullNameOfId(scope, assigned), index.a, value));
 		} else {
 			code.add(new IRInstruction(ASSIGN, table.getFullNameOfId(scope, assigned), value));
 		}		
@@ -159,31 +160,54 @@ public class IRGenerator {
 		List<String> params = new LinkedList<>();
 		params.add(ret);
 		params.add(table.getFullNameOfId(scope, functName));
-		handleExprList(scope, tree.getChild(2), table, params);
+		handleParams(scope, tree, table, functName, params);
 		code.add(new IRInstruction(EIROPCODE.CALLR, params));
 		return ret;
+	}
+
+	private void handleParams(String scope, ParseTreeNode tree,
+			SymbolTable table, String functionName, List<String> params) {
+		Cons<List<String>, List<Type>> functionParams = new Cons<List<String>, List<Type>>(
+				new LinkedList<String>(), new LinkedList<Type>());
+		handleExprList(scope, tree.getChild(2), table, functionParams);
+		List<String> functionParamNames = handleRenamingFunctionParams(
+				scope, table, functionName, functionParams);
+		for(String functionParam : functionParamNames){
+			params.add(functionParam);
+		}
+	}
+
+	private List<String> handleRenamingFunctionParams(String scope, SymbolTable table, 
+			String functionName, Cons<List<String>, List<Type>> params) {
+		List<String> names = table.matchingParamNames(scope, functionName, params.b);
+		for(int i = 0; i < names.size();i++){
+			code.add(new IRInstruction(ASSIGN, names.get(i), params.a.get(i)));
+		}
+		return names;
 	}
 
 	private void handleWhile(String scope, ParseTreeNode tree, SymbolTable table) {
 		String loopSuffix = loop();
 		code.add(new IRInstruction(LABEL, Configuration.LOOP_BEGIN + loopSuffix));
-		String flag = handleExpr(scope, tree.getChild(1).getChild(0), table);
+		String flag = handleExpr(scope, tree.getChild(1).getChild(0), table).a;
 		code.add(new IRInstruction(BREQ, flag, "0", Configuration.LOOP_END + loopSuffix));
 		handleStatSeq(scope, Configuration.LOOP_END + loopSuffix, tree.getChild(3), table);
+		code.add(new IRInstruction(GOTO, Configuration.LOOP_BEGIN + loopSuffix));
 		code.add(new IRInstruction(LABEL, Configuration.LOOP_END + loopSuffix));
 	}
+	
 	private void handleForLoop(String scope, ParseTreeNode tree,
 			SymbolTable table) {
 		String loopSuffix = loop();
-		String initial = handleExpr(scope, tree.getChild(3).getChild(0), table);
-		String end = handleExpr(scope, tree.getChild(5).getChild(0), table);
+		String initial = handleExpr(scope, tree.getChild(3).getChild(0), table).a;
 		String counter = tree.getChild(1).getSymbol().getText();
 		code.add(new IRInstruction(ASSIGN, counter, initial));
 		code.add(new IRInstruction(LABEL, Configuration.LOOP_BEGIN + loopSuffix));
+		String end = handleExpr(scope, tree.getChild(5).getChild(0), table).a;
 		code.add(new IRInstruction(BRGEQ, counter, end, Configuration.LOOP_END + loopSuffix));
 		handleStatSeq(scope, Configuration.LOOP_END + loopSuffix, tree.getChild(7), table);
 		code.add(new IRInstruction(ADD, counter, "" + 1));
-		code.add(new IRInstruction(GOTO, Configuration.LOOP_END + loopSuffix));
+		code.add(new IRInstruction(GOTO, Configuration.LOOP_BEGIN + loopSuffix));
 		code.add(new IRInstruction(LABEL, Configuration.LOOP_END + loopSuffix));
 	}
 
@@ -192,72 +216,79 @@ public class IRGenerator {
 		String functName = tree.getChild(0).getSymbol().getText();
 		List<String> params = new LinkedList<>();
 		params.add(table.getFullNameOfId(scope, functName));
-		handleExprList(scope, tree.getChild(2), table, params);
+		handleParams(scope, tree, table, functName, params);
 		code.add(new IRInstruction(EIROPCODE.CALL, params));
 	}
 
 	
 	private void handleExprList(String scope, ParseTreeNode tree,
-			SymbolTable table, List<String> params) {
+			SymbolTable table, Cons<List<String>, List<Type>> params) {
 		if(!tree.getChildren().isEmpty()){
 			if(!tree.getChild(0).getChildren().isEmpty()){
-				params.add(handleExpr(scope, tree.getChild(0).getChild(0), table));
+				Cons<String, Type> cons = handleExpr(scope, tree.getChild(0).getChild(0), table);
+				params.a.add(cons.a);
+				params.b.add(cons.b);
 			}
 			handleExprListTail(scope, tree.getChild(1), table, params);
 		}
 	}
 	
 	private void handleExprListTail(String scope, ParseTreeNode tree,
-			SymbolTable table, List<String> params) {
+			SymbolTable table, Cons<List<String>, List<Type>> params) {
 		if(!tree.getChildren().isEmpty()){
-			params.add(handleExpr(scope, tree.getChild(1).getChild(0), table));
+			Cons<String, Type> cons = handleExpr(scope, tree.getChild(1).getChild(0), table);
+			params.a.add(cons.a);
+			params.b.add(cons.b);
 			handleExprList(scope, tree.getChild(2), table, params);
 		}
 	}
 
 
-	private String handleExpr(String scope, ParseTreeNode tree,
+	private Cons<String, Type> handleExpr(String scope, ParseTreeNode tree,
 			SymbolTable table) {
 		if(tree.getSymbol().isValue()){
 			if(tree.getSymbol().equals(EVARIABLE.LVALUE)){
 				return handleLvalue(scope, tree, table);
-			} else if(tree.getSymbol().equals(ETERMINAL.STRLIT) 
-					|| tree.getSymbol().equals(ETERMINAL.INTLIT)){
-				return tree.getSymbol().getText();
+			} else if(tree.getSymbol().equals(ETERMINAL.STRLIT)){
+				return new Cons<>(tree.getSymbol().getText(), Type.STRING);
+			} else if(tree.getSymbol().equals(ETERMINAL.INTLIT)){
+				return new Cons<>(tree.getSymbol().getText(), Type.INT);
 			} else {
-				return table.getFullNameOfId(scope, tree.getSymbol().getText());
+				return new Cons<>(table.getFullNameOfId(scope, tree.getSymbol().getText()),
+						table.getTypeOfId(scope, tree.getSymbol().getText()));
 			}
 		}
 		String temp = temp();
 		if(tree.getSymbol().equals(ETERMINAL.UMINUS)){
-			String value = handleExpr(scope, tree.getChild(0), table);
-			code.add(new IRInstruction(MULT, temp, value, "-1"));
-			return temp;
+			Cons<String, Type> value = handleExpr(scope, tree.getChild(0), table);
+			code.add(new IRInstruction(MULT, temp, value.a, "-1"));
+			return new Cons<>(temp, Type.INT);
 		}
 		EIROPCODE opcode = convertOperatorEnum(tree.getSymbol().getTerminal());
-		String left = handleExpr(scope, tree.getChild(0), table);
+		Cons<String, Type> left = handleExpr(scope, tree.getChild(0), table);
 		if(opcode.equals(AND)){
 			code.add(new IRInstruction(ASSIGN, temp, "0"));
-			code.add(new IRInstruction(BREQ, left, "0",Configuration.SHORT_CIRCUIT + temp));
+			code.add(new IRInstruction(BREQ, left.a, "0",Configuration.SHORT_CIRCUIT + temp));
 		} else if(opcode.equals(OR)){
 			code.add(new IRInstruction(ASSIGN, temp, "1"));
-			code.add(new IRInstruction(BRNEQ, left, "0", Configuration.SHORT_CIRCUIT + temp));
+			code.add(new IRInstruction(BRNEQ, left.a, "0", Configuration.SHORT_CIRCUIT + temp));
 		}
-		String right = handleExpr(scope, tree.getChild(1), table);
+		Cons<String, Type> right = handleExpr(scope, tree.getChild(1), table);
 		if(tree.getSymbol().getTerminal().comparisionOperators()){
-			code.add(new IRInstruction(opcode, left, right, Configuration.COMPARE_FALSE + temp));
+			code.add(new IRInstruction(opcode, left.a, right.a, Configuration.COMPARE_FALSE + temp));
 			code.add(new IRInstruction(ADD, temp, "0", "1"));
 			code.add(new IRInstruction(GOTO, Configuration.COMPARE_END + temp));
 			code.add(new IRInstruction(LABEL, Configuration.COMPARE_FALSE + temp));
 			code.add(new IRInstruction(ADD, temp, "0", "0"));
 			code.add(new IRInstruction(LABEL, Configuration.COMPARE_END + temp));
 		} else {
-			code.add(new IRInstruction(opcode, temp, left, right));
+			code.add(new IRInstruction(opcode, temp, left.a, right.a));
 		}
 		if(opcode.equals(OR) || opcode.equals(AND)){
 			code.add(new IRInstruction(LABEL, Configuration.SHORT_CIRCUIT + temp));
+			return new Cons<>(temp, Type.INT);
 		}
-		return temp;
+		return new Cons<>(temp, left.b);
 	}
 
 	private EIROPCODE convertOperatorEnum(ETERMINAL terminal) {
@@ -305,16 +336,16 @@ public class IRGenerator {
 		return opcode;
 	}
 	
-	private String handleLvalue(String scope, ParseTreeNode tree,
+	private Cons<String, Type> handleLvalue(String scope, ParseTreeNode tree,
 			SymbolTable table) {
 		String id = tree.getChild(0).getSymbol().getText();
 		String ret = temp();
-		String index = buildLvalueIndex(scope, tree, table);
-		code.add(new IRInstruction(ARRAY_LOAD, ret, id, index));
-		return ret;
+		Cons<String, Type> index = buildLvalueIndex(scope, tree, table);
+		code.add(new IRInstruction(ARRAY_LOAD, ret, id, index.a));
+		return new Cons<>(ret, index.b);
 	}
 
-	private String buildLvalueIndex(String scope, ParseTreeNode tree,
+	private Cons<String, Type> buildLvalueIndex(String scope, ParseTreeNode tree,
 			SymbolTable table) {
 		int numExpr = (tree.getChildren().size() - 1) / 3;
 		String id = tree.getChild(0).getSymbol().getText();
@@ -327,11 +358,11 @@ public class IRGenerator {
 			for(int j = i + 1; j < dimensions.size();j++){
 				length *= dimensions.get(j);
 			}
-			String exprIndex = handleExpr(scope, tree.getChild(2 + i * 3).getChild(0), table);
+			String exprIndex = handleExpr(scope, tree.getChild(2 + i * 3).getChild(0), table).a;
 			code.add(new IRInstruction(MULT, mult, exprIndex, "" + length));
 			code.add(new IRInstruction(ADD, index, index, mult));
 		}
-		return index;
+		return new Cons<>(index, table.getTypeOfId(scope, id).dereference(numExpr));
 	}
 
 	private String loop(){

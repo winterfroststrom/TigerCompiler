@@ -8,5 +8,4 @@ let
 	end;
 in
 	v := x(4);
-	v := 4 | 4 & 3;
 end
