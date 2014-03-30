@@ -239,7 +239,7 @@ public class IRGenerator {
 			Cons<String, Type> cons = handleExpr(scope, tree.getChild(1).getChild(0), table);
 			params.a.add(cons.a);
 			params.b.add(cons.b);
-			handleExprList(scope, tree.getChild(2), table, params);
+			handleExprListTail(scope, tree.getChild(2), table, params);
 		}
 	}
 

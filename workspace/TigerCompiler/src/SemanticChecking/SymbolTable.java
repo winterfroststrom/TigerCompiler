@@ -359,6 +359,4 @@ public class SymbolTable {
 			return new LinkedList<>();
 		}
 	}
-	
-	
 }

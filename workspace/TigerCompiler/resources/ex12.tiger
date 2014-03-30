@@ -1,11 +1,12 @@
 let
+	type s = int;
 	var v : int;
 	function x(i : int) : int begin
 		return 3;
 	end;
-	function x(m : int, j : int) : int begin
+	function x(m : string, a : int, s : int, d: int, v :int) : int begin
 		return 4;
 	end;
 in
-	v := x(4);
+	v := x("", 4 + 4 + 4, 1, 1, 2);
 end
