@@ -8,21 +8,25 @@ public class Configuration {
 	public static final boolean PRINT_TOKENS = RELEASE || false;
 	public static final boolean PRINT_TREE = RELEASE || false;
 	public static final boolean PRINT_TABLE = RELEASE || false;
-	public static final boolean PRINT_IR = RELEASE || true;
+	public static final boolean PRINT_IR = RELEASE || false;
+	public static final boolean PRINT_MIPS_NAIVE = RELEASE || false;
+	public static final boolean PRINT_MIPS_BB = RELEASE || true;
+	public static final boolean PRINT_MIPS_EBB = RELEASE || false;
+	
+	public static final boolean MIPS_VALID_LABELS = RELEASE || false;
 	
 	public static final boolean LL1PARSER_DEBUGGING = !RELEASE && false;
 	public static final boolean LL1PARSER_DEBUGGING_VERBOSE = !RELEASE && false;
 
-	public static final String FORCED_LOAD_FILE = RELEASE ? null : "resources/ex12.tiger";
+	//public static final String FORCED_LOAD_FILE = RELEASE ? null : "resources/ex1.tiger";
+	public static final String FORCED_LOAD_FILE = "resources/ex1.tiger";
 	
 	public static final String TIGER_FILE_TYPE = ".tiger";
-	public static final String TIGER_LEXER_OUTPUT_TYPE = ".tokens";
-	public static final String TIGER_LEXER_ERROR_TYPE = ".err";
 	
 	public static final String PARSE_TREE_NODE_DELIMITER = "\n";
 	public static final String PARSE_TREE_NODE_PREFIX = " ";
 	
-	public static final String SCOPE_DELIMITER = ".";
+	public static final String SCOPE_DELIMITER = "@";
 	public static final String GLOBAL_SCOPE_NAME = "";
 	public static final Type DEFAULT_TYPE_ON_ERROR = Type.INT;
 	
@@ -38,5 +42,8 @@ public class Configuration {
 	public static final String TEMP_PREFIX = "t";
 	public static final String SHORT_CIRCUIT = "ShortCircuit_";
 	
-	
+	public static final String RENAME_WORD = "Z";
+	public static final String RENAME_WORD_DELIMITER = "z";
+	public static final String RENAME_WORD_MISC = "0";
+	public static final String BASIC_BLOCK_LABEL = "BasicBlock";
 }

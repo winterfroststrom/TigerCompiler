@@ -1,0 +1,142 @@
+#	BEGIN CODE GEN
+	.data
+Zz64z88:	 .word 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10
+Zz64z89:	 .word 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10
+Zz64z105:	 .word 0
+Zz64z115z117z109:	 .word 0
+Zz116z49:	 .word 0
+Zz116z48:	 .word 0
+Zz116z50:	 .word 0
+Zz116z52:	 .word 0
+Zz116z51:	 .word 0
+Zz116z54:	 .word 0
+Zz116z53:	 .word 0
+Zz64z112z114z105z110z116z105z64z112z97z114z97z109z48:	 .word 0
+Zz116z55:	 .word 0
+	.text
+#	Zz64z112z114z105z110z116z105:
+Zz64z112z114z105z110z116z105:
+#		meta_exact, 	la $a0, Zz64z112z114z105z110z116z105z64z112z97z114z97z109z48, 
+	la $a0, Zz64z112z114z105z110z116z105z64z112z97z114z97z109z48
+#		meta_exact, 	lw $a0, 0($a0), , 
+	lw $a0, 0($a0)
+#		meta_exact, 	li $v0, 1, , 
+	li $v0, 1
+#		meta_exact, 	syscall, , 
+	syscall
+#		return, , , 
+	jr $ra
+#	main:
+main:
+#		assign, Zz64z105, 0, 
+	li $t1, 0
+	la $s0, Zz64z105
+	sw $t1, 0($s0)
+#	Zz76z111z111z112z66z101z103z105z110z95z48:
+Zz76z111z111z112z66z101z103z105z110z95z48:
+#		brgeq, Zz64z105, 100, Zz76z111z111z112z69z110z100z95z48
+	la $s1, Zz64z105
+	lw $t0, 0($s1)
+	li $t1, 100
+	bge $t0, $t1, Zz76z111z111z112z69z110z100z95z48
+#		assign, Zz116z51, 0, 
+	li $t1, 0
+	la $s0, Zz116z51
+	sw $t1, 0($s0)
+#		mult, Zz116z52, Zz64z105, 1
+	la $s1, Zz64z105
+	lw $t1, 0($s1)
+	li $t2, 1
+	mul $t0, $t1, $t2
+	la $s0, Zz116z52
+	sw $t0, 0($s0)
+#		add, Zz116z51, Zz116z51, Zz116z52
+	la $s1, Zz116z51
+	lw $t1, 0($s1)
+	la $s1, Zz116z52
+	lw $t2, 0($s1)
+	add $t0, $t1, $t2
+	la $s0, Zz116z51
+	sw $t0, 0($s0)
+#		array_load, Zz116z50, Zz64z88, Zz116z51
+	la $t1, Zz64z88
+	la $s1, Zz116z51
+	lw $t2, 0($s1)
+	mul $t2, $t2, 4
+	add $t0, $t1, $t2
+	lw $t3, 0($t0)
+	la $s0, Zz116z50
+	sw $t3, 0($s0)
+#		assign, Zz116z54, 0, 
+	li $t1, 0
+	la $s0, Zz116z54
+	sw $t1, 0($s0)
+#		mult, Zz116z55, Zz64z105, 1
+	la $s1, Zz64z105
+	lw $t1, 0($s1)
+	li $t2, 1
+	mul $t0, $t1, $t2
+	la $s0, Zz116z55
+	sw $t0, 0($s0)
+#		add, Zz116z54, Zz116z54, Zz116z55
+	la $s1, Zz116z54
+	lw $t1, 0($s1)
+	la $s1, Zz116z55
+	lw $t2, 0($s1)
+	add $t0, $t1, $t2
+	la $s0, Zz116z54
+	sw $t0, 0($s0)
+#		array_load, Zz116z53, Zz64z89, Zz116z54
+	la $t1, Zz64z89
+	la $s1, Zz116z54
+	lw $t2, 0($s1)
+	mul $t2, $t2, 4
+	add $t0, $t1, $t2
+	lw $t3, 0($t0)
+	la $s0, Zz116z53
+	sw $t3, 0($s0)
+#		mult, Zz116z49, Zz116z50, Zz116z53
+	la $s1, Zz116z50
+	lw $t1, 0($s1)
+	la $s1, Zz116z53
+	lw $t2, 0($s1)
+	mul $t0, $t1, $t2
+	la $s0, Zz116z49
+	sw $t0, 0($s0)
+#		add, Zz116z48, Zz64z115z117z109, Zz116z49
+	la $s1, Zz64z115z117z109
+	lw $t1, 0($s1)
+	la $s1, Zz116z49
+	lw $t2, 0($s1)
+	add $t0, $t1, $t2
+	la $s0, Zz116z48
+	sw $t0, 0($s0)
+#		assign, Zz64z115z117z109, Zz116z48, 
+	la $s1, Zz116z48
+	lw $t1, 0($s1)
+	la $s0, Zz64z115z117z109
+	sw $t1, 0($s0)
+#		add, Zz64z105, Zz64z105, 1
+	la $s1, Zz64z105
+	lw $t1, 0($s1)
+	li $t2, 1
+	add $t0, $t1, $t2
+	la $s0, Zz64z105
+	sw $t0, 0($s0)
+#		goto, Zz76z111z111z112z66z101z103z105z110z95z48, , 
+	b Zz76z111z111z112z66z101z103z105z110z95z48
+#	Zz76z111z111z112z69z110z100z95z48:
+Zz76z111z111z112z69z110z100z95z48:
+#		assign, Zz64z112z114z105z110z116z105z64z112z97z114z97z109z48, Zz64z115z117z109, 
+	la $s1, Zz64z115z117z109
+	lw $t1, 0($s1)
+	la $s0, Zz64z112z114z105z110z116z105z64z112z97z114z97z109z48
+	sw $t1, 0($s0)
+#		call, Zz64z112z114z105z110z116z105, Zz64z112z114z105z110z116z105z64z112z97z114z97z109z48, 
+	sw $ra, 0($sp)
+	addi $sp, $sp, -4
+	jal Zz64z112z114z105z110z116z105
+	addi $sp, $sp, 4
+	lw $ra, 0($sp)
+#		meta_exact, 	jr $ra, , 
+	jr $ra

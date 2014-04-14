@@ -1,0 +1,46 @@
+#	BEGIN CODE GEN
+	.data
+Z0z5z1zZzprintzn:	 .word 0
+Z0z6z6zZzprintizparam0:	 .word 0
+	.text
+#	LABEL
+Z0z6zZzprinti:
+#	META_EXACT
+	la $a0, Z0z6z6zZzprintizparam0
+#	META_EXACT
+	lw $a0, 0($a0)
+#	META_EXACT
+	li $v0, 1
+#	META_EXACT
+	syscall
+#	RETURN
+	jr $ra
+#	LABEL
+Z0z5zZzprint:
+#	ASSIGN
+	la $s1, Z0z5z1zZzprintzn
+	lw $t1, 0($s1)
+	la $s0, Z0z6z6zZzprintizparam0
+	sw $t1, 0($s0)
+#	CALL
+	sw $ra, 0($sp)
+	addi $sp, $sp, -4
+	jal Z0z6zZzprinti
+	addi $sp, $sp, 4
+	lw $ra, 0($sp)
+#	RETURN
+	jr $ra
+#	LABEL
+main:
+#	ASSIGN
+	li $t1, 5
+	la $s0, Z0z5z1zZzprintzn
+	sw $t1, 0($s0)
+#	CALL
+	sw $ra, 0($sp)
+	addi $sp, $sp, -4
+	jal Z0z5zZzprint
+	addi $sp, $sp, 4
+	lw $ra, 0($sp)
+#	RETURN PROGRAM
+	jr $ra

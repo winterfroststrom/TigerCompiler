@@ -1,0 +1,106 @@
+successful parse
+(TIGER_PROGRAM
+ ([LET : let : 1])
+ (DECLARATION_SEGMENT
+  (TYPE_DECLARATION_LIST
+   (TYPE_DECLARATION
+    ([TYPE : type : 13])
+    ([ID : ArrayInt : 18])
+    ([EQ : = : 27])
+    (TYPE_LIT
+     ([ARRAY : array : 29])
+     ([LBRACK : [ : 35])
+     ([INTLIT : 100 : 36])
+     ([RBRACK : ] : 39])
+     (TYPE_DIM)
+     ([OF : of : 41])
+     (TYPE_ID
+      ([ID : int : 44])))
+    ([SEMI : ; : 47]))
+   (TYPE_DECLARATION_LIST))
+  (VAR_DECLARATION_LIST
+   (VAR_DECLARATION
+    ([VAR : var : 58])
+    (ID_LIST
+     ([ID : X : 62])
+     (ID_LIST_TAIL
+      ([COMMA : , : 63])
+      ([ID : Y : 65])
+      (ID_LIST_TAIL)))
+    ([COLON : : : 67])
+    (TYPE_ID
+     ([ID : ArrayInt : 69]))
+    (OPTIONAL_INIT
+     ([ASSIGN : := : 78])
+     (CONST
+      ([INTLIT : 10 : 81])))
+    ([SEMI : ; : 83]))
+   (VAR_DECLARATION_LIST
+    (VAR_DECLARATION
+     ([VAR : var : 94])
+     (ID_LIST
+      ([ID : i : 98])
+      (ID_LIST_TAIL
+       ([COMMA : , : 99])
+       ([ID : sum : 101])
+       (ID_LIST_TAIL)))
+     ([COLON : : : 105])
+     (TYPE_ID
+      ([ID : int : 106]))
+     (OPTIONAL_INIT
+      ([ASSIGN : := : 110])
+      (CONST
+       ([INTLIT : 0 : 113])))
+     ([SEMI : ; : 114]))
+    (VAR_DECLARATION_LIST)))
+  (FUNCT_DECLARATION_LIST))
+ ([IN : in : 116])
+ (STAT_SEQ
+  (STAT
+   ([FOR : for : 136])
+   ([ID : i : 140])
+   ([ASSIGN : := : 142])
+   (EXPR
+    ([INTLIT : 0 : 145]))
+   ([TO : to : 147])
+   (EXPR
+    ([INTLIT : 100 : 150]))
+   ([DO : do : 154])
+   (STAT_SEQ
+    (STAT
+     (LVALUE
+      ([ID : sum : 168]))
+     ([ASSIGN : := : 172])
+     (STAT_ASSIGN
+      (EXPR
+       ([PLUS : + : 179]
+        ([ID : sum : 175])
+        ([MULT : * : 186]
+         (LVALUE
+          ([ID : X : 181])
+          ([LBRACK : [ : 182])
+          (EXPR
+           ([ID : i : 183]))
+          ([RBRACK : ] : 184]))
+         (LVALUE
+          ([ID : Y : 188])
+          ([LBRACK : [ : 190])
+          (EXPR
+           ([ID : i : 191]))
+          ([RBRACK : ] : 192]))))))
+     ([SEMI : ; : 193]))
+    (STAT_SEQ_TAIL))
+   ([ENDDO : enddo : 203])
+   ([SEMI : ; : 208]))
+  (STAT_SEQ_TAIL
+   (STAT
+    ([ID : printi : 218])
+    ([LPAREN : ( : 224])
+    (EXPR_LIST
+     (EXPR
+      ([ID : sum : 225]))
+     (EXPR_LIST_TAIL))
+    ([RPAREN : ) : 228])
+    ([SEMI : ; : 229]))
+   (STAT_SEQ_TAIL)))
+ ([END : end : 232]))

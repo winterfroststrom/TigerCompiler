@@ -1,0 +1,4 @@
+Symbol Table :
+Types : {int=int, string=string}
+Names : {@flush=@flush:|void|, @print=@print:|void|, @getchar=@getchar:string, @concat=@concat:string, @ord=@ord:int, @printi=@printi:|void|, @exit=@exit:|void|, @substring=@substring:string, @size=@size:int, @chr=@chr:string, @print@n=@print@n:int, @not=@not:int}
+Kinds : {@flush=[([], [])], @print=[([string], [@print@param0]), ([int], [@print@n])], @getchar=[([], [])], @concat=[([string, string], [@concat@param0, @concat@param1])], @ord=[([string], [@ord@param0])], @printi=[([int], [@printi@param0])], @exit=[([int], [@exit@param0])], @substring=[([string, int, int], [@substring@param0, @substring@param1, @substring@param2])], @size=[([string], [@size@param0])], @chr=[([int], [@chr@param0])], @not=[([int], [@not@param0])]}

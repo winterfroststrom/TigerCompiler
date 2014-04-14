@@ -18,9 +18,6 @@ class SymbolTableChecker {
 		errors = new LinkedList<>();
 		table = new SymbolTable(errors);
 		table.build(tree);
-		if(Configuration.PRINT_TABLE){
-			System.out.println(table);
-		}
 		traverse(Configuration.GLOBAL_SCOPE_NAME, tree);
 		return table;
 	}

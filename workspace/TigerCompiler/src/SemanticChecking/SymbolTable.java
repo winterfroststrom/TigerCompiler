@@ -288,6 +288,10 @@ public class SymbolTable {
 		}
 	}
 
+	public boolean isFunction(String qualifiedId){
+		return names.containsKey(qualifiedId) && names.get(qualifiedId).function;
+	}
+	
 	public Type getTypeOfId(String scope, String id){
 		if(names.containsKey(id)){
 			return names.get(id).type;
