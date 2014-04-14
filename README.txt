@@ -25,6 +25,24 @@ The symbol table stores three hashmaps :
 The Semantic Checker traverses the tree with the symbol table and type checks 
 the rest of the tree.
 
+Because the IR does not have convenient comparision operators, branches were used.
+This means the temporary registers are live between basic blocks, 
+which means the temporaries are converted to variables.
+
+All IR variables and labels and registers are renamed to an ascii number format to account 
+for the limited alphabet accepted for MIPS labels.
+
+A IR opcode META_EXACT has been added to allow the implementation of system commands 
+because there is no convenient IR equivalent.
+Similarly, code generation also renames registers to MIPS registers 
+because register-memory operations are hard to represent in the IR.
+
+The class BasicBlock stores is a basic block.
+The control flow graph is represented as a list of BasicBlocks.
+The BasicBlock class has a label instruction, a jump instruction, a list of instructions, and variables.
+While adjacent blocks could use goto's to direct themselves to the next block to enable arbitrary ordering,
+the original order is maintained for simplicity.
+
 ---------------------------------------------------------------------------------
 RUNNING
 ---------------------------------------------------------------------------------
