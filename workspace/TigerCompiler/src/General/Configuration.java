@@ -18,8 +18,7 @@ public class Configuration {
 	public static final boolean LL1PARSER_DEBUGGING = !RELEASE && false;
 	public static final boolean LL1PARSER_DEBUGGING_VERBOSE = !RELEASE && false;
 
-	//public static final String FORCED_LOAD_FILE = RELEASE ? null : "resources/ex1.tiger";
-	public static final String FORCED_LOAD_FILE = "resources/ex1.tiger";
+	public static final String FORCED_LOAD_FILE = RELEASE ? null : "resources/ex1.tiger";
 	
 	public static final String TIGER_FILE_TYPE = ".tiger";
 	
