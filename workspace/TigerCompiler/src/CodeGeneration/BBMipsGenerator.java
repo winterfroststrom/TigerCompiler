@@ -1,9 +1,12 @@
 package CodeGeneration;
 
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
+import General.Cons;
 import General.IRInstruction;
 import General.IRInstruction.Operand;
 import SemanticChecking.SymbolTable;
@@ -18,10 +21,11 @@ class BBMipsGenerator {
 
 	public List<String> generate(List<IRInstruction> instructions,
 			SymbolTable table, int instructionIndex) {
-		List<BasicBlock> blocks = BasicBlock.parseIR(instructions,
+		Map<Integer, BasicBlock> blocks = BasicBlock.parseIR(instructions,
 				instructionIndex, table);
-		for (BasicBlock bb : blocks) {
-			output.add("#\tBlock " + bb.position + "\t" + bb.variables);
+
+		for (BasicBlock bb : BasicBlock.order(blocks)) {
+			output.add("#\tBlock " + bb.position + "\t" + bb.getVariables());
 			registerAllocate(bb, output, table);
 		}
 		return output;
@@ -30,34 +34,16 @@ class BBMipsGenerator {
 	private void registerAllocate(BasicBlock bb, List<String> output,
 			SymbolTable table) {
 		Map<Operand, String> registerMap = new HashMap<>();
-		if (bb.variables.size() < MIPS_TEMPORARY_COUNT) {
+		if (bb.getVariables().size() < MIPS_TEMPORARY_COUNT) {
 			int registerNum = 8;
-			for (Operand op : bb.variables) {
+			for (Operand op : bb.getVariables()) {
 				registerMap.put(op, "$" + registerNum++);
 			}
 		} else {
 			graphColor(bb, output, table, registerMap);
 		}
-		if (bb.label != null) {
-			RegisterCodeGeneration.generate(bb.label, table, output, registerMap);
-		}
-		output.add("#\t Load Registers");
-		for (Operand op : registerMap.keySet()) {
-			output.add("\tla $a0, " + op.value);
-			output.add("\tlw " + registerMap.get(op) + ", 0($a0)");
-		}
-		for (IRInstruction instruction : bb.instructions) {
-			RegisterCodeGeneration.generate(instruction, table, output, registerMap);
-		}
-		output.add("#\t Store Registers");
-		for (Operand op : registerMap.keySet()) {
-			output.add("\tla $a0, " + op.value);
-			output.add("\tsw " + registerMap.get(op) + ", 0($a0)");
-		}
-		if (bb.jump != null) {
-			RegisterCodeGeneration.generate(bb.jump, table, output, registerMap);
-		}
-		
+		RegisterCodeGenerator.generateBasicBlock(bb, registerMap, output, table, 
+				bb.getUsed().keySet(), bb.getDefined().keySet());
 	}
 
 	private void graphColor(BasicBlock bb, List<String> output2,

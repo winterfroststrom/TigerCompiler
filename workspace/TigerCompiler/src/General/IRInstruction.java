@@ -1,6 +1,6 @@
 package General;
 
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
 
 public class IRInstruction {
@@ -45,7 +45,7 @@ public class IRInstruction {
 	
 	public IRInstruction(EIROPCODE opcode, Operand...params){
 		this.opcode = opcode;
-		this.params = new LinkedList<>();
+		this.params = new ArrayList<>();
 		for(Operand param : params){
 			this.params.add(param);
 		}

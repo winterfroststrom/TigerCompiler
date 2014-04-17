@@ -1,5 +1,6 @@
 package CodeGeneration;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
@@ -33,14 +34,14 @@ public class MipsGenerator {
 		case BB:
 			return (new BBMipsGenerator(output)).generate(instructions, table, instructionIndex);
 		case EBB:
-			return new LinkedList<>();
+			return (new EBBMipsGenerator(output)).generate(instructions, table, instructionIndex);
 		default:
 			throw new UnsupportedOperationException("Uknown generator type");
 		}
 	}
 	
 	private List<IRInstruction> copy(List<IRInstruction> instructions) {
-		List<IRInstruction> copy = new LinkedList<>();
+		List<IRInstruction> copy = new ArrayList<>();
 		for(IRInstruction instruction : instructions){
 			copy.add(new IRInstruction(instruction.opcode, instruction.params));
 		}

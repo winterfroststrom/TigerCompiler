@@ -43,13 +43,6 @@ Zz76z111z111z112z66z101z103z105z110z95z48:
 	li $t1, 0
 	la $s0, Zz116z51
 	sw $t1, 0($s0)
-#		mult, Zz116z52, Zz64z105, 1
-	la $s1, Zz64z105
-	lw $t1, 0($s1)
-	li $t2, 1
-	mul $t0, $t1, $t2
-	la $s0, Zz116z52
-	sw $t0, 0($s0)
 #		add, Zz116z51, Zz116z51, Zz116z52
 	la $s1, Zz116z51
 	lw $t1, 0($s1)
@@ -71,13 +64,6 @@ Zz76z111z111z112z66z101z103z105z110z95z48:
 	li $t1, 0
 	la $s0, Zz116z54
 	sw $t1, 0($s0)
-#		mult, Zz116z55, Zz64z105, 1
-	la $s1, Zz64z105
-	lw $t1, 0($s1)
-	li $t2, 1
-	mul $t0, $t1, $t2
-	la $s0, Zz116z55
-	sw $t0, 0($s0)
 #		add, Zz116z54, Zz116z54, Zz116z55
 	la $s1, Zz116z54
 	lw $t1, 0($s1)

@@ -1,5 +1,6 @@
 package CodeGeneration;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -16,7 +17,7 @@ class IRRenamer {
 		List<IRInstruction> ret = new LinkedList<>();
 		Set<String> variables = new HashSet<>();
 		for(IRInstruction instruction : ir){
-			List<Operand> operands = new LinkedList<>();
+			List<Operand> operands = new ArrayList<>();
 			for(Operand operand : instruction.params){
 				switch(operand.type){
 				case LITERAL:

@@ -1,5 +1,6 @@
 package IRGeneration;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -213,7 +214,7 @@ public class IRGenerator {
 
 	private List<Operand> handleParams(String scope, ParseTreeNode tree,
 			SymbolTable table) {
-		List<Operand> params = new LinkedList<>();
+		List<Operand> params = new ArrayList<>();
 		String functName = tree.getChild(0).getSymbol().getText();
 		params.add(new Operand(EOPERAND.LABEL, table.getFullNameOfId(scope, functName)));
 		handleParamsHelper(scope, tree, table, functName, params);
@@ -402,10 +403,12 @@ public class IRGenerator {
 				length *= dimensions.get(j);
 			}
 			Operand exprIndex = handleExpr(scope, tree.getChild(2 + i * 3).getChild(0), table).a;
-			code.add(new IRInstruction(MULT, 
-					mult, 
-					exprIndex, 
-					new Operand(EOPERAND.LITERAL, "" + length)));
+			if(length != 1){
+				code.add(new IRInstruction(MULT, 
+						mult, 
+						exprIndex, 
+						new Operand(EOPERAND.LITERAL, "" + length)));
+			}
 			code.add(new IRInstruction(ADD, index, index, mult));
 		}
 		return new Cons<>(index, table.getTypeOfId(scope, id).dereference(numExpr));

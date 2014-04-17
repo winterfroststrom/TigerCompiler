@@ -1,5 +1,8 @@
 package CodeGeneration;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -8,32 +11,35 @@ import java.util.Map;
 import java.util.Set;
 
 import General.Cons;
+import General.EIROPCODE;
 import General.IRInstruction;
 import General.IRInstruction.EOPERAND;
 import General.IRInstruction.Operand;
 import SemanticChecking.SymbolTable;
 
-class BasicBlock {
+class BasicBlock{
 	int position; 
 	List<IRInstruction> instructions;
+	List<Integer> predecessors;
 	List<Integer> successors;
 	IRInstruction label;
 	IRInstruction jump;
-	Set<Operand> variables;
-	Set<Operand> usedFirst;
-	Set<Operand> defFirst;
-	
+	private Set<Operand> variables;
+	private Map<Operand, Set<Integer>> used;
+	private Map<Operand, Set<Integer>> defined;
+
 	
 	public BasicBlock(int position){
 		this.position = position;
-		instructions = new LinkedList<>();
+		instructions = new ArrayList<>();
 		successors = new LinkedList<>();
+		predecessors = new LinkedList<>();
 		variables = new HashSet<>();
-		usedFirst = new HashSet<>();
-		defFirst = new HashSet<>();
+		used = new HashMap<>();
+		defined = new HashMap<>();
 	}
 	
-	public static List<BasicBlock> parseIR(List<IRInstruction> ir, int beginIndex, SymbolTable table){
+	public static Map<Integer, BasicBlock> parseIR(List<IRInstruction> ir, int beginIndex, SymbolTable table){
 		Map<Integer, BasicBlock> blocks = new HashMap<>(); 
 		List<Cons<String, BasicBlock>> enteringBlocks = new LinkedList<>(); // current function 
 		List<Cons<String, BasicBlock>> returningBlocks = new LinkedList<>(); // current function 
@@ -120,54 +126,91 @@ class BasicBlock {
 		jumpSuccessors(returningBlocks, afterCallingBlocks);
 		jumpSuccessors(breakingBlocks, labeledBlocks);
 		
-		List<BasicBlock> ret = new LinkedList<>();
-		for(int i = beginIndex; i < ir.size();i++){
-			if(blocks.containsKey(i)){
-				ret.add(blocks.get(i));
-			}
-		}
-		return addVariables(ret);
+		addPredecessors(blocks);
+		
+		addVariables(blocks);
+		
+		return blocks;
 	}
 
-	private static List<BasicBlock> addVariables(List<BasicBlock> ret){
-		for(BasicBlock bb : ret){
-			
-			for(IRInstruction ir : bb.instructions){
-				classifyIRInstructionOperands(ir, bb);
+	private static void addVariables(Map<Integer, BasicBlock> ret){
+		for(BasicBlock bb : ret.values()){
+			int i = 0;
+			for(i = 0; i < bb.instructions.size();i++){
+				classifyIRInstructionOperands(bb.instructions.get(i), bb, i);
 			}
 			if(bb.jump != null){
-				classifyIRInstructionOperands(bb.jump, bb);
+				classifyIRInstructionOperands(bb.jump, bb, i);
 			}
 		}
-		return ret;
 	}
 	
-	private static void classifyIRInstructionOperands(IRInstruction instruction, BasicBlock bb){
-//		switch(instruction.opcode){
-//		case ASSIGN:
-//			Operand possiblyDefined = instruction.param(0);
-//			if(!bb.variables.contains(possiblyDefined)){
-//				bb.variables.add(possiblyDefined);
-//				bb.defFirst.add(possiblyDefined);
-//			}
-//			if(instruction.param(1).type.equals(EOPERAND.VARIABLE) 
-//					|| instruction.param(1).type.equals(EOPERAND.REGISTER)){
-//				
-//			}
-//			break;
-//		ASSIGN, ADD, SUB, MULT, DIV, AND,
-//		OR, GOTO, BREQ, BRNEQ, BRLT, BRGT, BRGEQ, BRLEQ,
-//		RETURN, CALL, CALLR, ARRAY_STORE, ARRAY_LOAD,
-//		LABEL, META_EXACT;
-//		
-//		case LABEL:
-//			break;
-//		}
-		for(Operand op : instruction.params){
-			if(op.type.equals(EOPERAND.VARIABLE) 
-					|| op.type.equals(EOPERAND.REGISTER)){
-				bb.variables.add(op);
+	private static void addPredecessors(Map<Integer, BasicBlock> blocks){
+		for(int bbIndex : blocks.keySet()){
+			for(int successor : blocks.get(bbIndex).successors){
+				blocks.get(successor).predecessors.add(bbIndex);
 			}
+		}
+	}
+	
+	
+	private static void classifyIRInstructionOperands(IRInstruction instruction, BasicBlock bb, int position){
+		switch(instruction.opcode){
+		case ASSIGN:
+		case ADD:
+		case SUB:
+		case MULT:
+		case DIV:
+		case AND:
+		case OR:
+		case CALLR:
+		case ARRAY_LOAD:
+			tryAddTo(bb.defined, instruction.param(0), position);
+			for(int i = 1; i < instruction.params.size();i++){
+				tryAddTo(bb.used, instruction.param(i), position);	
+			}
+			break;
+		case BREQ:
+		case BRNEQ:
+		case BRLT:
+		case BRGT:
+		case BRGEQ:
+		case BRLEQ:
+		case CALL:
+		case ARRAY_STORE:
+			for(int i = 0; i < instruction.params.size();i++){
+				tryAddTo(bb.used, instruction.param(i), position);	
+			}
+			break;
+		case RETURN:
+			if(instruction.params.size() > 0){
+				tryAddTo(bb.used, instruction.param(0), position);					
+			}
+		case GOTO:
+			break;
+		case META_EXACT:
+		case LABEL:
+			break;
+		}
+		for(int i = 0; i < instruction.params.size();i++){
+			tryAddTo(bb.variables, instruction.param(i));
+		}
+	}
+	
+	private static void tryAddTo(Set<Operand> variables, Operand op) {
+		if(op.type.equals(EOPERAND.VARIABLE) 
+				|| op.type.equals(EOPERAND.REGISTER)){
+			variables.add(op);
+		}
+	}
+	
+	private static void tryAddTo(Map<Operand, Set<Integer>> map, Operand op, int position) {
+		if(op.type.equals(EOPERAND.VARIABLE) 
+				|| op.type.equals(EOPERAND.REGISTER)){
+			if(!map.containsKey(op)){
+				map.put(op, new HashSet<Integer>());
+			}
+			map.get(op).add(position);
 		}
 	}
 	
@@ -199,10 +242,44 @@ class BasicBlock {
 		}
 	}
 	
+	public Map<Operand, Set<Integer>> getUsed(){
+		return used;
+	}
+	
+	public Map<Operand, Set<Integer>> getDefined(){
+		return defined;
+	}
+	
+	public Set<Operand> getVariables(){
+		return variables;
+	}
+		
+	public static List<BasicBlock> order(Map<Integer, BasicBlock> blocks){
+		List<BasicBlock> blockList = new LinkedList<>();
+		List<Integer> keys = new ArrayList<>();
+		for(int i : blocks.keySet()){
+			keys.add(i);
+		}
+		Collections.sort(keys);
+		for(int i : keys){
+				blockList.add(blocks.get(i));
+		}
+		return blockList;
+	}
+	
+	public static List<Integer> positions(Collection<BasicBlock> blocks){
+		List<Integer> positions = new LinkedList<>();
+		for(BasicBlock bb : blocks){
+			positions.add(bb.position);
+		}
+		return positions;
+	}
+	
 	@Override
 	public String toString(){
-		String out = position + " to " + successors + "\n";
-		out += "VARIABLES:\t" + variables + "\n";
+		String out = predecessors + " to " + position + " to " + successors + "\n";
+		out += "DEFINED:\t" + defined + "\n";
+		out += "USED:\t" + used + "\n";
 		out += "LABEL:\t" + label + "\n";
 		for(IRInstruction instruction : instructions){
 			out += instruction + "\n";

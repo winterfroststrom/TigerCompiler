@@ -7,11 +7,9 @@ main:
 LoopBegin_0:
 	brgeq, @i, 100, LoopEnd_0
 	assign, t3, 0, 
-	mult, t4, @i, 1
 	add, t3, t3, t4
 	array_load, t2, @X, t3
 	assign, t6, 0, 
-	mult, t7, @i, 1
 	add, t6, t6, t7
 	array_load, t5, @Y, t6
 	mult, t1, t2, t5
