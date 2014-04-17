@@ -85,7 +85,8 @@ public class SymbolTable {
 				handleParam(functName, paramTypes, paramNames, param);
 				buildParams(functName, paramTypes, paramNames, functDeclaration.getChild(3).getChild(1));
 			}
-			if(containsFunctionAndParamsHelper(functName, paramTypes)){
+			if(names.containsKey(functName)){
+//			if(containsFunctionAndParamsHelper(functName, paramTypes)){
 				errors.add(new SemanticError("Redeclared name " + functName 
 						+ " in global scope at position " 
 						+ functDeclaration.getChild(0).getSymbol().getPosition()));
