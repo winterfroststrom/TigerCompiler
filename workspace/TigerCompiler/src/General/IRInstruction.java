@@ -6,6 +6,7 @@ import java.util.List;
 public class IRInstruction {
 	public final EIROPCODE opcode;
 	public final List<Operand> params;
+
 	public static enum EOPERAND{
 		LITERAL, LABEL, REGISTER, VARIABLE
 	}

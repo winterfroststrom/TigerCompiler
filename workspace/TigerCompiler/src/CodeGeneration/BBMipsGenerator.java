@@ -12,7 +12,6 @@ import General.IRInstruction.Operand;
 import SemanticChecking.SymbolTable;
 
 class BBMipsGenerator {
-	private static final int MIPS_TEMPORARY_COUNT = 17;
 	private List<String> output;
 
 	public BBMipsGenerator(List<String> output) {
@@ -21,28 +20,30 @@ class BBMipsGenerator {
 
 	public List<String> generate(List<IRInstruction> instructions,
 			SymbolTable table, int instructionIndex) {
-		Map<Integer, BasicBlock> blocks = BasicBlock.parseIR(instructions,
+		Cons<Map<Integer, BasicBlock>, Map<IRInstruction, String>> cons = BasicBlock.parseIR(instructions,
 				instructionIndex, table);
+		Map<Integer, BasicBlock> blocks = cons.a;
+		Map<IRInstruction, String> functionMap = cons.b;
 
 		for (BasicBlock bb : BasicBlock.order(blocks)) {
 			output.add("#\tBlock " + bb.position + "\t" + bb.getVariables());
-			registerAllocate(bb, output, table);
+			registerAllocate(bb, output, table, functionMap);
 		}
 		return output;
 	}
 
 	private void registerAllocate(BasicBlock bb, List<String> output,
-			SymbolTable table) {
+			SymbolTable table, Map<IRInstruction, String> functionMap) {
 		Map<Operand, String> registerMap = new HashMap<>();
-		if (bb.getVariables().size() < MIPS_TEMPORARY_COUNT) {
-			int registerNum = 8;
+		if (bb.getVariables().size() < MipsGenerator.TEMP_REGISTERS.size()) {
+			int registerNum = 0;
 			for (Operand op : bb.getVariables()) {
-				registerMap.put(op, "$" + registerNum++);
+				registerMap.put(op, MipsGenerator.TEMP_REGISTERS.get(registerNum++));
 			}
 		} else {
 			graphColor(bb, output, table, registerMap);
 		}
-		RegisterCodeGenerator.generateBasicBlock(bb, registerMap, output, table, 
+		RegisterCodeGenerator.generateBasicBlock(bb, registerMap, output, table, functionMap, 
 				bb.getUsed().keySet(), bb.getDefined().keySet());
 	}
 

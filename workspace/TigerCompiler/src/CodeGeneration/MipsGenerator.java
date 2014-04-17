@@ -10,16 +10,22 @@ import General.EIROPCODE;
 import General.IRInstruction;
 import General.IRInstruction.EOPERAND;
 import General.IRInstruction.Operand;
+import General.Utilities;
 import SemanticChecking.SymbolTable;
 
 public class MipsGenerator {
+	final static List<String> TEMP_REGISTERS = 
+			Utilities.toAL("$8", "$9", "$10", "$11", "$12",
+							"$13", "$14", "$15", "$16", "$17",
+							"$18", "$19", "$20", "$21", "$22", 
+							"$23", "$24", "$25");
 	public enum EGENERATOR{
 		NAIVE, BB, EBB
 	}
 	public List<String> generate(EGENERATOR generator, List<IRInstruction> instructions, SymbolTable table){
-		instructions = copy(instructions);
+		instructions = copy(instructions); 
 		MipsFunctionImplementations.implementPrinti(instructions);
-		Cons<List<IRInstruction>, Set<String>> renamed = IRRenamer.rename(instructions);
+		Cons<List<IRInstruction>, Set<String>> renamed = IRRenamer.renameIR(instructions);
 		instructions = renamed.a;
 		
 		instructions.add(new IRInstruction(EIROPCODE.META_EXACT, new Operand(EOPERAND.LITERAL, "\tjr $ra")));
@@ -27,7 +33,7 @@ public class MipsGenerator {
 		List<String> output = new LinkedList<>();
 		output.add("#\tBEGIN CODE GEN");
 		
-		int instructionIndex = handleAssignment(instructions, output, renamed.b);
+		int instructionIndex = handleAssignment(instructions, output, renamed.b, table);
 		switch(generator){
 		case NAIVE:
 			return (new NaiveMipsGenerator(output)).generate(instructions, table, instructionIndex);
@@ -48,12 +54,15 @@ public class MipsGenerator {
 		return copy;
 	}
 
-	private int handleAssignment(List<IRInstruction> instructions, List<String> output, Set<String> variables) {
+	private int handleAssignment(List<IRInstruction> instructions, List<String> output, 
+			Set<String> variables, SymbolTable table) {
 		int instructionIndex = 0;
 		output.add("\t.data");
+		Set<String> params = IRRenamer.rename(table.allFunctionParamNames());
 		while(instructions.get(instructionIndex).opcode.equals(EIROPCODE.ASSIGN)){
 			IRInstruction instruction = instructions.get(instructionIndex);
 			String assignment = instruction.param(0).value + ":\t .word ";
+			params.remove(instruction.param(0).value);
 			if(instruction.params.size() == 3){
 				int times = Integer.parseInt(instruction.param(1).value);
 				for(int i = 0; i < times - 1;i++){
@@ -68,7 +77,11 @@ public class MipsGenerator {
 			variables.remove(instruction.param(0).value);
 		}
 		for(String variable : variables){
+			params.remove(variable);
 			output.add(variable + ":\t .word 0");
+		}
+		for(String unassignedParams : params){
+			output.add(unassignedParams + ":\t .word 0");
 		}
 		output.add("\t.text");
 		//output.add("\t.global main");

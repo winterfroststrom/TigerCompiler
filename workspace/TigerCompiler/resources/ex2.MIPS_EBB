@@ -1,0 +1,79 @@
+#	BEGIN CODE GEN
+	.data
+Zz64z112z114z105z110z116z64z110:	 .word 0
+Zz64z112z114z105z110z116z105z64z112z97z114z97z109z48:	 .word 0
+Zz64z99z111z110z99z97z116z64z112z97z114z97z109z48:	 .word 0
+Zz64z101z120z105z116z64z112z97z114z97z109z48:	 .word 0
+Zz64z115z105z122z101z64z112z97z114z97z109z48:	 .word 0
+Zz64z111z114z100z64z112z97z114z97z109z48:	 .word 0
+Zz64z99z111z110z99z97z116z64z112z97z114z97z109z49:	 .word 0
+Zz64z115z117z98z115z116z114z105z110z103z64z112z97z114z97z109z50:	 .word 0
+Zz64z112z114z105z110z116z64z112z97z114z97z109z48:	 .word 0
+Zz64z110z111z116z64z112z97z114z97z109z48:	 .word 0
+Zz64z99z104z114z64z112z97z114z97z109z48:	 .word 0
+Zz64z115z117z98z115z116z114z105z110z103z64z112z97z114z97z109z48:	 .word 0
+Zz64z115z117z98z115z116z114z105z110z103z64z112z97z114z97z109z49:	 .word 0
+	.text
+#	Block 0	[Zz64z112z114z105z110z116z105z64z112z97z114z97z109z48]
+#	Zz64z112z114z105z110z116z105:
+	la $a0, Zz64z112z114z105z110z116z105z64z112z97z114z97z109z48
+	lw $8, 0($a0)
+Zz64z112z114z105z110z116z105:
+#	 Load Registers
+#		meta_exact, 	la $a0, Zz64z112z114z105z110z116z105z64z112z97z114z97z109z48, 
+	la $a0, Zz64z112z114z105z110z116z105z64z112z97z114z97z109z48
+#		meta_exact, 	lw $a0, 0($a0), , 
+	lw $a0, 0($a0)
+#		meta_exact, 	li $v0, 1, , 
+	li $v0, 1
+#		meta_exact, 	syscall, , 
+	syscall
+#	 Store Registers
+#		return, , , 
+	jr $ra
+#	Block 6	[Zz64z112z114z105z110z116z64z110, Zz64z112z114z105z110z116z105z64z112z97z114z97z109z48]
+#	Zz64z112z114z105z110z116:
+	la $a0, Zz64z112z114z105z110z116z64z110
+	lw $9, 0($a0)
+Zz64z112z114z105z110z116:
+#	 Load Registers
+#		assign, Zz64z112z114z105z110z116z105z64z112z97z114z97z109z48, Zz64z112z114z105z110z116z64z110, 
+	move $8, $9
+#	 Store Registers
+#		call, Zz64z112z114z105z110z116z105, Zz64z112z114z105z110z116z105z64z112z97z114z97z109z48, 
+	la $a0, Zz64z112z114z105z110z116z105z64z112z97z114z97z109z48
+	sw $8, 0($a0)
+	sw $ra, 0($sp)
+	addi $sp, $sp, -4
+	jal Zz64z112z114z105z110z116z105
+	lw $ra, 4($sp)
+	addi $sp, $sp, 4
+#	Block 9	[]
+#	 Load Registers
+#	 Store Registers
+#		return, , , 
+	jr $ra
+#	Block 10	[Zz64z112z114z105z110z116z64z110]
+#	main:
+main:
+#	 Load Registers
+	la $a0, Zz64z112z114z105z110z116z105z64z112z97z114z97z109z48
+	lw $8, 0($a0)
+	la $a0, Zz64z112z114z105z110z116z64z110
+	lw $9, 0($a0)
+#		assign, Zz64z112z114z105z110z116z64z110, 5, 
+	addi $9, $zero, 5
+#	 Store Registers
+#		call, Zz64z112z114z105z110z116, Zz64z112z114z105z110z116z64z110, 
+	la $a0, Zz64z112z114z105z110z116z64z110
+	sw $9, 0($a0)
+	sw $ra, 0($sp)
+	addi $sp, $sp, -4
+	jal Zz64z112z114z105z110z116
+	lw $ra, 4($sp)
+	addi $sp, $sp, 4
+#	Block 13	[]
+#	 Load Registers
+#		meta_exact, 	jr $ra, , 
+	jr $ra
+#	 Store Registers

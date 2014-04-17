@@ -1,8 +1,10 @@
 package SemanticChecking;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 
 import General.Configuration;
 import General.Cons;
@@ -291,6 +293,27 @@ public class SymbolTable {
 	public boolean isFunction(String qualifiedId){
 		return names.containsKey(qualifiedId) && names.get(qualifiedId).function;
 	}
+
+	public List<String> functionParamNames(String qualifiedId){
+		if(isFunction(qualifiedId)){
+			List<String> allNames = new LinkedList<>();
+			for(Cons<List<Type>, List<String>> params : functionParams.get(qualifiedId)){
+				for(String param : params.b){
+					allNames.add(param);
+				}
+			}
+			return allNames;
+		}
+		return null;
+	}
+
+	public Set<String> allFunctionParamNames(){
+		Set<String> allNames = new HashSet<>();
+		for(String function : functionParams.keySet()){
+			allNames.addAll(functionParamNames(function));
+		}
+		return allNames;
+	}
 	
 	public Type getTypeOfId(String scope, String id){
 		if(names.containsKey(id)){
@@ -323,6 +346,7 @@ public class SymbolTable {
 		}
 		return types;
 	}
+	
 	public List<String> matchingParamNames(String scope, String name, List<Type> paramTypes){
 		List<String> names = matchingParamNamesHelper(ScopedName.addScopeToName(
 				Configuration.GLOBAL_SCOPE_NAME, name), paramTypes);

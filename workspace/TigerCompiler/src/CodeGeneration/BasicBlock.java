@@ -39,8 +39,16 @@ class BasicBlock{
 		defined = new HashMap<>();
 	}
 	
-	public static Map<Integer, BasicBlock> parseIR(List<IRInstruction> ir, int beginIndex, SymbolTable table){
+	/**
+	 * 
+	 * @param ir 
+	 * @param beginIndex
+	 * @param table
+	 * @return this second return parameter depends on irinstructions being unchanged 
+	 */
+	public static Cons<Map<Integer, BasicBlock>, Map<IRInstruction, String>> parseIR(List<IRInstruction> ir, int beginIndex, SymbolTable table){
 		Map<Integer, BasicBlock> blocks = new HashMap<>(); 
+		Map<IRInstruction, String> functionMap = new HashMap<>();
 		List<Cons<String, BasicBlock>> enteringBlocks = new LinkedList<>(); // current function 
 		List<Cons<String, BasicBlock>> returningBlocks = new LinkedList<>(); // current function 
 		List<Cons<String, BasicBlock>> breakingBlocks = new LinkedList<>(); // target label
@@ -94,6 +102,7 @@ class BasicBlock{
 					returningBlocks.add(new Cons<>(function, current));
 					blocks.put(current.position, current);
 					current.jump = instruction;
+					functionMap.put(instruction, function);
 				}
 				current = new BasicBlock(i + 1);
 				break;
@@ -130,7 +139,7 @@ class BasicBlock{
 		
 		addVariables(blocks);
 		
-		return blocks;
+		return new Cons<>(blocks, functionMap);
 	}
 
 	private static void addVariables(Map<Integer, BasicBlock> ret){

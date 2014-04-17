@@ -13,9 +13,22 @@ Zz116z54:	 .word 0
 Zz116z53:	 .word 0
 Zz64z112z114z105z110z116z105z64z112z97z114z97z109z48:	 .word 0
 Zz116z55:	 .word 0
+Zz64z99z111z110z99z97z116z64z112z97z114z97z109z48:	 .word 0
+Zz64z101z120z105z116z64z112z97z114z97z109z48:	 .word 0
+Zz64z115z105z122z101z64z112z97z114z97z109z48:	 .word 0
+Zz64z111z114z100z64z112z97z114z97z109z48:	 .word 0
+Zz64z99z111z110z99z97z116z64z112z97z114z97z109z49:	 .word 0
+Zz64z115z117z98z115z116z114z105z110z103z64z112z97z114z97z109z50:	 .word 0
+Zz64z112z114z105z110z116z64z112z97z114z97z109z48:	 .word 0
+Zz64z110z111z116z64z112z97z114z97z109z48:	 .word 0
+Zz64z99z104z114z64z112z97z114z97z109z48:	 .word 0
+Zz64z115z117z98z115z116z114z105z110z103z64z112z97z114z97z109z48:	 .word 0
+Zz64z115z117z98z115z116z114z105z110z103z64z112z97z114z97z109z49:	 .word 0
 	.text
 #	Block 4	[Zz64z112z114z105z110z116z105z64z112z97z114z97z109z48]
 #	Zz64z112z114z105z110z116z105:
+	la $a0, Zz64z112z114z105z110z116z105z64z112z97z114z97z109z48
+	lw $8, 0($a0)
 Zz64z112z114z105z110z116z105:
 #	 Load Registers
 #		meta_exact, 	la $a0, Zz64z112z114z105z110z116z105z64z112z97z114z97z109z48, 
@@ -48,92 +61,94 @@ Zz76z111z111z112z66z101z103z105z110z95z48:
 #		brgeq, Zz64z105, 100, Zz76z111z111z112z69z110z100z95z48
 	addi $a1, $zero, 100
 	bge $8, $a1, Zz76z111z111z112z69z110z100z95z48
-#	Block 14	[Zz116z55, Zz116z52, Zz116z51, Zz116z54, Zz116z53, Zz64z89, Zz64z115z117z109, Zz64z88, Zz116z50, Zz116z49, Zz64z105, Zz116z48]
+#	Block 14	[Zz64z105, Zz116z55, Zz116z52, Zz116z51, Zz64z89, Zz116z54, Zz64z115z117z109, Zz116z53, Zz64z88, Zz116z50, Zz116z49, Zz116z48]
 #	 Load Registers
-	la $a0, Zz116z55
+	la $a0, Zz64z105
 	lw $8, 0($a0)
-	la $a0, Zz116z52
+	la $a0, Zz116z55
 	lw $9, 0($a0)
-	la $a0, Zz116z51
+	la $a0, Zz116z52
 	lw $10, 0($a0)
-	la $a0, Zz116z54
+	la $a0, Zz116z51
 	lw $11, 0($a0)
-	la $a0, Zz116z53
-	lw $12, 0($a0)
 	la $a0, Zz64z89
+	lw $12, 0($a0)
+	la $a0, Zz116z54
 	lw $13, 0($a0)
 	la $a0, Zz64z115z117z109
 	lw $14, 0($a0)
-	la $a0, Zz116z50
-	lw $16, 0($a0)
-	la $a0, Zz64z88
+	la $a0, Zz116z53
 	lw $15, 0($a0)
-	la $a0, Zz116z49
+	la $a0, Zz64z88
+	lw $16, 0($a0)
+	la $a0, Zz116z50
 	lw $17, 0($a0)
-	la $a0, Zz64z105
+	la $a0, Zz116z49
 	lw $18, 0($a0)
 	la $a0, Zz116z48
 	lw $19, 0($a0)
 #		assign, Zz116z51, 0, 
-	addi $10, $zero, 0
+	addi $11, $zero, 0
 #		add, Zz116z51, Zz116z51, Zz116z52
-	add $10, $10, $9
+	add $11, $11, $10
 #		array_load, Zz116z50, Zz64z88, Zz116z51
 	la $a0, Zz64z88
-	mul $10, $10, 4
-	add $a0, $a0, $10
-	lw $16, 0($a0)
-#		assign, Zz116z54, 0, 
-	addi $11, $zero, 0
-#		add, Zz116z54, Zz116z54, Zz116z55
-	add $11, $11, $8
-#		array_load, Zz116z53, Zz64z89, Zz116z54
-	la $a0, Zz64z89
 	mul $11, $11, 4
 	add $a0, $a0, $11
-	lw $12, 0($a0)
+	lw $17, 0($a0)
+#		assign, Zz116z54, 0, 
+	addi $13, $zero, 0
+#		add, Zz116z54, Zz116z54, Zz116z55
+	add $13, $13, $9
+#		array_load, Zz116z53, Zz64z89, Zz116z54
+	la $a0, Zz64z89
+	mul $13, $13, 4
+	add $a0, $a0, $13
+	lw $15, 0($a0)
 #		mult, Zz116z49, Zz116z50, Zz116z53
-	mul $17, $16, $12
+	mul $18, $17, $15
 #		add, Zz116z48, Zz64z115z117z109, Zz116z49
-	add $19, $14, $17
+	add $19, $14, $18
 #		assign, Zz64z115z117z109, Zz116z48, 
 	move $14, $19
 #		add, Zz64z105, Zz64z105, 1
 	addi $a1, $zero, 1
-	add $18, $18, $a1
+	add $8, $8, $a1
 #	 Store Registers
+	la $a0, Zz64z105
+	sw $8, 0($a0)
 	la $a0, Zz116z51
-	sw $10, 0($a0)
-	la $a0, Zz116z54
 	sw $11, 0($a0)
-	la $a0, Zz116z53
-	sw $12, 0($a0)
+	la $a0, Zz116z54
+	sw $13, 0($a0)
 	la $a0, Zz64z115z117z109
 	sw $14, 0($a0)
+	la $a0, Zz116z53
+	sw $15, 0($a0)
 	la $a0, Zz116z50
-	sw $16, 0($a0)
-	la $a0, Zz116z49
 	sw $17, 0($a0)
-	la $a0, Zz64z105
+	la $a0, Zz116z49
 	sw $18, 0($a0)
 	la $a0, Zz116z48
 	sw $19, 0($a0)
 #		goto, Zz76z111z111z112z66z101z103z105z110z95z48, , 
 	b Zz76z111z111z112z66z101z103z105z110z95z48
-#	Block 25	[Zz64z115z117z109, Zz64z112z114z105z110z116z105z64z112z97z114z97z109z48]
+#	Block 25	[Zz64z112z114z105z110z116z105z64z112z97z114z97z109z48, Zz64z115z117z109]
 #	Zz76z111z111z112z69z110z100z95z48:
 Zz76z111z111z112z69z110z100z95z48:
 #	 Load Registers
-	la $a0, Zz64z115z117z109
-	lw $8, 0($a0)
 	la $a0, Zz64z112z114z105z110z116z105z64z112z97z114z97z109z48
+	lw $8, 0($a0)
+	la $a0, Zz64z115z117z109
 	lw $9, 0($a0)
 #		assign, Zz64z112z114z105z110z116z105z64z112z97z114z97z109z48, Zz64z115z117z109, 
-	move $9, $8
+	move $8, $9
 #	 Store Registers
 	la $a0, Zz64z112z114z105z110z116z105z64z112z97z114z97z109z48
-	sw $9, 0($a0)
+	sw $8, 0($a0)
 #		call, Zz64z112z114z105z110z116z105, Zz64z112z114z105z110z116z105z64z112z97z114z97z109z48, 
+	la $a0, Zz64z112z114z105z110z116z105z64z112z97z114z97z109z48
+	sw $8, 0($a0)
 	sw $ra, 0($sp)
 	addi $sp, $sp, -4
 	jal Zz64z112z114z105z110z116z105

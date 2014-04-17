@@ -13,7 +13,7 @@ import General.IRInstruction.EOPERAND;
 import General.IRInstruction.Operand;
 
 class IRRenamer {
-	public static Cons<List<IRInstruction>, Set<String>> rename(List<IRInstruction> ir){
+	public static Cons<List<IRInstruction>, Set<String>> renameIR(List<IRInstruction> ir){
 		List<IRInstruction> ret = new LinkedList<>();
 		Set<String> variables = new HashSet<>();
 		for(IRInstruction instruction : ir){
@@ -69,5 +69,29 @@ class IRRenamer {
 		} else {
 			return rename;
 		}
+	}
+	
+	public static Set<String> rename(Set<String> names){
+		Set<String> renames = new HashSet<>();
+		for(String name : names){
+			renames.add(rename(name));
+		}
+		return renames;
+	}
+	
+	public static List<String> rename(List<String> names){
+		List<String> renames = new LinkedList<>();
+		for(String name : names){
+			renames.add(rename(name));
+		}
+		return renames;
+	}
+	
+	public static List<String> unrename(List<String> renames){
+		List<String> names = new LinkedList<>();
+		for(String rename : renames){
+			names.add(unrename(rename));
+		}
+		return names;
 	}
 }
