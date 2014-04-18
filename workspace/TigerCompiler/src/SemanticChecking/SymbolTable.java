@@ -316,6 +316,14 @@ public class SymbolTable {
 		return allNames;
 	}
 	
+	public Type getTypeOfQualifiedId(String id){
+		if(names.containsKey(id)){
+			return names.get(id).type;
+		} else {
+			return null;
+		}
+	}
+	
 	public Type getTypeOfId(String scope, String id){
 		if(names.containsKey(id)){
 			return names.get(id).type;

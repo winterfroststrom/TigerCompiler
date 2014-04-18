@@ -408,8 +408,10 @@ public class IRGenerator {
 						mult, 
 						exprIndex, 
 						new Operand(EOPERAND.LITERAL, "" + length)));
+				code.add(new IRInstruction(ADD, index, index, mult));
+			} else {
+				code.add(new IRInstruction(ADD, index, index, exprIndex));				
 			}
-			code.add(new IRInstruction(ADD, index, index, mult));
 		}
 		return new Cons<>(index, table.getTypeOfId(scope, id).dereference(numExpr));
 	}
