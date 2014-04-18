@@ -43,6 +43,14 @@ The BasicBlock class has a label instruction, a jump instruction, a list of inst
 While adjacent blocks could use goto's to direct themselves to the next block to enable arbitrary ordering,
 the original order is maintained for simplicity.
 
+Graph coloring is implemented by using liveliness analysis and forward propagating the du-chains based on 
+the calculated liveliness information. 
+Since EBB blocks have only one entry points, this means a simple BFS is enough to extend du-chain analysis for EBBs.
+
+Basic support for functions exists.
+Function parameters are treated as globals, which is not correct, but it is acceptable since function implementation is optional.
+Since the IR always assigns values to the parameter names of functions, this means this basic level of function support was mostly automatic.
+
 ---------------------------------------------------------------------------------
 RUNNING
 ---------------------------------------------------------------------------------
