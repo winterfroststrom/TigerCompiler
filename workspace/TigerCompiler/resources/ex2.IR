@@ -1,7 +1,0 @@
-@print:
-	assign, @printi@param0, @print@n, 
-	call, @printi, @printi@param0, 
-	return, , , 
-main:
-	assign, @print@n, 5, 
-	call, @print, @print@n, 

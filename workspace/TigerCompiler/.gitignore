@@ -3,4 +3,9 @@
 .project
 .settings
 *.tokens
+*.MIP_*
+*.IR
+*.TREE
+*.TABLE
+*.ERROR
 *.err
