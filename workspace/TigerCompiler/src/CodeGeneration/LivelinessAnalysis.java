@@ -66,15 +66,16 @@ public class LivelinessAnalysis {
 		
 		int registerNum = duChainAnalysis(bb, instructions, virtualRegisterMap);
 		
-		Map<Integer, List<Integer>> graph = createInterferenceGraph(
+		Map<Integer, Set<Integer>> graph = createInterferenceGraph(
 				instructions, virtualRegisterMap, registerNum);
+
+
 		
 		Map<Integer, String> virtualRegisterColoring = 
 				GraphColor.graphColor(Configuration.TEMP_REGISTERS, graph);
 		
 		Map<IRInstruction, Map<Operand, String>> registerMap = createRegisterMap(
 				instructions, virtualRegisterMap, virtualRegisterColoring);
-		
 		return registerMap;
 	}
 
@@ -137,30 +138,38 @@ public class LivelinessAnalysis {
 	}
 
 
-	private static Map<Integer, List<Integer>> createInterferenceGraph(
+	private static Map<Integer, Set<Integer>> createInterferenceGraph(
 			List<IRInstruction> instructions,
 			Map<IRInstruction, Map<Operand, Integer>> virtualRegisterMap,
 			int registerNum) {
-		Map<Integer, List<Integer>> graph = new HashMap<>();
+		Map<Integer, Set<Integer>> graph = new HashMap<>();
 		for(int i = 0; i < registerNum; i++){
-			graph.put(i, new LinkedList<Integer>());
+			graph.put(i, new HashSet<Integer>());
 		}
 		
 		for(IRInstruction instruction : instructions){
-			List<Integer> conflictingRegisters = new ArrayList<>();
-			Map<Operand, Integer> virtualMap = virtualRegisterMap.get(instruction);
-			for(Operand op : instruction.params){
-				conflictingRegisters.add(virtualMap.get(op));
-			}
-			for(int i = 0; i < conflictingRegisters.size();i++){
-				for(int j = 0; j < conflictingRegisters.size();j++){
-					if(i != j){
-						graph.get(i).add(j);
-					}
-				}	
-			}
+			addConflictsToGraph(virtualRegisterMap, graph, instruction);
 		}
+		addConflictsToGraph(virtualRegisterMap, graph, null);
 		return graph;
+	}
+
+
+	private static void addConflictsToGraph(
+			Map<IRInstruction, Map<Operand, Integer>> virtualRegisterMap,
+			Map<Integer, Set<Integer>> graph, IRInstruction instruction) {
+		Map<Operand, Integer> virtualMap = virtualRegisterMap.get(instruction);
+		List<Integer> conflictingRegisters = new ArrayList<>();
+		for(Integer i : virtualMap.values()){
+			conflictingRegisters.add(i);
+		}
+		for(int i1 = 0; i1 < conflictingRegisters.size();i1++){
+			for(int j = 0; j < conflictingRegisters.size();j++){
+				if(i1 != j){
+					graph.get(conflictingRegisters.get(i1)).add(conflictingRegisters.get(j));
+				}
+			}	
+		}
 	}
 
 
@@ -185,8 +194,10 @@ public class LivelinessAnalysis {
 			IRInstruction instruction) {
 		Map<Operand, Integer> virtualMap = virtualRegisterMap.get(instruction);
 		for(Operand op : virtualMap.keySet()){
-			String color = virtualRegisterColoring.get(virtualMap.get(op));
-			registerMap.get(instruction).put(op, color);	
+			Integer virtualRegister = virtualMap.get(op);
+			if(virtualRegisterColoring.containsKey(virtualRegister)){
+				registerMap.get(instruction).put(op, virtualRegisterColoring.get(virtualRegister));	
+			}	
 		}
 	}
 

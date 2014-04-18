@@ -5,6 +5,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
+import General.Configuration;
 import General.Cons;
 import General.EIROPCODE;
 import General.IRInstruction;
@@ -25,7 +26,9 @@ public class MipsGenerator {
 		instructions.add(new IRInstruction(EIROPCODE.META_EXACT, new Operand(EOPERAND.LITERAL, "\tjr $ra")));
 		
 		List<String> output = new LinkedList<>();
-		output.add("#\tBEGIN CODE GEN");
+		if(Configuration.MIPS_COMMENTS){
+			output.add("#\tBEGIN CODE GEN");
+		}
 		
 		int instructionIndex = handleAssignment(instructions, output, renamed.b, table);
 		switch(generator){

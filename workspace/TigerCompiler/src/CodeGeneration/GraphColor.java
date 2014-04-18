@@ -9,7 +9,7 @@ import java.util.Map;
 import java.util.Set;
 
 class GraphColor {
-	public static <T> Map<T, String> graphColor(ArrayList<String> colors, Map<T, List<T>> graph){
+	public static <T> Map<T, String> graphColor(ArrayList<String> colors, Map<T, Set<T>> graph){
 		Map<T, String> coloring = new HashMap<T, String>();
 		Set<T> spilled = new HashSet<>();
 		List<T> stack = new LinkedList<T>();
@@ -75,9 +75,9 @@ class GraphColor {
 		ArrayList<String> colors = new ArrayList<>();
 		colors.add("$t1");
 		colors.add("$t2");
-		Map<Integer, List<Integer>> graph = new HashMap<>();
-		List<Integer> list;
-		list = new LinkedList<>();
+		Map<Integer, Set<Integer>> graph = new HashMap<>();
+		Set<Integer> list;
+		list = new HashSet<>();
 		list.add(1);
 		list.add(3);
 		list.add(5);
@@ -86,7 +86,7 @@ class GraphColor {
 		graph.put(2, list);
 		graph.put(4, list);
 		graph.put(6, list);
-		list = new LinkedList<>();
+		list = new HashSet<>();
 		list.add(0);
 		list.add(2);
 		list.add(4);

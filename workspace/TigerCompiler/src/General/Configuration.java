@@ -13,13 +13,13 @@ public class Configuration {
 	public static final boolean PRINT_TABLE = RELEASE || false;
 	public static final boolean PRINT_IR = RELEASE || false;
 	public static final boolean PRINT_MIPS_NAIVE = RELEASE || false;
-	public static final boolean PRINT_MIPS_BB = RELEASE || false;
-	public static final boolean PRINT_MIPS_EBB = RELEASE || true;
+	public static final boolean PRINT_MIPS_BB = RELEASE || true;
+	public static final boolean PRINT_MIPS_EBB = RELEASE || false;
 	
-	public static final boolean MIPS_COMMENTS = !RELEASE && false; 
+	public static final boolean MIPS_COMMENTS = !RELEASE && true; 
 	public static final boolean MIPS_VALID_LABELS = RELEASE || false;
 	public static final boolean LOAD_EXTENDED_LIBRARY = RELEASE || false;
-	public final static ArrayList<String> TEMP_REGISTERS = (RELEASE || true) ? 
+	public final static ArrayList<String> TEMP_REGISTERS = (RELEASE || false) ? 
 			Utilities.toAL("$8", "$9", "$10", "$11", "$12", "$13", 
 							"$14", "$15", "$16", "$17", "$18", "$19", 
 							"$20", "$21", "$22", "$23", "$24", "$25") : 

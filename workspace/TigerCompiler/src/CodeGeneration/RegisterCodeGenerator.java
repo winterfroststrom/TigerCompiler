@@ -31,7 +31,9 @@ class RegisterCodeGenerator {
 	
 	public void generate(IRInstruction instruction) {
 		registerMap = instructionRegisterMap.get(instruction);
-		output.add("#\t" + instruction);
+		if(Configuration.MIPS_COMMENTS){
+			output.add("#\t" + instruction);
+		}
 		switch (instruction.opcode) {
 		case LABEL:
 			String label = IRRenamer.unrename(instruction.param(0).value);
@@ -382,7 +384,6 @@ class RegisterCodeGenerator {
 			Map<IRInstruction,Map<Operand, String>> instructionRegisterMap, 
 			List<String> output, SymbolTable table, Map<IRInstruction, String> functionMap, 
 			Collection<Operand> load, Collection<Operand> save){
-
 		RegisterCodeGenerator rcg = new RegisterCodeGenerator(instructionRegisterMap, output, table, functionMap);
 		if(Configuration.MIPS_COMMENTS){
 			output.add("#\tBlock " + bb.position + "\t" + bb.getVariables());

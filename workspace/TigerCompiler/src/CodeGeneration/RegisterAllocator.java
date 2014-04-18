@@ -15,11 +15,7 @@ import SemanticChecking.SymbolTable;
 class RegisterAllocator {
 	public static Map<IRInstruction, Map<Operand, String>> allocate(BasicBlock bb, List<String> output,
 			SymbolTable table, Map<IRInstruction, String> functionMap) {
-		if (bb.getVariables().size() < Configuration.TEMP_REGISTERS.size()) {
-			return registerAssignment(bb.getVariables(), bb.allInstructions());
-		} else {
-			return  LivelinessAnalysis.analyze(bb);
-		}
+		return  LivelinessAnalysis.analyze(bb);
 	}
 	
 	public static Map<IRInstruction, Map<Operand, String>> allocate(BasicBlock bb, List<String> output,

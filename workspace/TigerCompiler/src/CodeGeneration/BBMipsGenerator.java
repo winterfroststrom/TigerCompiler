@@ -26,7 +26,7 @@ class BBMipsGenerator {
 			Map<IRInstruction, Map<Operand, String>> registerMap = 
 					RegisterAllocator.allocate(bb, output, table, functionMap);
 			RegisterCodeGenerator.generateBasicBlock(bb, registerMap, output, table, functionMap, 
-					bb.in, bb.out);
+					bb.getUsed(), bb.getDefined());
 		}
 		return output;
 	}
