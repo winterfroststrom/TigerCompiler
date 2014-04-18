@@ -1,6 +1,7 @@
 package General;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 public class IRInstruction {
@@ -76,5 +77,91 @@ public class IRInstruction {
 			}
 			return ret; 
 		}
+	}
+	public List<Operand> getUsed(){
+		List<Operand> used = new LinkedList<>();
+		switch(opcode){
+		case ASSIGN:
+		case ADD:
+		case SUB:
+		case MULT:
+		case DIV:
+		case AND:
+		case OR:
+		case CALLR:
+		case ARRAY_LOAD:
+			for(int i = 1; i < params.size();i++){
+				Operand op = param(i);
+				if(op.type.equals(EOPERAND.VARIABLE) 
+						|| op.type.equals(EOPERAND.REGISTER)){
+					used.add(op);
+				}
+			}
+			break;
+		case BREQ:
+		case BRNEQ:
+		case BRLT:
+		case BRGT:
+		case BRGEQ:
+		case BRLEQ:
+		case CALL:
+		case ARRAY_STORE:
+			for(int i = 0; i < params.size();i++){
+				Operand op = param(i);
+				if(op.type.equals(EOPERAND.VARIABLE) 
+						|| op.type.equals(EOPERAND.REGISTER)){
+					used.add(op);
+				}
+			}
+			break;
+		case RETURN:
+			if(params.size() > 0){
+				Operand op = param(0);
+				if(op.type.equals(EOPERAND.VARIABLE) 
+						|| op.type.equals(EOPERAND.REGISTER)){
+					used.add(op);
+				}
+			}
+		case GOTO:
+		case META_EXACT:
+		case LABEL:
+			break;
+		}
+		return used;
+	}
+	
+	public List<Operand> getDefined(){
+		List<Operand> defined = new LinkedList<>();
+		switch(opcode){
+		case ASSIGN:
+		case ADD:
+		case SUB:
+		case MULT:
+		case DIV:
+		case AND:
+		case OR:
+		case CALLR:
+		case ARRAY_LOAD:
+			Operand op = param(0);
+			if(op.type.equals(EOPERAND.VARIABLE) 
+					|| op.type.equals(EOPERAND.REGISTER)){
+				defined.add(op);
+			}
+			return defined;
+		case BREQ:
+		case BRNEQ:
+		case BRLT:
+		case BRGT:
+		case BRGEQ:
+		case BRLEQ:
+		case CALL:
+		case ARRAY_STORE:
+		case RETURN:
+		case GOTO:
+		case META_EXACT:
+		case LABEL:
+			break;
+		}
+		return defined;
 	}
 }
