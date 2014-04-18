@@ -75,7 +75,8 @@ private List<String> output;
 				break;
 			case CALLR:
 				handleCall(instruction.param(0).value);
-				if(table.getTypeOfId("", instruction.param(1).value).isArray()){
+				String functionName = IRRenamer.unrename(instruction.param(1).value);
+				if(table.getTypeOfQualifiedId(functionName).isArray()){
 					// TODO: implement array returns
 					throw new UnsupportedOperationException();
 				} else {

@@ -24,9 +24,11 @@ class BasicBlock{
 	List<Integer> successors;
 	IRInstruction label;
 	IRInstruction jump;
+	Set<Operand> in;
+	Set<Operand> out;
 	private Set<Operand> variables;
-	private Map<Operand, Set<Integer>> used;
-	private Map<Operand, Set<Integer>> defined;
+	private Set<Operand> used;
+	private Set<Operand> defined;
 
 	
 	public BasicBlock(int position){
@@ -35,8 +37,10 @@ class BasicBlock{
 		successors = new LinkedList<>();
 		predecessors = new LinkedList<>();
 		variables = new HashSet<>();
-		used = new HashMap<>();
-		defined = new HashMap<>();
+		in = new HashSet<>();
+		out = new HashSet<>();
+		used = new HashSet<>();
+		defined = new HashSet<>();
 	}
 	
 	/**
@@ -138,7 +142,7 @@ class BasicBlock{
 		addPredecessors(blocks);
 		
 		addVariables(blocks);
-		
+		LivelinessAnalysis.computeInOut(blocks);
 		return new Cons<>(blocks, functionMap);
 	}
 
@@ -164,42 +168,13 @@ class BasicBlock{
 	
 	
 	private static void classifyIRInstructionOperands(IRInstruction instruction, BasicBlock bb, int position){
-		switch(instruction.opcode){
-		case ASSIGN:
-		case ADD:
-		case SUB:
-		case MULT:
-		case DIV:
-		case AND:
-		case OR:
-		case CALLR:
-		case ARRAY_LOAD:
-			tryAddTo(bb.defined, instruction.param(0), position);
-			for(int i = 1; i < instruction.params.size();i++){
-				tryAddTo(bb.used, instruction.param(i), position);	
+		for(Operand op : instruction.getUsed()){
+			if(!bb.defined.contains(op)){
+				bb.used.add(op);
 			}
-			break;
-		case BREQ:
-		case BRNEQ:
-		case BRLT:
-		case BRGT:
-		case BRGEQ:
-		case BRLEQ:
-		case CALL:
-		case ARRAY_STORE:
-			for(int i = 0; i < instruction.params.size();i++){
-				tryAddTo(bb.used, instruction.param(i), position);	
-			}
-			break;
-		case RETURN:
-			if(instruction.params.size() > 0){
-				tryAddTo(bb.used, instruction.param(0), position);					
-			}
-		case GOTO:
-			break;
-		case META_EXACT:
-		case LABEL:
-			break;
+		}
+		for(Operand op : instruction.getDefined()){
+			bb.defined.add(op);
 		}
 		for(int i = 0; i < instruction.params.size();i++){
 			tryAddTo(bb.variables, instruction.param(i));
@@ -210,16 +185,6 @@ class BasicBlock{
 		if(op.type.equals(EOPERAND.VARIABLE) 
 				|| op.type.equals(EOPERAND.REGISTER)){
 			variables.add(op);
-		}
-	}
-	
-	private static void tryAddTo(Map<Operand, Set<Integer>> map, Operand op, int position) {
-		if(op.type.equals(EOPERAND.VARIABLE) 
-				|| op.type.equals(EOPERAND.REGISTER)){
-			if(!map.containsKey(op)){
-				map.put(op, new HashSet<Integer>());
-			}
-			map.get(op).add(position);
 		}
 	}
 	
@@ -251,16 +216,30 @@ class BasicBlock{
 		}
 	}
 	
-	public Map<Operand, Set<Integer>> getUsed(){
+	public Set<Operand> getUsed(){
 		return used;
 	}
 	
-	public Map<Operand, Set<Integer>> getDefined(){
+	public Set<Operand> getDefined(){
 		return defined;
 	}
 	
 	public Set<Operand> getVariables(){
 		return variables;
+	}
+	
+	public List<IRInstruction> allInstructions(){
+		List<IRInstruction> ret = new ArrayList<>();
+		if(label != null){
+			ret.add(label);
+		}
+		for(IRInstruction ins : instructions){
+			ret.add(ins);
+		}
+		if(jump != null){
+			ret.add(jump);
+		}
+		return ret;
 	}
 		
 	public static List<BasicBlock> order(Map<Integer, BasicBlock> blocks){
@@ -287,6 +266,8 @@ class BasicBlock{
 	@Override
 	public String toString(){
 		String out = predecessors + " to " + position + " to " + successors + "\n";
+		out += "IN:\t" + in + "\n";
+		out += "OUT:\t" + this.out + "\n";
 		out += "DEFINED:\t" + defined + "\n";
 		out += "USED:\t" + used + "\n";
 		out += "LABEL:\t" + label + "\n";
@@ -295,5 +276,15 @@ class BasicBlock{
 		}
 		out += "JUMP: " + jump + "\n";
 		return out;
+	}
+
+	public IRInstruction lastInstruction() {
+		if(jump != null){
+			return jump;
+		} else if(instructions.size() > 0){
+			return instructions.get(instructions.size() - 1);
+		} else {
+			return label;
+		}
 	}
 }

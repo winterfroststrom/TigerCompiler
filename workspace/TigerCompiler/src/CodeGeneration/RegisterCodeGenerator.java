@@ -4,6 +4,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
+import General.Configuration;
 import General.IRInstruction;
 import General.IRInstruction.EOPERAND;
 import General.IRInstruction.Operand;
@@ -14,20 +15,22 @@ class RegisterCodeGenerator {
 	private static final String STORE_SPILL_VALUE_REGISTER = "$a2";
 	private static final String STORE_SPILL_ADDRESS_REGISTER = "$a3";
 	
-	private Map<Operand, String> registerMap;
+	private Map<IRInstruction, Map<Operand, String>> instructionRegisterMap;
 	private List<String> output;
 	private SymbolTable table;
 	private Map<IRInstruction, String> functionMap;
+	private Map<Operand, String> registerMap;
 	
-	public RegisterCodeGenerator(Map<Operand, String> registerMap, List<String> output, 
-			SymbolTable table, Map<IRInstruction, String> functionMap){
-		this.registerMap = registerMap;
+	public RegisterCodeGenerator(Map<IRInstruction, Map<Operand, String>> instructionRegisterMap, 
+			List<String> output, SymbolTable table, Map<IRInstruction, String> functionMap){
+		this.instructionRegisterMap = instructionRegisterMap;
 		this.output = output;
 		this.table = table;
 		this.functionMap = functionMap;
 	}
 	
 	public void generate(IRInstruction instruction) {
+		registerMap = instructionRegisterMap.get(instruction);
 		output.add("#\t" + instruction);
 		switch (instruction.opcode) {
 		case LABEL:
@@ -111,7 +114,8 @@ class RegisterCodeGenerator {
 				storeToLabel(instruction.param(i));
 			}
 			handleCall(instruction.param(1).value);
-			if (table.getTypeOfId("", instruction.param(1).value).isArray()) {
+			String functionName = IRRenamer.unrename(instruction.param(1).value);
+			if(table.getTypeOfQualifiedId(functionName).isArray()){
 				// TODO: implement array returns
 				throw new UnsupportedOperationException();
 			} else {
@@ -132,6 +136,7 @@ class RegisterCodeGenerator {
 			output.add(out);
 			break;
 		}
+		registerMap = null;
 	}
 
 	private void handleArrayStore(IRInstruction instruction) {
@@ -238,8 +243,7 @@ class RegisterCodeGenerator {
 	}
 
 	private void handleAssign(IRInstruction instruction) {
-		storeIntoRegisterMapGeneral(instruction.param(0), instruction.param(1),
-				output, registerMap);
+		storeIntoRegisterMapGeneral(instruction.param(0), instruction.param(1));
 	}
 
 	public String loadFromRegisterMap(Operand op, String spill) {
@@ -252,8 +256,7 @@ class RegisterCodeGenerator {
 		}
 	}
 
-	private void storeIntoRegisterMapGeneral(Operand destination,
-			Operand value, List<String> output, Map<Operand, String> registerMap) {
+	private void storeIntoRegisterMapGeneral(Operand destination, Operand value) {
 		if (registerMap.containsKey(destination)) {
 			String desintationRegister = registerMap.get(destination);
 			switch (value.type) {
@@ -346,6 +349,13 @@ class RegisterCodeGenerator {
 		}
 	}
 	
+	public void storeToLabel(Operand op){
+		if(registerMap.containsKey(op)){
+			output.add("\tla $a0, " + op.value);
+			output.add("\tsw " + registerMap.get(op) + ", 0($a0)");
+		}
+	}
+	
 	private void functionLoadFromLabel(String string) {
 		Operand op = new Operand(EOPERAND.VARIABLE, string);
 		if(registerMap.containsKey(op)){
@@ -354,12 +364,7 @@ class RegisterCodeGenerator {
 		}
 	}
 	
-	public void storeToLabel(Operand op){
-		if(registerMap.containsKey(op)){
-			output.add("\tla $a0, " + op.value);
-			output.add("\tsw " + registerMap.get(op) + ", 0($a0)");
-		}
-	}	
+		
 	
 	private void storeFromLabelToStack(Operand label){
 		output.add("\tla $a0, " + label.value);
@@ -373,23 +378,43 @@ class RegisterCodeGenerator {
 		output.add("\tsw $a1, 0($a0)");		
 	}
 	
-	public static void generateBasicBlock(BasicBlock bb, Map<Operand, String> registerMap, 
+	public static void generateBasicBlock(BasicBlock bb, 
+			Map<IRInstruction,Map<Operand, String>> instructionRegisterMap, 
 			List<String> output, SymbolTable table, Map<IRInstruction, String> functionMap, 
 			Collection<Operand> load, Collection<Operand> save){
-		RegisterCodeGenerator rcg = new RegisterCodeGenerator(registerMap, output, table, functionMap);
+
+		RegisterCodeGenerator rcg = new RegisterCodeGenerator(instructionRegisterMap, output, table, functionMap);
+		if(Configuration.MIPS_COMMENTS){
+			output.add("#\tBlock " + bb.position + "\t" + bb.getVariables());
+			output.add("#\t\tIN :" + bb.in);
+			output.add("#\t\tOUT :" + bb.out);
+		}
 		if (bb.label != null) {
 			rcg.generate(bb.label);
 		}
-		output.add("#\t Load Registers");
-		for (Operand used : load) {
-			rcg.loadFromLabel(used);
+		if(Configuration.MIPS_COMMENTS){
+			output.add("#\t Load Registers ");
+		}
+		for (Operand op : load) {
+			Map<Operand, String> registerMap = rcg.instructionRegisterMap.get(null);
+			if(registerMap.containsKey(op)){
+				rcg.output.add("\tla $a0, " + op.value);
+				rcg.output.add("\tlw " + registerMap.get(op) + ", 0($a0)");
+			}
 		}
 		for (IRInstruction instruction : bb.instructions) {
 			rcg.generate(instruction);
 		}
-		output.add("#\t Store Registers");
+		if(Configuration.MIPS_COMMENTS){
+			output.add("#\t Store Registers ");
+		}
 		for (Operand op : save) {
-			rcg.storeToLabel(op);
+			Map<Operand, String> registerMap = rcg.instructionRegisterMap.get(bb.lastInstruction());
+			if(registerMap.containsKey(op)){
+				//System.out.println("-------------------------------");
+				rcg.output.add("\tla $a0, " + op.value);
+				rcg.output.add("\tsw " + registerMap.get(op) + ", 0($a0)");
+			}
 		}
 		if (bb.jump != null) {
 			rcg.generate(bb.jump);

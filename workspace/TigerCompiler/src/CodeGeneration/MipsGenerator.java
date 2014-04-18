@@ -10,21 +10,15 @@ import General.EIROPCODE;
 import General.IRInstruction;
 import General.IRInstruction.EOPERAND;
 import General.IRInstruction.Operand;
-import General.Utilities;
 import SemanticChecking.SymbolTable;
 
 public class MipsGenerator {
-	final static List<String> TEMP_REGISTERS = 
-			Utilities.toAL("$8", "$9", "$10", "$11", "$12",
-							"$13", "$14", "$15", "$16", "$17",
-							"$18", "$19", "$20", "$21", "$22", 
-							"$23", "$24", "$25");
 	public enum EGENERATOR{
 		NAIVE, BB, EBB
 	}
 	public List<String> generate(EGENERATOR generator, List<IRInstruction> instructions, SymbolTable table){
 		instructions = copy(instructions); 
-		MipsFunctionImplementations.implementPrinti(instructions);
+		MipsFunctionImplementations.implementLibrary(instructions);
 		Cons<List<IRInstruction>, Set<String>> renamed = IRRenamer.renameIR(instructions);
 		instructions = renamed.a;
 		

@@ -7,14 +7,15 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import General.IRInstruction;
 import General.IRInstruction.Operand;
 
 class ExtendedBasicBlock{
 	BasicBlock root;
 	Set<BasicBlock> blocks;
 	Set<BasicBlock> exits;	
-	private Map<Operand, Set<Integer>> used;
-	private Map<Operand, Set<Integer>> defined;
+	private Set<Operand> in;
+	private Set<Operand> out;
 	private Set<BasicBlock> allBlocks;
 	private Set<Operand> variables;
 	
@@ -25,29 +26,26 @@ class ExtendedBasicBlock{
 	}
 	
 	public void realize(){
-		used = new HashMap<>();
-		for(Operand key : root.getUsed().keySet()){
-			used.put(key, root.getUsed().get(key));
+		//only need root since there is only one entry point
+		in = new HashSet<>(); 
+		for(Operand op : root.in){
+			in.add(op);
 		}
-		for(BasicBlock block : blocks){
-			for(Operand key : block.getUsed().keySet()){
-				used.put(key, block.getUsed().get(key));
+		
+		out = new HashSet<>();
+		//  should only need to care about outs of exits because otherwise registers are still passing
+		for(BasicBlock block : exits){
+			for(Operand op : block.out){
+				out.add(op);
 			}
 		}
-		defined = new HashMap<>();
-		for(Operand key : root.getDefined().keySet()){
-			defined.put(key, root.getDefined().get(key));
-		}
-		for(BasicBlock block : blocks){
-			for(Operand key : block.getDefined().keySet()){
-				defined.put(key, block.getDefined().get(key));
-			}
-		}
+
 		allBlocks = new HashSet<>();
 		allBlocks.add(root);
 		for(BasicBlock bb : blocks){
 			allBlocks.add(bb);
 		}
+		
 		variables = new HashSet<>();
 		variables.addAll(root.getVariables());
 		for(BasicBlock bb : blocks){
@@ -55,12 +53,12 @@ class ExtendedBasicBlock{
 		}
 	}
 	
-	public Map<Operand, Set<Integer>> getUsed(){
-		return used;
+	public Set<Operand> getIn(){
+		return in;
 	}
 	
-	public Map<Operand, Set<Integer>> getDefined(){
-		return defined;
+	public Set<Operand> getOut(){
+		return out;
 	}
 	
 	public Set<BasicBlock> allBlocks(){
@@ -69,6 +67,16 @@ class ExtendedBasicBlock{
 	
 	public Set<Operand> getVariables(){
 		return variables;
+	}
+	
+	public List<IRInstruction> allInstructions(){
+		List<IRInstruction> all = new LinkedList<>();
+		for(BasicBlock block : allBlocks()){
+			for(IRInstruction instruction : block.allInstructions()){
+				all.add(instruction);
+			}
+		}
+		return all;
 	}
 	
 	@Override
@@ -83,8 +91,8 @@ class ExtendedBasicBlock{
 		}
 		String out = "ExtendedBasicBlock: " + root.position + " and " + positions 
 				+ " exiting on " + exitPositions + "\n";
-		out += "DEFINED:\t" + defined + "\n";
-		out += "USED:\t" + used + "\n";
+		out += "IN:\t" + in + "\n";
+		out += "OUT:\t" + out + "\n";
 		out += "ROOT:\n" + root + "\n";
 		for(BasicBlock block : blocks){
 			out += block;

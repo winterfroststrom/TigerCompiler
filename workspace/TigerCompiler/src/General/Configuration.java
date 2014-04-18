@@ -1,5 +1,8 @@
 package General;
 
+import java.util.ArrayList;
+import java.util.List;
+
 
 public class Configuration {
 	public static final boolean RELEASE = true;
@@ -13,13 +16,20 @@ public class Configuration {
 	public static final boolean PRINT_MIPS_BB = RELEASE || false;
 	public static final boolean PRINT_MIPS_EBB = RELEASE || true;
 	
+	public static final boolean MIPS_COMMENTS = !RELEASE && false; 
 	public static final boolean MIPS_VALID_LABELS = RELEASE || false;
+	public static final boolean LOAD_EXTENDED_LIBRARY = RELEASE || false;
+	public final static ArrayList<String> TEMP_REGISTERS = (RELEASE || true) ? 
+			Utilities.toAL("$8", "$9", "$10", "$11", "$12", "$13", 
+							"$14", "$15", "$16", "$17", "$18", "$19", 
+							"$20", "$21", "$22", "$23", "$24", "$25") : 
+			Utilities.toAL("$8", "$9", "$10", "$11", "$12");
 	
 	public static final boolean LL1PARSER_DEBUGGING = !RELEASE && false;
 	public static final boolean LL1PARSER_DEBUGGING_VERBOSE = !RELEASE && false;
 
 //	public static final String FORCED_LOAD_FILE = RELEASE ? null : "resources/ex1.tiger";
-	public static final String FORCED_LOAD_FILE = "resources/ex2.tiger";
+	public static final String FORCED_LOAD_FILE = "resources/ex1.tiger";
 	
 	public static final String TIGER_FILE_TYPE = ".tiger";
 	

@@ -18,11 +18,10 @@ class BBtoEBB {
 			}
 		}
 		bfs(blocks, ebbs, roots);
+		addExits(blocks, ebbs);
 		for(ExtendedBasicBlock ebb : ebbs){
 			ebb.realize();
-		}
-		addExits(blocks, ebbs);
-		return toMap(ebbs);
+		}return toMap(ebbs);
 	}
 
 	private static Map<BasicBlock, ExtendedBasicBlock> toMap(
@@ -39,10 +38,15 @@ class BBtoEBB {
 	private static void addExits(Map<Integer, BasicBlock> blocks,
 			List<ExtendedBasicBlock> ebbs) {
 		for(ExtendedBasicBlock ebb : ebbs){
-			for(BasicBlock block : ebb.allBlocks()){
+			Set<BasicBlock> allBlocks = new HashSet<>();
+			allBlocks.add(ebb.root);
+			for(BasicBlock bb : ebb.blocks){
+				allBlocks.add(bb);
+			}
+			for(BasicBlock block : allBlocks){
 				for(int successorIndex : block.successors){
 					BasicBlock successor = blocks.get(successorIndex);
-					if(!(successor.equals(ebb.root) || ebb.blocks.contains(successor))){
+					if(!ebb.blocks.contains(successor)){
 						ebb.exits.add(block);
 					}
 				}	
