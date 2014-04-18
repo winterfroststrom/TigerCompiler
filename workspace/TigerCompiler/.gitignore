@@ -3,7 +3,8 @@
 .project
 .settings
 *.tokens
-*.MIP_*
+*.TOKENS
+*.MIPS_*
 *.IR
 *.TREE
 *.TABLE
