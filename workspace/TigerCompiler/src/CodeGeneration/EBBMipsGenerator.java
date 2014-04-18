@@ -28,13 +28,19 @@ class EBBMipsGenerator {
 		
 		Map<BasicBlock, ExtendedBasicBlock> ebbMap = BBtoEBB.convert(blocks);
 		Set<Integer> ebbRootPositions = new HashSet<>();
+		Set<ExtendedBasicBlock> ebbs = new HashSet<>();
+		
 		for(ExtendedBasicBlock ebb : ebbMap.values()){
 			ebbRootPositions.add(ebb.root.position);
+			ebbs.add(ebb);
 		}
+		Map<BasicBlock, Map<IRInstruction, Map<Operand, String>>> registerMapMap = 
+				RegisterAllocator.allocateEBB(ebbs);
+		
 		for (BasicBlock bb : BasicBlock.order(blocks)) {
 			ExtendedBasicBlock ebb = ebbMap.get(bb);
 			Map<IRInstruction, Map<Operand, String>> registerMap = 
-					RegisterAllocator.allocate(bb, output, table, functionMap, ebb, ebbRootPositions);
+					registerMapMap.get(bb);
 			Collection<Operand> load = new LinkedList<>();
 			if(ebb.root.equals(bb)){
 				load = ebb.getIn();

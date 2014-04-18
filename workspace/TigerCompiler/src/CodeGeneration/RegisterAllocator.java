@@ -13,19 +13,16 @@ import General.IRInstruction.Operand;
 import SemanticChecking.SymbolTable;
 
 class RegisterAllocator {
-	public static Map<IRInstruction, Map<Operand, String>> allocate(BasicBlock bb, List<String> output,
-			SymbolTable table, Map<IRInstruction, String> functionMap) {
-		return  LivelinessAnalysis.analyze(bb);
+	public static Map<IRInstruction, Map<Operand, String>> allocate(BasicBlock bb) {
+		return LivelinessAnalysis.analyze(bb);
 	}
 	
-	public static Map<IRInstruction, Map<Operand, String>> allocate(BasicBlock bb, List<String> output,
-			SymbolTable table, Map<IRInstruction, String> functionMap, 
-			ExtendedBasicBlock ebb, Set<Integer> ebbPositions) {
-		if (ebb.getVariables().size() < Configuration.TEMP_REGISTERS.size()) {
-			return registerAssignment(ebb.getVariables(), ebb.allInstructions());
-		} else {
-			return emptyAssignment(ebb.allInstructions());
-		}
+	public static Map<IRInstruction, Map<Operand, String>> allocate(ExtendedBasicBlock ebb) {
+		return LivelinessAnalysis.analyze(ebb);
+	}
+	
+	private static boolean canAssign(Set<Operand> variables){
+		return variables.size() < Configuration.TEMP_REGISTERS.size();
 	}
 	
 	private static Map<IRInstruction, Map<Operand, String>> registerAssignment(Set<Operand> variables, 
@@ -52,5 +49,27 @@ class RegisterAllocator {
 		}
 		registerMap.put(null, registerMapAtInstruction);
 		return registerMap;
+	}
+
+	public static Map<BasicBlock, Map<IRInstruction, Map<Operand, String>>> allocateEBB(
+			Collection<ExtendedBasicBlock> ebbs) {
+		Map<BasicBlock, Map<IRInstruction, Map<Operand, String>>> registerMapMap = new HashMap<>();
+		for(ExtendedBasicBlock ebb : ebbs){
+			Map<IRInstruction, Map<Operand, String>> registerMap = allocate(ebb);
+			for(BasicBlock bb : ebb.allBlocks()){
+				registerMapMap.put(bb, registerMap);
+			}
+		}
+		
+		return registerMapMap;
+	}
+	
+	public static Map<BasicBlock, Map<IRInstruction, Map<Operand, String>>> allocateBB(
+			Collection<BasicBlock> blocks) {
+		Map<BasicBlock, Map<IRInstruction, Map<Operand, String>>> registerMapMap = new HashMap<>();
+		for(BasicBlock bb : blocks){
+			registerMapMap.put(bb, allocate(bb));
+		}
+		return registerMapMap;
 	}
 }

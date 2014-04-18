@@ -54,22 +54,44 @@ public class LivelinessAnalysis {
 			}
 		} while(changed);
 	}
+	public static Map<IRInstruction, Map<Operand, String>> analyze(ExtendedBasicBlock ebb){
+		List<IRInstruction> instructions = ebb.allInstructions();
+		Map<IRInstruction, Map<Operand, Integer>> virtualRegisterMap = 
+				initializeVirtualRegisterMap(instructions);
 		
+		int registerNum = reverseDuChainAnalysis(ebb, instructions, virtualRegisterMap);
+		
+		Map<IRInstruction, Map<Operand, String>> registerMap = colorRegisters(
+				instructions, virtualRegisterMap, registerNum);
+		
+		return registerMap;
+	}	
 	
 	public static Map<IRInstruction, Map<Operand, String>> analyze(BasicBlock bb){
 		List<IRInstruction> instructions = bb.allInstructions();
 		
-		//Map<IRInstruction, Set<Operand>> live = liveAtInstructions(bb, instructions);
-		
+//		Map<IRInstruction, Map<Operand, Integer>> virtualRegisterMap = 
+//				initializeVirtualRegisterMap(instructions);
+//		int registerNum = duChainAnalysis(bb, instructions, virtualRegisterMap);
+//				
+//		Map<IRInstruction, Map<Operand, String>> registerMap = colorRegisters(
+//				instructions, virtualRegisterMap, registerNum);
+
 		Map<IRInstruction, Map<Operand, Integer>> virtualRegisterMap = 
 				initializeVirtualRegisterMap(instructions);
+		int registerNum = reverseDuChainAnalysis(bb, instructions, virtualRegisterMap);		
+
+		Map<IRInstruction, Map<Operand, String>> registerMap = colorRegisters(
+				instructions, virtualRegisterMap, registerNum);
 		
-		int registerNum = duChainAnalysis(bb, instructions, virtualRegisterMap);
-		
+		return registerMap;
+	}
+	private static Map<IRInstruction, Map<Operand, String>> colorRegisters(
+			List<IRInstruction> instructions,
+			Map<IRInstruction, Map<Operand, Integer>> virtualRegisterMap,
+			int registerNum) {
 		Map<Integer, Set<Integer>> graph = createInterferenceGraph(
 				instructions, virtualRegisterMap, registerNum);
-
-
 		
 		Map<Integer, String> virtualRegisterColoring = 
 				GraphColor.graphColor(Configuration.TEMP_REGISTERS, graph);
@@ -91,7 +113,85 @@ public class LivelinessAnalysis {
 		return virtualRegisterMap;
 	}
 
+	private static int reverseDuChainAnalysis(ExtendedBasicBlock ebb,
+			List<IRInstruction> instructions,
+			Map<IRInstruction, Map<Operand, Integer>> virtualRegisterMap) {
+		int registerNum = 0;
+		
+		Map<Operand, Integer> firstVirtualMap = virtualRegisterMap.get(null);
+		for(Operand op : ebb.root.in){
+			firstVirtualMap.put(op, registerNum++);
+		}
 
+		List<Cons<Map<Operand, Integer>, BasicBlock>> queue = new LinkedList<>();
+		Set<BasicBlock> visited = new HashSet<>();
+		queue.add(new Cons<>(firstVirtualMap, ebb.root));
+		while(!queue.isEmpty()){
+			Cons<Map<Operand, Integer>, BasicBlock> current = queue.remove(0);
+			BasicBlock bb = current.b;
+			if(visited.contains(bb)){
+				continue;
+			}
+			visited.add(bb);
+			registerNum = reverseDuChainAnalysis(registerNum, bb, bb.allInstructions(), 
+					virtualRegisterMap, current.a);
+			for(int successorIndex : bb.successors){
+				for(BasicBlock possibleSuccessor : ebb.blocks){
+					if(possibleSuccessor.position == successorIndex){
+						queue.add(new Cons<>(virtualRegisterMap.get(bb.lastInstruction()), possibleSuccessor));
+					}
+				}
+			}
+		}
+		
+		return registerNum;
+	}
+
+	private static int reverseDuChainAnalysis(BasicBlock bb,
+			List<IRInstruction> instructions,
+			Map<IRInstruction, Map<Operand, Integer>> virtualRegisterMap){
+		int registerNum = 0;
+		Map<Operand, Integer> firstVirtualMap = virtualRegisterMap.get(null);
+		for(Operand op : bb.in){
+			firstVirtualMap.put(op, registerNum++);
+		}
+		registerNum = reverseDuChainAnalysis(registerNum, bb, instructions, virtualRegisterMap, firstVirtualMap);
+		return registerNum;
+	}
+	
+	private static int reverseDuChainAnalysis(int registerNum, BasicBlock bb,
+			List<IRInstruction> instructions,
+			Map<IRInstruction, Map<Operand, Integer>> virtualRegisterMap,
+			Map<Operand, Integer> firstVirtualMap){
+		Map<IRInstruction, Set<Operand>> live = liveAtInstructions(bb, instructions);
+		for(int i = 0; i < instructions.size();i++){
+			IRInstruction instruction = instructions.get(i);
+			Map<Operand, Integer> previousVirtualMap;
+			if(i == 0){
+				previousVirtualMap = firstVirtualMap;
+			} else {
+				IRInstruction previous = instructions.get(i - 1);
+				previousVirtualMap = virtualRegisterMap.get(previous);
+			}
+			
+			Map<Operand, Integer> virtualMap = virtualRegisterMap.get(instruction);
+			Set<Operand> liveAtInstruction = live.get(instruction);
+			
+			for(Operand op : previousVirtualMap.keySet()){
+				if(liveAtInstruction.contains(op)){
+					virtualMap.put(op, previousVirtualMap.get(op));	
+				}
+			}
+			
+			for(Operand defined : instruction.getDefined()){
+				if(!instruction.getUsed().contains(defined)){
+					virtualMap.put(defined, registerNum++);
+				}
+			}
+		}
+		return registerNum;
+	}
+	
 	private static int duChainAnalysis(BasicBlock bb,
 			List<IRInstruction> instructions,
 			Map<IRInstruction, Map<Operand, Integer>> virtualRegisterMap) {
@@ -111,7 +211,7 @@ public class LivelinessAnalysis {
 				IRInstruction last = instructions.get(i + 1);
 				registerNum = duChain(registerNum, instruction, last,
 						virtualMap);
-			}	
+			}
 			// propagate to next instruction
 			for(Operand op : virtualMap.keySet()){
 				lastVirtualMap.put(op, virtualMap.get(op));
@@ -121,7 +221,29 @@ public class LivelinessAnalysis {
 		return registerNum;
 	}
 
+	private static int duChain(int registerNum, IRInstruction instruction,
+			IRInstruction last, Map<Operand, Integer> virtualMap) {
+		duChainEnd(last, virtualMap);
 
+		// if live, then still live, if dead, then now live with new chain
+		for(Operand used : instruction.getUsed()){
+			if(!virtualMap.containsKey(used)){
+				virtualMap.put(used, registerNum++);
+			}
+		}
+		return registerNum;
+	}
+
+
+	private static void duChainEnd(IRInstruction last,
+			Map<Operand, Integer> virtualMap) {
+		// if live then i - 1 is dead, if dead then still dead
+		for(Operand defined : last.getDefined()){
+			if(!last.getUsed().contains(defined)){
+				virtualMap.remove(defined);
+			}
+		}
+	}
 	private static Map<IRInstruction, Map<Operand, String>> createRegisterMap(
 			List<IRInstruction> instructions,
 			Map<IRInstruction, Map<Operand, Integer>> virtualRegisterMap,
@@ -198,31 +320,6 @@ public class LivelinessAnalysis {
 			if(virtualRegisterColoring.containsKey(virtualRegister)){
 				registerMap.get(instruction).put(op, virtualRegisterColoring.get(virtualRegister));	
 			}	
-		}
-	}
-
-
-	private static int duChain(int registerNum, IRInstruction instruction,
-			IRInstruction last, Map<Operand, Integer> virtualMap) {
-		duChainEnd(last, virtualMap);
-
-		// if live, then still live, if dead, then now live with new chain
-		for(Operand used : instruction.getUsed()){
-			if(!virtualMap.containsKey(used)){
-				virtualMap.put(used, registerNum++);
-			}
-		}
-		return registerNum;
-	}
-
-
-	private static void duChainEnd(IRInstruction last,
-			Map<Operand, Integer> virtualMap) {
-		// if live then i - 1 is dead, if dead then still dead
-		for(Operand defined : last.getDefined()){
-			if(!last.getUsed().contains(defined)){
-				virtualMap.remove(defined);
-			}
 		}
 	}
 

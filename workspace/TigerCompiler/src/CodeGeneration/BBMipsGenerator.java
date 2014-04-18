@@ -21,10 +21,10 @@ class BBMipsGenerator {
 				instructionIndex, table);
 		Map<Integer, BasicBlock> blocks = cons.a;
 		Map<IRInstruction, String> functionMap = cons.b;
-
+		Map<BasicBlock, Map<IRInstruction, Map<Operand, String>>> registerMapMap = 
+				RegisterAllocator.allocateBB(blocks.values());
 		for (BasicBlock bb : BasicBlock.order(blocks)) {
-			Map<IRInstruction, Map<Operand, String>> registerMap = 
-					RegisterAllocator.allocate(bb, output, table, functionMap);
+			Map<IRInstruction, Map<Operand, String>> registerMap = registerMapMap.get(bb);
 			RegisterCodeGenerator.generateBasicBlock(bb, registerMap, output, table, functionMap, 
 					bb.getUsed(), bb.getDefined());
 		}

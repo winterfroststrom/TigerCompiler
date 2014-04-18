@@ -33,6 +33,7 @@ class RegisterCodeGenerator {
 		registerMap = instructionRegisterMap.get(instruction);
 		if(Configuration.MIPS_COMMENTS){
 			output.add("#\t" + instruction);
+			output.add("#\t" + registerMap);
 		}
 		switch (instruction.opcode) {
 		case LABEL:
@@ -389,6 +390,8 @@ class RegisterCodeGenerator {
 			output.add("#\tBlock " + bb.position + "\t" + bb.getVariables());
 			output.add("#\t\tIN :" + bb.in);
 			output.add("#\t\tOUT :" + bb.out);
+			output.add("#\t\tUSED :" + bb.getUsed());
+			output.add("#\t\tDEFINED :" + bb.getDefined());
 		}
 		if (bb.label != null) {
 			rcg.generate(bb.label);

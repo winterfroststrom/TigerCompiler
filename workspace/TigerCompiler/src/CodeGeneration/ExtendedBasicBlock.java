@@ -13,7 +13,7 @@ import General.IRInstruction.Operand;
 class ExtendedBasicBlock{
 	BasicBlock root;
 	Set<BasicBlock> blocks;
-	Set<BasicBlock> exits;	
+	Set<BasicBlock> exits;
 	private Set<Operand> in;
 	private Set<Operand> out;
 	private Set<BasicBlock> allBlocks;

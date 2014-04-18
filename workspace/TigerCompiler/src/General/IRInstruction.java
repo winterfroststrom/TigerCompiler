@@ -78,6 +78,7 @@ public class IRInstruction {
 			return ret; 
 		}
 	}
+	
 	public List<Operand> getUsed(){
 		List<Operand> used = new LinkedList<>();
 		switch(opcode){
@@ -106,6 +107,7 @@ public class IRInstruction {
 		case BRLEQ:
 		case CALL:
 		case ARRAY_STORE:
+		case META_EXACT:
 			for(int i = 0; i < params.size();i++){
 				Operand op = param(i);
 				if(op.type.equals(EOPERAND.VARIABLE) 
@@ -123,7 +125,6 @@ public class IRInstruction {
 				}
 			}
 		case GOTO:
-		case META_EXACT:
 		case LABEL:
 			break;
 		}
