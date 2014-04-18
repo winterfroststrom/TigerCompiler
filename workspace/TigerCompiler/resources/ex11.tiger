@@ -1,6 +1,6 @@
 let
-	type foo = array[200] of int;
-	type bar = array[100] of foo;
+	type foo = array[20] of int;
+	type bar = array[10] of foo;
 	type quux = bar;
 	var x : bar;
 	var i, j : int;

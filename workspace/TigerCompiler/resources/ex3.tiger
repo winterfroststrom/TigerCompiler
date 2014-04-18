@@ -1,7 +1,13 @@
 let
-
         function return_it(n:int) : int begin
-                return(n);
+        	if n = 0 then
+        		return n;
+        	else
+        		printi(n);
+        		n := return_it(n);
+        		printi(n);
+            	return n; 
+        	endif;
         end;
 in
         return_it(5);
