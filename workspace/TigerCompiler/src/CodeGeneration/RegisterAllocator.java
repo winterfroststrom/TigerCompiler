@@ -14,11 +14,27 @@ import SemanticChecking.SymbolTable;
 
 class RegisterAllocator {
 	public static Map<IRInstruction, Map<Operand, String>> allocate(BasicBlock bb) {
-		return LivelinessAnalysis.analyze(bb);
+		if(Configuration.GRAPH_COLORING){
+			if(canAssign(bb.getVariables())){
+				return registerAssignment(bb.getVariables(), bb.allInstructions());
+			} else {
+				return emptyAssignment(bb.allInstructions());
+			}
+		} else {
+			return LivelinessAnalysis.analyze(bb);	
+		}
 	}
 	
 	public static Map<IRInstruction, Map<Operand, String>> allocate(ExtendedBasicBlock ebb) {
-		return LivelinessAnalysis.analyze(ebb);
+		if(Configuration.GRAPH_COLORING){
+			if(canAssign(ebb.getVariables())){
+				return registerAssignment(ebb.getVariables(), ebb.allInstructions());
+			} else {
+				return emptyAssignment(ebb.allInstructions());
+			}
+		} else {
+			return LivelinessAnalysis.analyze(ebb);	
+		}
 	}
 	
 	private static boolean canAssign(Set<Operand> variables){

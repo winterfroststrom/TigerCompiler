@@ -20,8 +20,8 @@ import SemanticChecking.SymbolTable;
 class BasicBlock{
 	int position; 
 	List<IRInstruction> instructions;
-	List<Integer> predecessors;
-	List<Integer> successors;
+	Set<Integer> predecessors;
+	Set<Integer> successors;
 	IRInstruction label;
 	IRInstruction jump;
 	Set<Operand> in;
@@ -34,8 +34,8 @@ class BasicBlock{
 	public BasicBlock(int position){
 		this.position = position;
 		instructions = new ArrayList<>();
-		successors = new LinkedList<>();
-		predecessors = new LinkedList<>();
+		successors = new HashSet<>();
+		predecessors = new HashSet<>();
 		variables = new HashSet<>();
 		in = new HashSet<>();
 		out = new HashSet<>();
@@ -210,7 +210,6 @@ class BasicBlock{
 			for(Cons<String, BasicBlock> target : targetBlocks){
 				if(source.a.equals(target.a)){
 					source.b.successors.add(target.b.position);
-					break;
 				}
 			}
 		}

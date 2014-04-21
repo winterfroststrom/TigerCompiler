@@ -1,0 +1,19 @@
+
+let
+        var i :int := 0;
+in
+	if i = 0 then
+		printi(i);
+		i := 5;
+		printi(i);
+	else
+		printi(9);
+	endif;
+	if i <> 0 then
+		printi(9);
+	else
+		printi(i);
+		i := 5;
+		printi(i);
+	endif;
+end

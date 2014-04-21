@@ -1,0 +1,9 @@
+
+let
+        var i :int := 0;
+in
+	while i < 10 do
+		i := i + 1;
+		printi(i);
+	enddo;
+end

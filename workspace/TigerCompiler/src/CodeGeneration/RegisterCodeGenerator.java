@@ -32,11 +32,11 @@ class RegisterCodeGenerator {
 	public void generate(IRInstruction instruction) {
 		registerMap = instructionRegisterMap.get(instruction);
 		if(Configuration.MIPS_COMMENTS){
-			output.add("#\t" + instruction);
-			output.add("#\t" + registerMap);
+			output.add("#\t IRInstruction : " + instruction + "\t" + registerMap);
 		}
 		switch (instruction.opcode) {
 		case LABEL:
+			output.add(instruction.toString());
 			String label = IRRenamer.unrename(instruction.param(0).value);
 			if(table.isFunction(label)){
 				List<String> paramNames = IRRenamer.rename(table.functionParamNames(label));
@@ -44,7 +44,6 @@ class RegisterCodeGenerator {
 					functionLoadFromLabel(paramNames.get(i));
 				}
 			}
-			output.add(instruction.toString());
 			break;
 		case ASSIGN:
 			handleAssign(instruction);
@@ -387,7 +386,8 @@ class RegisterCodeGenerator {
 			Collection<Operand> load, Collection<Operand> save){
 		RegisterCodeGenerator rcg = new RegisterCodeGenerator(instructionRegisterMap, output, table, functionMap);
 		if(Configuration.MIPS_COMMENTS){
-			output.add("#\tBlock " + bb.position + "\t" + bb.getVariables());
+			output.add("#\tBlock " + bb.predecessors + " -> "+ bb.position + " -> " + bb.successors);
+			output.add("#\t\tVARIABLES :" + bb.getVariables());
 			output.add("#\t\tIN :" + bb.in);
 			output.add("#\t\tOUT :" + bb.out);
 			output.add("#\t\tUSED :" + bb.getUsed());

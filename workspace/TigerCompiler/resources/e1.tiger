@@ -1,0 +1,16 @@
+
+let
+        type ArrayInt = array [100] of int; /*Declare ArrayInt as a new type */
+        var X, Y : ArrayInt := 10; /* Declare vars X and Y as arrays with initialization */
+        var i, sum :int := 0;
+in
+        /*Note, Tiger is zero-indexed which means it should be 0->99 instead of 1-100*/
+        for i := 0 to 100 do /* for loop for dot product */
+        	if i = 3 | i = 10 then
+        		sum := sum + 5;
+        	else 
+        		sum := sum + X[i] * Y [i];
+        	endif;
+        enddo;
+        printi(sum); /* library call to printi to print the dot product */
+end

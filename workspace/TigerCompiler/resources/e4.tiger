@@ -1,0 +1,11 @@
+let
+        var i :int := 0;
+        function printc ( n : int ) begin
+                printi(n);
+        end;
+in
+	while i < 10 do
+		i := i + (i < 4) + 1;
+		printc(i);
+	enddo;
+end
