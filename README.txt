@@ -39,6 +39,9 @@ because register-memory operations are hard to represent in the IR.
 
 The class BasicBlock stores is a basic block.
 The control flow graph is represented as a list of BasicBlocks.
+If the Configuration.java file is modified to enable MIPS_COMMENTS, 
+then each segment of mips code will be annotated with the corresponding basic block number (numbering is based on instruction position)
+as well as an indicator of the successor and predecessor blocks by their block numbers.
 The BasicBlock class has a label instruction, a jump instruction, a list of instructions, and variables.
 While adjacent blocks could use goto's to direct themselves to the next block to enable arbitrary ordering,
 the original order is maintained for simplicity.
@@ -47,9 +50,11 @@ Graph coloring is implemented by using liveliness analysis and forward propagati
 the calculated liveliness information. 
 Since EBB blocks have only one entry points, this means a simple BFS is enough to extend du-chain analysis for EBBs.
 
-Basic support for functions exists.
+Basic support for scopeless functions exists.
 Function parameters are treated as globals, which is not correct, but it is acceptable since function implementation is optional.
 Since the IR always assigns values to the parameter names of functions, this means this basic level of function support was mostly automatic.
+The only additional bit necessary was for the return address to be saved and loaded from the stack as necessary, which is done as part of the 
+mips code generation for the call/callr and return ir statements.
 
 ---------------------------------------------------------------------------------
 RUNNING
