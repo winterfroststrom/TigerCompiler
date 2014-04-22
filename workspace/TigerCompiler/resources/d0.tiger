@@ -1,0 +1,8 @@
+let
+in
+	if 0 >= 0 then
+		printi(5);
+	else
+		printi(9);
+	endif;
+end

@@ -346,10 +346,10 @@ public class IRGenerator {
 			opcode = BRGT;
 			break;
 		case GREATER:
-			opcode = BRLT;
+			opcode = BRLEQ;
 			break;
 		case GREATEREQ:
-			opcode = BRLEQ;
+			opcode = BRLT;
 			break;
 		case PLUS:
 			opcode = ADD;

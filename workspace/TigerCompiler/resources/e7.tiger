@@ -1,0 +1,192 @@
+let
+	type board_t = array [9] of int;
+
+	var board : board_t := 0;
+	var player1 : int := 111;
+	var player2 : int := 120;	
+	var i, j : int := 0;
+	var strTemp : string;
+	var intTemp : int;
+	var input : int;
+	var notWin1 : int := 1;
+	var notWin2 : int := 1;
+	var notQuit : int := 1;
+	var isPlayer1Turn : int := 1;
+
+	function c2i(row : int, col : int) : int begin
+		return 3 * row + col;
+	end;
+	function checkRow(player : int, row : int) : int begin
+		intTemp := c2i(row, 0);
+		intTemp := board[intTemp];
+		if intTemp then
+			intTemp := c2i(row, 1);
+			intTemp := board[intTemp];
+			if intTemp then
+				intTemp := c2i(row, 2);
+				intTemp := board[intTemp];
+				if intTemp then
+					return 1;
+				endif;
+			endif;
+		endif;
+		return 0;
+	end;
+	function checkCol(player : int, col : int) : int begin
+		intTemp := c2i(0, col);
+		intTemp := board[intTemp];
+		if intTemp then
+			intTemp := c2i(1, col);
+			intTemp := board[intTemp];
+			if intTemp then
+				intTemp := c2i(2, col);
+				intTemp := board[intTemp];
+				if intTemp then
+					return 1;
+				endif;
+			endif;
+		endif;
+		return 0;
+	end;
+	function checkNotWin(player : int) : int begin
+		intTemp := checkRow(player, 0);
+		if intTemp then
+			return 0;
+		else 
+			intTemp := checkRow(player, 1);
+			if intTemp then
+				return 0;
+			else
+				intTemp := checkRow(player, 2);
+				if intTemp then
+					return 0;
+				endif;
+			endif;
+		endif;
+		intTemp := checkCol(player, 0);
+		if intTemp then
+			return 0;
+		else 
+			intTemp := checkCol(player, 1);
+			if intTemp then
+				return 0;
+			else
+				intTemp := checkCol(player, 2);
+				if intTemp then
+					return 0;
+				endif;
+			endif;
+		endif;
+		if (board[0] = player & board[4] = player & board[8] = player)
+			| (board[2] = player & board[4] = player & board[6] = player) then
+			return 0;
+		endif;
+		return 1;
+	end;
+
+	function isOccupied(index : int) : int begin
+		return board[index] = player1 | board[index] = player2;
+	end;
+
+	function getInput() begin
+		strTemp := getchar();
+		input := ord(strTemp);
+		input := input - 48;
+	end;
+
+	function pc(code : int) begin
+		strTemp := chr(code);
+		print(strTemp);
+	end;
+	function nl() begin
+		pc(10);
+	end;
+	function sp() begin
+		pc(32);
+	end;
+	function printPlayer(player : int) begin
+		pc(112);pc(108);pc(97);pc(121);pc(101);pc(114);sp();pc(player);
+	end;
+	function printBoard() begin
+		pc(98);pc(111);pc(97);pc(114);pc(100);pc(58);nl();
+		for i := 0 to 3 do
+			pc(124);
+			for j := 0 to 3 do
+				intTemp := c2i(i, j);
+				intTemp := isOccupied(intTemp);
+				if intTemp then
+					intTemp := c2i(i, j);
+					pc(board[intTemp]);
+				else
+					sp();
+				endif;
+				pc(124);
+			enddo;
+			nl();
+		enddo;
+	end;
+	function printWinner() begin
+		if notWin1 then
+			printPlayer(player2);
+		else
+			printPlayer(player1);
+		endif;
+		sp();
+		pc(119);pc(105);pc(110);pc(115);nl();
+	end;
+	function printBye() begin
+		pc(98);pc(121);pc(101);nl();
+	end;
+	function printInvalid() begin
+		pc(105);pc(110);pc(118);pc(97);pc(108);pc(105);pc(100);nl();
+	end;
+
+in 
+	while notWin1 & notWin2 & notQuit do
+		printBoard();
+		getInput();
+		nl();
+		if input = 9 then
+			notQuit := 0;
+		else 
+			printi(input);
+			if input < 9 & input >= 0 then
+				intTemp := isOccupied(input);
+				if intTemp then
+					printInvalid();
+				else 
+					if isPlayer1Turn then
+						board[input] := player1;
+						isPlayer1Turn := 0;
+					else
+						board[input] := player2;
+						isPlayer1Turn := 1;
+					endif;
+				endif;
+			else
+				printInvalid();
+			endif;
+		endif;
+		notWin1 := checkNotWin(player1);
+		notWin2 := checkNotWin(player2);
+	enddo;
+	if notQuit then
+		printWinner();
+	else
+		printBye();
+	endif;
+end
+
+
+
+
+
+
+
+
+
+
+
+
+
+

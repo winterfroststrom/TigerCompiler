@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 
 import General.Configuration;
+import General.EIROPCODE;
 import General.IRInstruction;
 import General.IRInstruction.EOPERAND;
 import General.IRInstruction.Operand;
@@ -412,16 +413,29 @@ class RegisterCodeGenerator {
 		if(Configuration.MIPS_COMMENTS){
 			output.add("#\t Store Registers ");
 		}
-		for (Operand op : save) {
-			Map<Operand, String> registerMap = rcg.instructionRegisterMap.get(bb.lastInstruction());
-			if(registerMap.containsKey(op)){
-				//System.out.println("-------------------------------");
-				rcg.output.add("\tla $a0, " + op.value);
-				rcg.output.add("\tsw " + registerMap.get(op) + ", 0($a0)");
-			}
-		}
-		if (bb.jump != null) {
+		if(bb.jump != null && bb.jump.isFunctionCall()){
+			// TODO : figure out why this is needed for e8 and find a correct solution
 			rcg.generate(bb.jump);
+			for (Operand op : save) {
+				Map<Operand, String> registerMap = rcg.instructionRegisterMap.get(bb.lastInstruction());
+				if(registerMap.containsKey(op)){
+					//System.out.println("-------------------------------");
+					rcg.output.add("\tla $a0, " + op.value);
+					rcg.output.add("\tsw " + registerMap.get(op) + ", 0($a0)");
+				}
+			}
+		} else {
+			for (Operand op : save) {
+				Map<Operand, String> registerMap = rcg.instructionRegisterMap.get(bb.lastInstruction());
+				if(registerMap.containsKey(op)){
+					//System.out.println("-------------------------------");
+					rcg.output.add("\tla $a0, " + op.value);
+					rcg.output.add("\tsw " + registerMap.get(op) + ", 0($a0)");
+				}
+			}
+			if (bb.jump != null) {
+				rcg.generate(bb.jump);
+			}
 		}
 	}
 }

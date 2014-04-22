@@ -1,0 +1,15 @@
+let
+	type arr_t = array [10] of int;
+	var arr : arr_t := 1;
+	var i : int;
+	var s : string;
+in
+	for i := 0 to 10 do
+		arr[i] := arr[i] + i;
+	enddo;
+	for i := 0 to 10 do
+		printi(arr[i]);
+		s := chr(10);
+		print(s);
+	enddo;
+end

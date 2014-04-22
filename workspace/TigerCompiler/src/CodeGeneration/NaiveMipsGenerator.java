@@ -74,7 +74,7 @@ private List<String> output;
 				handleCall(instruction.param(0).value);
 				break;
 			case CALLR:
-				handleCall(instruction.param(0).value);
+				handleCall(instruction.param(1).value);
 				String functionName = IRRenamer.unrename(instruction.param(1).value);
 				if(table.getTypeOfQualifiedId(functionName).isArray()){
 					// TODO: implement array returns
@@ -85,7 +85,7 @@ private List<String> output;
 				break;
 			case ARRAY_STORE:
 				output.add("\tla $t1, " + instruction.param(0).value); // address
-				handleLoadOperand(instruction.param(2), "$t2");
+				handleLoadOperand(instruction.param(1), "$t2");
 				output.add("\tmul $t2, $t2, 4");
 				output.add("\tadd $t0, $t1, $t2"); // add offset
 				output.add("\tsw " + handleLoadOperand(instruction.param(2), "$t3") + ", 0($t0)");

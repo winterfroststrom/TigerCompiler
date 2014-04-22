@@ -131,6 +131,10 @@ public class IRInstruction {
 		return used;
 	}
 	
+	public boolean isFunctionCall(){
+		return opcode.equals(EIROPCODE.CALL) || opcode.equals(EIROPCODE.CALLR);
+	}
+	
 	public List<Operand> getDefined(){
 		List<Operand> defined = new LinkedList<>();
 		switch(opcode){

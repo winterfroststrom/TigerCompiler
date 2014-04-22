@@ -9,7 +9,7 @@ import General.IRInstruction.EOPERAND;
 import General.IRInstruction.Operand;
 
 public class MipsFunctionImplementations {
-
+	private static final String TEMP_ARG_REGISTER = "$a0";
 	public static void implementLibrary(List<IRInstruction> instructions){
 		int instructionIndex = 0;
 		while(instructions.get(instructionIndex).opcode.equals(EIROPCODE.ASSIGN)){
@@ -17,13 +17,36 @@ public class MipsFunctionImplementations {
 		}instructionIndex = implementPrinti(instructions, instructionIndex);
 		
 		if(Configuration.LOAD_EXTENDED_LIBRARY){
-//			instructionIndex = implementPrint(instructions, instructionIndex); // prints char not string
+			instructionIndex = implementPrint(instructions, instructionIndex); // prints char not string
 			instructionIndex = implementGetchar(instructions, instructionIndex);
+			instructionIndex = implementOrd(instructions, instructionIndex);
+			instructionIndex = implementChr(instructions, instructionIndex);
+			
 			instructionIndex = implementNot(instructions, instructionIndex);
 			instructionIndex = implementExit(instructions, instructionIndex);
 		}
 	}
 
+	private static int implementOrd(List<IRInstruction> instructions,
+			int instructionIndex) {
+		String function = "ord";
+		instructionIndex = addLabel(instructions, instructionIndex, function);
+		instructionIndex = loadParam(instructions, instructionIndex, function, "param0");
+		instructionIndex = loadReturn(instructions, instructionIndex);
+		instructions.add(instructionIndex++, new IRInstruction(EIROPCODE.RETURN));
+		return instructionIndex;
+	}
+
+	private static int implementChr(List<IRInstruction> instructions,
+			int instructionIndex) {
+		String function = "chr";
+		instructionIndex = addLabel(instructions, instructionIndex, function);
+		instructionIndex = loadParam(instructions, instructionIndex, function, "param0");
+		instructionIndex = loadReturn(instructions, instructionIndex);
+		instructions.add(instructionIndex++, new IRInstruction(EIROPCODE.RETURN));
+		return instructionIndex;
+	}
+	
 	private static int implementPrint(List<IRInstruction> instructions,
 			int instructionIndex) {
 		String function = "print";
@@ -49,7 +72,6 @@ public class MipsFunctionImplementations {
 		String function = "getchar";
 		instructionIndex = addLabel(instructions, instructionIndex, function);
 		instructionIndex = syscall(instructions, instructionIndex, 12);
-		instructionIndex = loadReturn(instructions, instructionIndex);
 		instructions.add(instructionIndex++, new IRInstruction(EIROPCODE.RETURN));
 		return instructionIndex;
 	}
@@ -61,7 +83,7 @@ public class MipsFunctionImplementations {
 		instructionIndex = addLabel(instructions, instructionIndex, function);
 		instructionIndex = loadParam(instructions, instructionIndex, function, "param0");
 		instructions.add(instructionIndex++, new IRInstruction(EIROPCODE.META_EXACT, 
-				new Operand(EOPERAND.LITERAL, "beq $a0, $zero, not0")));
+				new Operand(EOPERAND.LITERAL, "beq " + TEMP_ARG_REGISTER + ", $zero, not0")));
 		instructions.add(instructionIndex++, new IRInstruction(EIROPCODE.META_EXACT, 
 				new Operand(EOPERAND.LITERAL, "addi $v0, $zero, 1")));
 		instructions.add(instructionIndex++, new IRInstruction(EIROPCODE.RETURN));
@@ -101,15 +123,15 @@ public class MipsFunctionImplementations {
 	private static int loadParam(List<IRInstruction> instructions,
 			int instructionIndex, String function, String param) {
 		instructions.add(instructionIndex++, new IRInstruction(EIROPCODE.META_EXACT, 
-				new Operand(EOPERAND.LITERAL, "\tla $a0"), createParam(function, param)));
+				new Operand(EOPERAND.LITERAL, "\tla " + TEMP_ARG_REGISTER), createParam(function, param)));
 		instructions.add(instructionIndex++, new IRInstruction(EIROPCODE.META_EXACT, 
-				new Operand(EOPERAND.LITERAL, "\tlw $a0, 0($a0)")));
+				new Operand(EOPERAND.LITERAL, "\tlw " + TEMP_ARG_REGISTER + ", 0(" + TEMP_ARG_REGISTER + ")")));
 		return instructionIndex;
 	}
 	
 	private static int loadReturn(List<IRInstruction> instructions, int instructionIndex) {
 		instructions.add(instructionIndex++, new IRInstruction(EIROPCODE.META_EXACT, 
-				new Operand(EOPERAND.LITERAL, "\tmove $v0, $a0")));
+				new Operand(EOPERAND.LITERAL, "\tmove $v0, " + TEMP_ARG_REGISTER)));
 		return instructionIndex;
 	}
 	

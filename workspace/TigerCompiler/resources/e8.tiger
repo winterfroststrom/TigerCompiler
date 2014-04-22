@@ -1,0 +1,9 @@
+let
+	var s : string;
+	var i : int;
+in
+	s := getchar();
+	i := ord(s);
+	printi(i);
+	print(s);
+end

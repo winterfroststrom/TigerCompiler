@@ -15,11 +15,11 @@ public class Configuration {
 	public static final boolean PRINT_MIPS_EBB = RELEASE || true;
 
 	public static final String FORCED_LOAD_FILE = RELEASE ? null : "resources/ex1.tiger";
-//	public static final String FORCED_LOAD_FILE = "resources/e5.tiger";
+//	public static final String FORCED_LOAD_FILE = "resources/e7.tiger";
 	
 	public static final boolean MIPS_COMMENTS = !RELEASE && true; 
 	public static final boolean MIPS_VALID_LABELS = RELEASE || false;
-	public static final boolean LOAD_EXTENDED_LIBRARY = RELEASE || false;
+	public static final boolean LOAD_EXTENDED_LIBRARY = RELEASE || true;
 	public static final boolean GRAPH_COLORING = RELEASE || true;
 	public final static ArrayList<String> TEMP_REGISTERS = (RELEASE || true) ? 
 			Utilities.toAL("$8", "$9", "$10", "$11", "$12", "$13", 
