@@ -14,8 +14,8 @@ public class Configuration {
 	public static final boolean PRINT_MIPS_BB = RELEASE || true;
 	public static final boolean PRINT_MIPS_EBB = RELEASE || false;
 
-//	public static final String FORCED_LOAD_FILE = RELEASE ? null : "resources/e7.tiger";
-	public static final String FORCED_LOAD_FILE = "resources/d0.tiger";
+	public static final String FORCED_LOAD_FILE = RELEASE ? null : "resources/e7.tiger";
+//	public static final String FORCED_LOAD_FILE = "resources/d0.tiger";
 	
 	public static final boolean MIPS_COMMENTS = !RELEASE && true; 
 	public static final boolean MIPS_VALID_LABELS = RELEASE || false;
