@@ -1,0 +1,9 @@
+let
+	var i : int;
+in
+	i := 0;
+	if i < 9 & i >= 0 then
+		printi(i);
+	endif;
+	printi(i);
+end

@@ -162,12 +162,16 @@ in
 						printInvalid();
 					else 
 						if isPlayer1Turn then
+							printPlayer(player1);sp();
 							board[input] := player1;
 							isPlayer1Turn := 0;
 						else
+							printPlayer(player2);sp();
 							board[input] := player2;
 							isPlayer1Turn := 1;
 						endif;
+						pc(112);pc(108);pc(97);pc(121);pc(101);pc(100);sp();
+						printi(input);nl();
 					endif;
 				else
 					printInvalid();
