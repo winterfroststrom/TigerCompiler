@@ -7,10 +7,10 @@ import General.IRInstruction.EOPERAND;
 import General.IRInstruction.Operand;
 import SemanticChecking.SymbolTable;
 
-public class NaiveMipsGenerator {
-private List<String> output;
+public class NaiveCodeGenerator extends AbstractCodeGenerator{
+	private List<String> output;
 	
-	public NaiveMipsGenerator(List<String> output){
+	public NaiveCodeGenerator(List<String> output){
 		this.output = output;
 	}
 	
@@ -71,10 +71,10 @@ private List<String> output;
 				output.add("\tjr $ra");
 				break;
 			case CALL:
-				handleCall(instruction.param(0).value);
+				handleCall(instruction.param(0).value, instruction.params(1), table, output);
 				break;
 			case CALLR:
-				handleCall(instruction.param(1).value);
+				handleCall(instruction.param(1).value, instruction.params(2), table, output);
 				String functionName = IRRenamer.unrename(instruction.param(1).value);
 				if(table.getTypeOfQualifiedId(functionName).isArray()){
 					// TODO: implement array returns
@@ -108,14 +108,6 @@ private List<String> output;
 			}
 		}
 		return output;
-	}
-
-	private void handleCall(String function) {
-		output.add("\tsw $ra, 0($sp)");
-		output.add("\taddi $sp, $sp, -4");
-		output.add("\tjal " + function);
-		output.add("\taddi $sp, $sp, 4");
-		output.add("\tlw $ra, 0($sp)");
 	}
 
 	private void handleBranch(String branch, Operand operand1, Operand operand2,
@@ -173,5 +165,10 @@ private List<String> output;
 			System.err.println("NMG HSL: This should never happen.");
 			break;
 		}
+	}
+
+	@Override
+	protected String getRegisterMap(String register) {
+		return null;
 	}
 }

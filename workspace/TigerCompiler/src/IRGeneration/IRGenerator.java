@@ -235,13 +235,14 @@ public class IRGenerator {
 
 	private List<Operand> handleRenamingFunctionParams(String scope, SymbolTable table, 
 			String functionName, Cons<List<Operand>, List<Type>> params) {
-		List<String> names = table.matchingParamNames(scope, functionName, params.b);
-		List<Operand> operands = new LinkedList<>();
-		for(int i = 0; i < names.size();i++){
-			operands.add(new Operand(EOPERAND.VARIABLE, names.get(i)));
-			code.add(new IRInstruction(ASSIGN, operands.get(i), params.a.get(i)));
-		}
-		return operands;
+//		List<String> names = table.matchingParamNames(scope, functionName, params.b);
+//		List<Operand> operands = new LinkedList<>();
+//		for(int i = 0; i < names.size();i++){
+//			operands.add(new Operand(EOPERAND.VARIABLE, names.get(i)));
+//			code.add(new IRInstruction(ASSIGN, operands.get(i), params.a.get(i)));
+//		}
+//		return operands;
+		return params.a;
 	}
 
 	

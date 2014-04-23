@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import General.Configuration;
 import General.Cons;
 import General.EIROPCODE;
 import General.IRInstruction;
@@ -66,8 +67,9 @@ class BasicBlock{
 			IRInstruction instruction = ir.get(i);
 			switch(instruction.opcode){
 			case LABEL:
-				if(table.isFunction(IRRenamer.unrename(instruction.param(0).value))
-						|| instruction.param(0).value.equals("main")){
+				boolean isFunction = table.isFunction(IRRenamer.unrename(instruction.param(0).value))
+						|| instruction.param(0).value.equals("main");
+				if(isFunction){
 					function = instruction.param(0).value;
 				}
 				if(current != null) {
@@ -82,10 +84,12 @@ class BasicBlock{
 					current = new BasicBlock(i);
 				}
 				current.label = instruction;
-				enteringBlocks.add(new Cons<>(function, current));
+				if(isFunction){
+					enteringBlocks.add(new Cons<>(function, current));
+				}
 				if(!table.isFunction(IRRenamer.unrename(instruction.param(0).value))){
 					labeledBlocks.add(new Cons<>(instruction.param(0).value, current));
-				}				
+				}
 				break;
 			case BREQ:
 			case BRNEQ:
@@ -138,7 +142,6 @@ class BasicBlock{
 		jumpSuccessors(callingBlocks, enteringBlocks);
 		jumpSuccessors(returningBlocks, afterCallingBlocks);
 		jumpSuccessors(breakingBlocks, labeledBlocks);
-		
 		addPredecessors(blocks);
 		
 		addVariables(blocks);
@@ -264,16 +267,22 @@ class BasicBlock{
 	
 	@Override
 	public String toString(){
-		String out = predecessors + " to " + position + " to " + successors + "\n";
-		out += "IN:\t" + in + "\n";
-		out += "OUT:\t" + this.out + "\n";
-		out += "DEFINED:\t" + defined + "\n";
-		out += "USED:\t" + used + "\n";
-		out += "LABEL:\t" + label + "\n";
-		for(IRInstruction instruction : instructions){
-			out += instruction + "\n";
+		String out = predecessors + " to " + position + " to " + successors;
+		if(Configuration.SHORT_BB_PRINT){
+			out += "\t";
+			out += "LABEL:\t" + label + "\t" + "JUMP: " + jump + "\n";
+		} else {
+			out += "\n";
+			out += "IN:\t" + in + "\n";
+			out += "OUT:\t" + this.out + "\n";
+			out += "DEFINED:\t" + defined + "\n";
+			out += "USED:\t" + used + "\n";
+			out += "LABEL:\t" + label + "\n";
+			for(IRInstruction instruction : instructions){
+				out += instruction + "\n";
+			}
+			out += "JUMP: " + jump + "\n";
 		}
-		out += "JUMP: " + jump + "\n";
 		return out;
 	}
 

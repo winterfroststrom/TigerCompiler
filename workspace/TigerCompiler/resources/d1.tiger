@@ -1,0 +1,11 @@
+let
+	function recurse(n : int) begin
+		if n >= 0 then
+			printi(n);
+			recurse(n - 1);
+			printi(n);
+		endif;
+	end;
+in
+	recurse(5);
+end

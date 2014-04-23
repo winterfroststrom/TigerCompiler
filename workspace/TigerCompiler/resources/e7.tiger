@@ -19,13 +19,13 @@ let
 	function checkRow(player : int, row : int) : int begin
 		intTemp := c2i(row, 0);
 		intTemp := board[intTemp];
-		if intTemp then
+		if intTemp = player then
 			intTemp := c2i(row, 1);
 			intTemp := board[intTemp];
-			if intTemp then
+			if intTemp = player then
 				intTemp := c2i(row, 2);
 				intTemp := board[intTemp];
-				if intTemp then
+				if intTemp = player then
 					return 1;
 				endif;
 			endif;
@@ -35,13 +35,13 @@ let
 	function checkCol(player : int, col : int) : int begin
 		intTemp := c2i(0, col);
 		intTemp := board[intTemp];
-		if intTemp then
+		if intTemp = player then
 			intTemp := c2i(1, col);
 			intTemp := board[intTemp];
-			if intTemp then
+			if intTemp = player then
 				intTemp := c2i(2, col);
 				intTemp := board[intTemp];
-				if intTemp then
+				if intTemp = player then
 					return 1;
 				endif;
 			endif;
@@ -142,33 +142,41 @@ let
 	end;
 
 in 
+	pc(101);pc(110);pc(116);pc(101);pc(114);sp(); /*enter*/
+	pc(48);pc(45);pc(56);pc(32);/*0-8*/
+	pc(40);pc(57);sp();/*(9*/
+	pc(116);pc(111);sp();/*to*/
+	pc(113);pc(117);pc(105);pc(116);pc(41);pc(58);/*quit):*/
+	nl();
+	printBoard();
 	while notWin1 & notWin2 & notQuit do
-		printBoard();
 		getInput();
 		nl();
-		if input = 9 then
-			notQuit := 0;
-		else 
-			printi(input);
-			if input < 9 & input >= 0 then
-				intTemp := isOccupied(input);
-				if intTemp then
-					printInvalid();
-				else 
-					if isPlayer1Turn then
-						board[input] := player1;
-						isPlayer1Turn := 0;
-					else
-						board[input] := player2;
-						isPlayer1Turn := 1;
+		if input <> -38 then
+			if input = 9 then
+				notQuit := 0;
+			else 
+				if input < 9 & input >= 0 then
+					intTemp := isOccupied(input);
+					if intTemp then
+						printInvalid();
+					else 
+						if isPlayer1Turn then
+							board[input] := player1;
+							isPlayer1Turn := 0;
+						else
+							board[input] := player2;
+							isPlayer1Turn := 1;
+						endif;
 					endif;
+				else
+					printInvalid();
 				endif;
-			else
-				printInvalid();
 			endif;
+			notWin1 := checkNotWin(player1);
+			notWin2 := checkNotWin(player2);
+			printBoard();
 		endif;
-		notWin1 := checkNotWin(player1);
-		notWin2 := checkNotWin(player2);
 	enddo;
 	if notQuit then
 		printWinner();

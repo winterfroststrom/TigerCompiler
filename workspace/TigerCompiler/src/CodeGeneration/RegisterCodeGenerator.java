@@ -1,6 +1,7 @@
 package CodeGeneration;
 
 import java.util.Collection;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -11,7 +12,7 @@ import General.IRInstruction.EOPERAND;
 import General.IRInstruction.Operand;
 import SemanticChecking.SymbolTable;
 
-class RegisterCodeGenerator {
+class RegisterCodeGenerator extends AbstractCodeGenerator{
 	private static final String RETURN_VALUE_REGISTER = "$v0";
 	private static final String STORE_SPILL_VALUE_REGISTER = "$a2";
 	private static final String STORE_SPILL_ADDRESS_REGISTER = "$a3";
@@ -38,13 +39,6 @@ class RegisterCodeGenerator {
 		switch (instruction.opcode) {
 		case LABEL:
 			output.add(instruction.toString());
-			String label = IRRenamer.unrename(instruction.param(0).value);
-			if(table.isFunction(label)){
-				List<String> paramNames = IRRenamer.rename(table.functionParamNames(label));
-				for(int i = 0; i < paramNames.size();i++){
-					functionLoadFromLabel(paramNames.get(i));
-				}
-			}
 			break;
 		case ASSIGN:
 			handleAssign(instruction);
@@ -107,22 +101,16 @@ class RegisterCodeGenerator {
 			output.add("\tjr $ra");
 			break;
 		case CALL:
-			for(int i = 1; i < instruction.params.size();i++){
-				storeToLabel(instruction.param(i));
-			}
-			handleCall(instruction.param(0).value);
+			handleCall(instruction.functionName(), instruction.functionParameters(), table, output);
 			break;
 		case CALLR:
-			for(int i = 2; i < instruction.params.size();i++){
-				storeToLabel(instruction.param(i));
-			}
-			handleCall(instruction.param(1).value);
-			String functionName = IRRenamer.unrename(instruction.param(1).value);
+			handleCall(instruction.functionName(), instruction.functionParameters(), table, output);
+			String functionName = IRRenamer.unrename(instruction.functionName());
 			if(table.getTypeOfQualifiedId(functionName).isArray()){
 				// TODO: implement array returns
 				throw new UnsupportedOperationException();
 			} else {
-				handleStoreLabel(instruction.param(0), RETURN_VALUE_REGISTER);
+				handleStoreFunctionReturnToLabelAndRegister(instruction.param(0));
 			}
 			break;
 		case ARRAY_STORE:
@@ -179,13 +167,19 @@ class RegisterCodeGenerator {
 			storeIntoRegisterMapRegister(instruction.param(0), "$a0");	
 		}
 	}
-
-	private void handleCall(String function) {
-		saveRegister("$ra");
-		output.add("\tjal " + function);
-		restoreRegister("$ra");
+	
+	protected String getRegisterMap(String variable){
+		Operand isVariable = new Operand(EOPERAND.REGISTER, variable);
+		Operand isRegister = new Operand(EOPERAND.VARIABLE, variable);
+		if(registerMap.containsKey(isVariable)){
+			return registerMap.get(isVariable);
+		} else if(registerMap.containsKey(isRegister)){
+			return registerMap.get(isRegister);
+		} else {
+			return null;
+		}
 	}
-
+	
 	private void handleBranch(String branch, Operand operand1,
 			Operand operand2, String label) {
 
@@ -241,8 +235,13 @@ class RegisterCodeGenerator {
 		}
 	}
 
-	private void handleStoreLabel(Operand label, String source) {
-		storeIntoRegisterMapRegister(label, source);
+	private void handleStoreFunctionReturnToLabelAndRegister(Operand label) {
+		output.add("\tla $a0, " + label);
+		output.add("\tsw " + RETURN_VALUE_REGISTER + ", 0($a0)");
+		if (registerMap.containsKey(label)) {
+			String desintationRegister = registerMap.get(label);
+			output.add("\tmove " + desintationRegister + ", " + RETURN_VALUE_REGISTER);
+		}
 	}
 
 	private void handleAssign(IRInstruction instruction) {
@@ -313,13 +312,13 @@ class RegisterCodeGenerator {
 
 	private void handleSpill(List<String> instructions, List<String> registers){
 		for(int i = 0; i < registers.size();i++){
-			saveRegister(registers.get(i));
+			saveRegister(registers.get(i), output);
 		}
 		for(String instruction : instructions){
 			output.add(instruction);
 		}
 		for(int i = registers.size() - 1; i >= 0 ;i--){
-			restoreRegister(registers.get(i));
+			restoreRegister(registers.get(i), output);
 		}
 	}
 	
@@ -333,16 +332,6 @@ class RegisterCodeGenerator {
 	private void storeSpillPreamble() {
 //		saveRegister(STORE_SPILL_VALUE_REGISTER);
 //		saveRegister(STORE_SPILL_ADDRESS_REGISTER);
-	}
-
-	private void saveRegister(String register) {		
-		output.add("\tsw " + register + ", 0($sp)");
-		output.add("\taddi $sp, $sp, -4");
-	}
-
-	private void restoreRegister(String register) {
-		output.add("\tlw " + register + ", 4($sp)");
-		output.add("\taddi $sp, $sp, 4");
 	}
 
 	public void loadFromLabel(Operand op){
@@ -359,32 +348,23 @@ class RegisterCodeGenerator {
 		}
 	}
 	
-	private void functionLoadFromLabel(String string) {
-		Operand op = new Operand(EOPERAND.VARIABLE, string);
-		if(registerMap.containsKey(op)){
-			output.add("\tla $a0, " + op.value);
-			output.add("\tlw " + registerMap.get(op) + ", 0($a0)");
+	private void functionLoadFromLabel(String label) {
+		String register = getRegisterMap(label);
+		if(register != null){
+			output.add("\tla $a0, " + label);
+			output.add("\tlw " + register + ", 0($a0)");
 		}
 	}
 	
 		
 	
-	private void storeFromLabelToStack(Operand label){
-		output.add("\tla $a0, " + label.value);
-		output.add("\tlw $a0, 0($a0)");
-		saveRegister("$a0");
-	}
-	
-	private void loadToLabelFromStack(Operand label){
-		restoreRegister("$a1");
-		output.add("\tla $a0, " + label.value);
-		output.add("\tsw $a1, 0($a0)");		
-	}
-	
 	public static void generateBasicBlock(BasicBlock bb, 
 			Map<IRInstruction,Map<Operand, String>> instructionRegisterMap, 
 			List<String> output, SymbolTable table, Map<IRInstruction, String> functionMap, 
 			Collection<Operand> load, Collection<Operand> save){
+		//removes dead code
+		if(bb.successors.isEmpty() && bb.predecessors.isEmpty() && !(bb.label != null && bb.label.equals("main")))
+			return;
 		RegisterCodeGenerator rcg = new RegisterCodeGenerator(instructionRegisterMap, output, table, functionMap);
 		if(Configuration.MIPS_COMMENTS){
 			output.add("#\tBlock " + bb.predecessors + " -> "+ bb.position + " -> " + bb.successors);
@@ -413,29 +393,23 @@ class RegisterCodeGenerator {
 		if(Configuration.MIPS_COMMENTS){
 			output.add("#\t Store Registers ");
 		}
+		List<String> params;
 		if(bb.jump != null && bb.jump.isFunctionCall()){
-			// TODO : figure out why this is needed for e8 and find a correct solution
-			rcg.generate(bb.jump);
-			for (Operand op : save) {
-				Map<Operand, String> registerMap = rcg.instructionRegisterMap.get(bb.lastInstruction());
-				if(registerMap.containsKey(op)){
-					//System.out.println("-------------------------------");
-					rcg.output.add("\tla $a0, " + op.value);
-					rcg.output.add("\tsw " + registerMap.get(op) + ", 0($a0)");
-				}
-			}
+			String functionName = IRRenamer.unrename(bb.jump.functionName());
+			params = IRRenamer.rename(table.functionParamNames(functionName));
 		} else {
-			for (Operand op : save) {
-				Map<Operand, String> registerMap = rcg.instructionRegisterMap.get(bb.lastInstruction());
-				if(registerMap.containsKey(op)){
-					//System.out.println("-------------------------------");
-					rcg.output.add("\tla $a0, " + op.value);
-					rcg.output.add("\tsw " + registerMap.get(op) + ", 0($a0)");
-				}
+			params = new LinkedList<>();
+		}
+		for (Operand op : save) {
+			Map<Operand, String> registerMap = rcg.instructionRegisterMap.get(bb.lastInstruction());
+			if(registerMap.containsKey(op) && !params.contains(op.value)){
+				//System.out.println("-------------------------------");
+				rcg.output.add("\tla $a0, " + op.value);
+				rcg.output.add("\tsw " + registerMap.get(op) + ", 0($a0)");
 			}
-			if (bb.jump != null) {
-				rcg.generate(bb.jump);
-			}
+		}
+		if (bb.jump != null) {
+			rcg.generate(bb.jump);
 		}
 	}
 }

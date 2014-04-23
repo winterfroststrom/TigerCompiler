@@ -1,10 +1,11 @@
 let
         function return_it(n:int) : int begin
+		printi(n);
         	if n <> 0 then
         		n := return_it(n - 1);
         	endif;
-            printi(n);
-        	return n; 
+		printi(n);
+		return n; 
         end;
 in
         return_it(5);

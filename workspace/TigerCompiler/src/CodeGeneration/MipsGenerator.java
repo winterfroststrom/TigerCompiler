@@ -33,7 +33,7 @@ public class MipsGenerator {
 		int instructionIndex = handleAssignment(instructions, output, renamed.b, table);
 		switch(generator){
 		case NAIVE:
-			return (new NaiveMipsGenerator(output)).generate(instructions, table, instructionIndex);
+			return (new NaiveCodeGenerator(output)).generate(instructions, table, instructionIndex);
 		case BB:
 			return (new BBMipsGenerator(output)).generate(instructions, table, instructionIndex);
 		case EBB:

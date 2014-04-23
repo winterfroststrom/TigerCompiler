@@ -50,11 +50,15 @@ Graph coloring is implemented by using liveliness analysis and forward propagati
 the calculated liveliness information. 
 Since EBB blocks have only one entry points, this means a simple BFS is enough to extend du-chain analysis for EBBs.
 
-Basic support for scopeless functions exists.
-Function parameters are treated as globals, which is not correct, but it is acceptable since function implementation is optional.
-Since the IR always assigns values to the parameter names of functions, this means this basic level of function support was mostly automatic.
-The only additional bit necessary was for the return address to be saved and loaded from the stack as necessary, which is done as part of the 
-mips code generation for the call/callr and return ir statements.
+Functions are implemented by pushing the parameter values to the stack before a call and restoring them after a call.
+The parameters to a function are placed in the global function parameter labels, which allows them to be treated as normal variables.
+
+Because it was easier to implement, there are actually two code generators.
+They both work via ad hoc one-to-one conversion from IR to mips.
+They are the NaiveCodeGenerator and the RegisterCodeGenerator.
+The first generates code while always spilling variables, and the second uses a register map to avoid spilling.
+
+For a nice game of tic tac toe, please compile e7.tiger.
 
 ---------------------------------------------------------------------------------
 RUNNING

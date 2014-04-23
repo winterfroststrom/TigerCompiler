@@ -20,6 +20,10 @@ public class IRInstruction {
 			this.type = type;
 			this.value = value;
 		}
+
+		public boolean isVariable(){
+			return type.equals(EOPERAND.VARIABLE) || type.equals(EOPERAND.REGISTER);
+		}
 		
 		@Override
 		public String toString(){
@@ -44,6 +48,13 @@ public class IRInstruction {
 		return params.get(index);
 	}
 	
+	public List<Operand> params(int index){
+		List<Operand> ret = new ArrayList<>(params.size() - index);
+		for(int i = index; i < params.size();i++){
+			ret.add(params.get(i));
+		}
+		return ret;
+	}
 	
 	public IRInstruction(EIROPCODE opcode, Operand...params){
 		this.opcode = opcode;
@@ -133,6 +144,26 @@ public class IRInstruction {
 	
 	public boolean isFunctionCall(){
 		return opcode.equals(EIROPCODE.CALL) || opcode.equals(EIROPCODE.CALLR);
+	}
+	
+	public List<Operand> functionParameters(){
+		if(opcode.equals(EIROPCODE.CALL)){
+			return params(1);
+		} else if(opcode.equals(EIROPCODE.CALLR)){
+			return params(2);
+		} else {
+			throw new IllegalStateException("Should not be able to ask for paramters of non-function call");
+		}
+	}
+	
+	public String functionName(){
+		if(opcode.equals(EIROPCODE.CALL)){
+			return param(0).value;
+		} else if(opcode.equals(EIROPCODE.CALLR)){
+			return param(1).value;
+		} else {
+			throw new IllegalStateException("Should not be able to ask for function name of non-function call");
+		}
 	}
 	
 	public List<Operand> getDefined(){
