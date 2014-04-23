@@ -17,10 +17,10 @@ abstract class AbstractCodeGenerator {
 		output.add("\tla $a1, " + label);
 		output.add("\tsw $a0, 0($a1)");
 		
-//		String labelRegister = getRegisterMap(label);
-//		if(labelRegister != null){
-//			output.add("\tmove " + labelRegister + ", $a0");			
-//		}
+		String labelRegister = getRegisterMap(label);
+		if(labelRegister != null){
+			output.add("\tmove " + labelRegister + ", $a0");			
+		}
 	}
 	
 	private void storeFromRegisterToLabelToStack(String register, String label, List<String> output){
@@ -32,10 +32,10 @@ abstract class AbstractCodeGenerator {
 		output.add("\tla $a0, " + label);
 		output.add("\tsw " + register + ", 0($a0)");
 		
-//		String labelRegister = getRegisterMap(label);
-//		if(labelRegister != null){
-//			output.add("\tmove " + labelRegister + ", " + register);			
-//		}
+		String labelRegister = getRegisterMap(label);
+		if(labelRegister != null){
+			output.add("\tmove " + labelRegister + ", " + register);			
+		}
 	}
 	
 	private void storeFromImmediateToLabelToStack(String immediate, String label, List<String> output){
@@ -48,10 +48,10 @@ abstract class AbstractCodeGenerator {
 		output.add("\tla $a1, " + label);
 		output.add("\tsw $a0, 0($a1)");
 		
-//		String labelRegister = getRegisterMap(label);
-//		if(labelRegister != null){
-//			output.add("\tmove " + labelRegister + ", $a0");		
-//		}
+		String labelRegister = getRegisterMap(label);
+		if(labelRegister != null){
+			output.add("\tmove " + labelRegister + ", $a0");		
+		}
 	}
 	
 	private void loadToLabelFromStack(String variable, List<String> output){
