@@ -11,13 +11,13 @@ public class Configuration {
 	public static final boolean PRINT_TABLE = RELEASE || false;
 	public static final boolean PRINT_IR = RELEASE || false;
 	public static final boolean PRINT_MIPS_NAIVE = RELEASE || false;
-	public static final boolean PRINT_MIPS_BB = RELEASE || false;
-	public static final boolean PRINT_MIPS_EBB = RELEASE || true;
+	public static final boolean PRINT_MIPS_BB = RELEASE || true;
+	public static final boolean PRINT_MIPS_EBB = RELEASE || false;
 
 //	public static final String FORCED_LOAD_FILE = RELEASE ? null : "resources/e7.tiger";
-	public static final String FORCED_LOAD_FILE = "resources/d1.tiger";
+	public static final String FORCED_LOAD_FILE = "resources/d0.tiger";
 	
-	public static final boolean MIPS_COMMENTS = !RELEASE && false; 
+	public static final boolean MIPS_COMMENTS = !RELEASE && true; 
 	public static final boolean MIPS_VALID_LABELS = RELEASE || false;
 	public static final boolean LOAD_EXTENDED_LIBRARY = RELEASE || true;
 	public static final boolean GRAPH_COLORING = RELEASE || true;

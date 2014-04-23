@@ -39,6 +39,7 @@ class RegisterCodeGenerator extends AbstractCodeGenerator{
 		switch (instruction.opcode) {
 		case LABEL:
 			output.add(instruction.toString());
+			
 			break;
 		case ASSIGN:
 			handleAssign(instruction);
@@ -98,13 +99,16 @@ class RegisterCodeGenerator extends AbstractCodeGenerator{
 			if (instruction.params.size() > 0) {
 				handleLoadIntoRegister(instruction.param(0), RETURN_VALUE_REGISTER);
 			}
+			handleRestoreReturn(instruction, functionMap, table, output);
 			output.add("\tjr $ra");
 			break;
 		case CALL:
 			handleCall(instruction.functionName(), instruction.functionParameters(), table, output);
+			restoreRegister("$ra", output);
 			break;
 		case CALLR:
 			handleCall(instruction.functionName(), instruction.functionParameters(), table, output);
+			restoreRegister("$ra", output);
 			String functionName = IRRenamer.unrename(instruction.functionName());
 			if(table.getTypeOfQualifiedId(functionName).isArray()){
 				// TODO: implement array returns

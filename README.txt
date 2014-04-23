@@ -50,8 +50,9 @@ Graph coloring is implemented by using liveliness analysis and forward propagati
 the calculated liveliness information. 
 Since EBB blocks have only one entry points, this means a simple BFS is enough to extend du-chain analysis for EBBs.
 
-Functions are implemented by pushing the parameter values to the stack before a call and restoring them after a call.
+Functions are implemented by pushing the parameter values to the stack before a call and restoring them before the return statement.
 The parameters to a function are placed in the global function parameter labels, which allows them to be treated as normal variables.
+This also obviates the need for frame pointers because the stack is only ever used for spilling-like purposes.
 
 Because it was easier to implement, there are actually two code generators.
 They both work via ad hoc one-to-one conversion from IR to mips.

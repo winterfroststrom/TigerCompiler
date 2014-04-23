@@ -71,11 +71,15 @@ public class NaiveCodeGenerator extends AbstractCodeGenerator{
 				output.add("\tjr $ra");
 				break;
 			case CALL:
-				handleCall(instruction.param(0).value, instruction.params(1), table, output);
+				handleCall(instruction.functionName(), instruction.functionParameters(), table, output);
+				handleRestoreFromFunction(instruction.functionName(), table, output);
+				restoreRegister("$ra", output);
 				break;
 			case CALLR:
-				handleCall(instruction.param(1).value, instruction.params(2), table, output);
-				String functionName = IRRenamer.unrename(instruction.param(1).value);
+				handleCall(instruction.functionName(), instruction.functionParameters(), table, output);
+				handleRestoreFromFunction(instruction.functionName(), table, output);
+				restoreRegister("$ra", output);
+				String functionName = IRRenamer.unrename(instruction.functionName());
 				if(table.getTypeOfQualifiedId(functionName).isArray()){
 					// TODO: implement array returns
 					throw new UnsupportedOperationException();
